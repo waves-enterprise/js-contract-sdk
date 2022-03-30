@@ -1,0 +1,27 @@
+{
+  "name": "js-contract-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/src/index.js",
+    "dev": "tsc -w -p tsconfig.json",
+    "generate-pb": "node ./scripts/generate-pb.cjs",
+    "build-docker": "node scripts/build-docker-image.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@wavesenterprise/js-sdk": "^3.4.7",
+    "make-synchronous": "^1.0.0",
+    "my-protos": "^1.0.0",
+    "node-fetch": "^3.2.3",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "tsconfig-paths": "^3.14.1",
+    "typescript": "^4.6.2"
+  }
+}

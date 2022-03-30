@@ -1,0 +1,26 @@
+{
+  "id": "2ikp3mdPHiet3VuFNJKZMz6YFQaxxZGdH18mGwLesLZJ",
+  "type": 103,
+  "sender": "3NdiwnpGP3aWXeHNULD22FBNzKnN9DvoP55",
+  "senderPublicKey": "reVytadKowwSLB7j1HuG5nmVLgoDjFU6YA18NnWR37B",
+  "contractId": "2DDjHWf9GJbqjZaYBo6VKRaQnqR1ENVnXFE3uarCorox",
+  "params": [
+    {
+      "type": "string",
+      "value": "setValue",
+      "key": "action",
+      "stringValue": "setValue"
+    }
+  ],
+  "fee": 0,
+  "version": 2,
+  "proofs": [
+    ""
+  ],
+  "timestamp": 1648033276282,
+  "feeAssetId": null,
+  "createData": null,
+  "callData": {
+    "contractVersion": 1
+  }
+}
