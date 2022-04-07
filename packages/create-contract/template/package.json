@@ -1,0 +1,17 @@
+{
+  "name": "js-contract-sdk",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@waves-enterprise/js-contract-grpc-client": "^1.8.2",
+    "@waves-enterprise/js-contract-sdk": "^1.0.0",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.2"
+  }
+}

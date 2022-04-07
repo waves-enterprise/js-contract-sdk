@@ -5,9 +5,11 @@ import {AddressServiceClient} from "@waves-enterprise/js-contract-grpc-client/co
 import {UtilServiceClient} from "@waves-enterprise/js-contract-grpc-client/contract/contract_util_service";
 import {Config} from "./config";
 import {TypeOf} from "../intefaces/helpers";
-
+import {logger} from "../core/logger";
 
 export class GRPCClient {
+    log = logger(this);
+
     contractService: TypeOf<typeof ContractServiceClient>;
     transactionService: TypeOf<typeof TransactionServiceClient>;
     addressService: TypeOf<typeof AddressServiceClient>;
@@ -33,6 +35,8 @@ export class GRPCClient {
         const connection: ClientReadableStream<any> = this.contractService.connect({
             connectionId: this.config.connectionId(),
         }, connectionMeta)
+
+        this.log.info('RPC connection initialized')
 
         return connection;
     }

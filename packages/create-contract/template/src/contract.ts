@@ -1,10 +1,7 @@
-import 'reflect-metadata';
-
-import {Action, Contract} from "../src";
-import {Param} from "../src/core/decorators/param";
+import {Action, Contract, Param} from "@waves-enterprise/js-contract-sdk";
 
 @Contract()
-export class TestContract {
+export class #{contractName} {
     @Action({onInit: true})
     async init() {
     }

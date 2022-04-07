@@ -6,7 +6,6 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/src/index.js",
     "dev": "tsc -w -p tsconfig.json",
@@ -15,7 +14,12 @@
   },
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "@wavesenterprise/js-sdk": "^3.4.7",
+    "reflect-metadata": "^0.1.13"
+  },
   "devDependencies": {
-    "lerna": "^4.0.0"
+    "lerna": "^4.0.0",
+    "typescript": "^4.6.2"
   }
 }

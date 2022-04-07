@@ -5,8 +5,6 @@ import {Context} from "../context";
 import {DataEntry} from "@waves-enterprise/js-contract-grpc-client/data_entry";
 
 export class ContractState {
-    private internalState = new Map();
-
     private stateReader: RpcStateReader;
     private stateWriter: StateWriter;
 

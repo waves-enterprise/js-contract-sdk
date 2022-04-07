@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/js-contract-sdk.iml" filepath="$PROJECT_DIR$/.idea/js-contract-sdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/../js-grpc-client/.idea/js-grpc-client.iml" filepath="$PROJECT_DIR$/../js-grpc-client/.idea/js-grpc-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../we-create-contract/.idea/we-create-contract.iml" filepath="$PROJECT_DIR$/../we-create-contract/.idea/we-create-contract.iml" />
     </modules>
   </component>
 </project>
