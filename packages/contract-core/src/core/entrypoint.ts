@@ -1,9 +1,7 @@
-import {GRPCClient} from "../grpc/client";
-import {Config, envConfig} from "../grpc/config";
-import {Context} from "./context";
-import {ContractTransactionResponse} from "@waves-enterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {ContractProcessor} from "./processors/contract-processor";
+import {Config, envConfig} from "../rpc/config";
 import {logger} from "./logger";
+import {Index} from "../rpc";
+import {TransactionResponseHandler} from "./handlers/transaction-response-handler";
 
 export class Entrypoint {
     log = logger(this)
@@ -12,7 +10,7 @@ export class Entrypoint {
      * Contract RPC client
      * @private
      */
-    private rpcClient: GRPCClient;
+    private rpc: Index;
 
     /**
      * RPC connection config
@@ -22,44 +20,20 @@ export class Entrypoint {
 
     constructor() {
         this.config = envConfig()
-        // this.rpcClient = new GRPCClient(this.config);
+        this.rpc = new Index(this.config);
     }
 
     public start() {
         this.log.info('RPC connection created');
 
-        const conn = this.rpcClient.connect();
-        const processor = new ContractProcessor(this.rpcClient);
+        const contractRPC = this.rpc.Contract;
 
-        conn.on('data', (resp: ContractTransactionResponse) => {
-            const ctx = new Context(resp);
+        contractRPC.connect();
 
-            console.log('ContractTransactionResponse=', JSON.stringify(resp));
+        const responseHandler = new TransactionResponseHandler(this.rpc)
 
-            processor.process(ctx);
-        })
-
-        conn.on('close', () => {
-            this.log.info('Connection stream closed')
-        })
-        conn.on('end', () => {
-            this.log.info('Connection stream ended')
-        })
-        conn.on('error', (error) => {
-            this.log.info('Connection stream error: ', error)
-        })
-        conn.on('readable', () => {
-            this.log.info('Connection stream readable')
-            conn.read()
-        })
-        conn.on('pause', () => {
-            this.log.info('Connection stream paused')
-        })
-        conn.on('resume', () => {
-            this.log.info('Connection stream resume')
-        })
-
-        this.log.info('RPC connection created');
+        contractRPC
+            .addResponseHandler(responseHandler.handle)
     }
 }
 
@@ -67,8 +41,7 @@ export function start(contract: any) {
     Promise.resolve().then(async () => {
         try {
             const entry = new Entrypoint()
-
-            entry.start()
+            entry.start();
 
             process.on('SIGINT', async () => {
                 try {

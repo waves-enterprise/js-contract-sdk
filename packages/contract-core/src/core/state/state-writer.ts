@@ -1,6 +1,6 @@
 import {IStateWriter} from "./interfaces";
 import {getValueStateKey} from "../../utils";
-import {DataEntry} from "@waves-enterprise/js-contract-grpc-client/data_entry";
+import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 
 export class StateWriter implements IStateWriter {
     private internalState = new Map();
@@ -9,8 +9,7 @@ export class StateWriter implements IStateWriter {
         this.internalState.set(key, value);
     }
 
-
-    getDataEntries() {
+    getEntries() {
         let entries: DataEntry[] = [];
 
         for (const [key, value] of this.internalState.entries()) {

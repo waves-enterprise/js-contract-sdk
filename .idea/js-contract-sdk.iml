@@ -7,5 +7,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="js-grpc-client" />
     <orderEntry type="module" module-name="we-create-contract" />
+    <orderEntry type="module" module-name="we-contract-starter" />
   </component>
 </module>

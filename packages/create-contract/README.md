@@ -7,7 +7,7 @@ With NPM:
 in any folder
 
 ```bash
-$ npm i -g @waves-enterprise/create-contract
+$ npm i -g @wavesenterprise/create-contract
 
 $ create-contract FirstContract -t first-contract
 ```

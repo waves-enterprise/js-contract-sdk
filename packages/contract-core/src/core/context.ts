@@ -1,4 +1,4 @@
-import {ContractTransaction, ContractTransactionResponse} from "@waves-enterprise/js-contract-grpc-client/contract/contract_contract_service";
+import {ContractTransaction, ContractTransactionResponse} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 import {Metadata} from "@grpc/grpc-js";
 import {TxId} from "./consts";
 import {ParamsMap, ParamsMapper} from "./mappers/params-mapper";
