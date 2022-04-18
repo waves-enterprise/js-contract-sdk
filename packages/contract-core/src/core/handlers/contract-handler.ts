@@ -3,6 +3,7 @@ import {ContractRegistry} from "../contract-registry";
 import {ActionResolver} from "../action-resolver";
 import {ContractState} from "../state/contract-state";
 import {logger} from "../logger";
+import {InvokeContractActionException} from "../exceptions";
 
 export class ContractHandler {
     log = logger(this)
@@ -11,6 +12,13 @@ export class ContractHandler {
         const contract = ContractRegistry.getDefault();
         const actionResolver = new ActionResolver();
 
-        await actionResolver.invoke(contract, ctx, state);
+        try {
+            await actionResolver.invoke(contract, ctx, state);
+
+            this.log.info('Contract handler executed successfully');
+        } catch (e) {
+            console.log(e)
+            throw new InvokeContractActionException(e.message);
+        }
     }
 }

@@ -6,7 +6,7 @@ export const HOST_NETWORK = process.env.HOST_NETWORK || '';
 
 // export const IS_TESTING_ENV = envs.error === undefined ? envs?.parsed?.IS_TESTING_ENV : false
 
-export class Config {
+export class RPCConnectionConfig {
     constructor(
         private _connectionId: string,
         private _connectionToken: string,
@@ -33,8 +33,8 @@ export class Config {
 }
 
 
-export const envConfig = (): Config => {
-    return new Config(
+export const envConfig = (): RPCConnectionConfig => {
+    return new RPCConnectionConfig(
         CONNECTION_ID,
         CONNECTION_TOKEN,
         NODE,

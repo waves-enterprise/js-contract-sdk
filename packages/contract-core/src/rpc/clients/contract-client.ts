@@ -1,18 +1,19 @@
 import {GenericClient} from "../types";
-import {Config} from "../config";
+import {RPCConnectionConfig} from "../config";
 import {ClientReadableStream, credentials, Metadata, ServiceError} from "@grpc/grpc-js";
-import type {
+import {
     CommitExecutionResponse,
     ContractKeyRequest,
     ContractKeyResponse,
     ContractKeysRequest,
     ContractKeysResponse,
+    ContractServiceClient,
     ContractTransactionResponse,
     ExecutionErrorRequest,
     ExecutionSuccessRequest
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {ContractServiceClient} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 import {logger} from "../../core/logger";
+import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 
 
 export type IContractClient = GenericClient<Omit<ContractServiceClient, 'connect'>>;
@@ -20,13 +21,15 @@ export type IContractClient = GenericClient<Omit<ContractServiceClient, 'connect
 export class ContractClient implements IContractClient {
     log = logger(this);
 
-    private config: Config;
+    private strict = false;
+
+    private config: RPCConnectionConfig;
     private auth: Metadata;
     private impl: ContractServiceClient;
 
     connection: ClientReadableStream<ContractTransactionResponse>;
 
-    constructor(config: Config) {
+    constructor(config: RPCConnectionConfig) {
         this.config = config;
 
         const address = `${this.config.node()}:${this.config.nodePort()}`;
@@ -75,13 +78,19 @@ export class ContractClient implements IContractClient {
 
     getContractKey(req: ContractKeyRequest) {
         return this.internalCall<ContractKeyRequest, ContractKeyResponse>(
-            (handler) => this.impl.getContractKey(req, this.auth, handler)
+            (handler) => this.impl.getContractKey(req, this.auth, handler),
+            () => ContractKeyResponse.fromPartial({entry: DataEntry.fromPartial({})})
         )
     }
 
-    getContractKeys(req: ContractKeysRequest) {
+    getContractKeys(req: Partial<ContractKeysRequest>) {
         return this.internalCall<ContractKeysRequest, ContractKeysResponse>(
-            (handler) => this.impl.getContractKeys(req, this.auth, handler)
+            (handler) => this.impl.getContractKeys(
+                ContractKeysRequest.fromPartial(req),
+                this.auth,
+                handler
+            ),
+            () => ContractKeysResponse.fromPartial({entries: []})
         )
     }
 
@@ -93,7 +102,7 @@ export class ContractClient implements IContractClient {
 
     commitExecutionError(req: ExecutionErrorRequest) {
         return this.internalCall<ExecutionErrorRequest, CommitExecutionResponse>(
-            (handler) => this.impl.commitExecutionError(req, this.auth, handler)
+            (handler) => this.impl.commitExecutionError(req, this.auth, handler),
         )
     }
 
@@ -105,11 +114,29 @@ export class ContractClient implements IContractClient {
         this.connection.on("data", handler);
     }
 
-    private internalCall<P, R>(fn: (h: (e: ServiceError, r: R) => void) => void) {
+    private internalCall<P, R>(
+        fn: (h: (e: ServiceError, r: R) => void) => void,
+        errorEnhancer?: () => any
+    ) {
         return new Promise<R>((resolve, reject) => {
             const handler = (err: ServiceError, resp: R) => {
                 if (!err) {
                     return resolve(resp);
+                }
+
+                const { metadata } = err as any
+                const { internalRepr } = metadata
+                const internalReprKeysAndValues = []
+                for (const [key, value] of internalRepr.entries()) {
+                    internalReprKeysAndValues.push(`${key}: ${value}`)
+                }
+
+                console.log(err, resp, internalReprKeysAndValues.join(', '))
+
+                if (this.strict === false && errorEnhancer) {
+                    resolve(errorEnhancer());
+
+                    return
                 }
 
                 reject(err);

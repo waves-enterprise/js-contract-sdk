@@ -1,7 +1,11 @@
-import {Config, envConfig} from "../rpc/config";
+import {envConfig, RPCConnectionConfig} from "../rpc/config";
 import {logger} from "./logger";
-import {Index} from "../rpc";
+import {RPC} from "../rpc";
 import {TransactionResponseHandler} from "./handlers/transaction-response-handler";
+
+type ContractConfig = {
+    strictState: boolean;
+}
 
 export class Entrypoint {
     log = logger(this)
@@ -10,17 +14,17 @@ export class Entrypoint {
      * Contract RPC client
      * @private
      */
-    private rpc: Index;
+    private readonly rpc: RPC;
 
     /**
      * RPC connection config
      * @private
      */
-    private readonly config: Config;
+    private readonly rpcConfig: RPCConnectionConfig;
 
-    constructor() {
-        this.config = envConfig()
-        this.rpc = new Index(this.config);
+    constructor(private config: ContractConfig = {strictState: false}) {
+        this.rpcConfig = envConfig()
+        this.rpc = new RPC(this.rpcConfig);
     }
 
     public start() {

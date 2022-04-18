@@ -42,7 +42,13 @@ export class ActionResolver {
             actionArgs[value.index] = arg;
         }
 
-        await (c[actionData.propertyName] as Function)(...actionArgs);
+        try {
+            await (c[actionData.propertyName] as Function)(...actionArgs);
+            this.log.info('Action proccesed');
+        } catch (e) {
+
+            return Promise.reject(e);
+        }
     }
 
     private getContractMetadata(contract: Constructable<any>): TContractActionsMetadata {

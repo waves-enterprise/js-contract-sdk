@@ -19,7 +19,7 @@ export class ContractProcessor {
 
     async process(ctx: Context) {
         const contract = this.rpc.Contract;
-        
+
         const state = new ContractState(this.rpc, ctx);
         const contractHandler = new ContractHandler();
 
@@ -28,14 +28,17 @@ export class ContractProcessor {
 
         try {
             await contractHandler.handle(ctx, state);
+            this.log.info('Handled', state.getStateEntries());
 
             await contract.commitExecutionSuccess({
-                txId: ctx.contractId,
+                txId: ctx.transaction.id,
                 results: state.getStateEntries()
             })
+
+            this.log.info('Contract state committed successfully', JSON.stringify(state.getStateEntries()))
         } catch (e) {
             await contract.commitExecutionError({
-                txId: ctx.contractId,
+                txId: ctx.transaction.id,
                 code: e.number || 0,
                 message: e.message
             })

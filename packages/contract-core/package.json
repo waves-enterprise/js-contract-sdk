@@ -1,6 +1,6 @@
 {
-  "name": "@wavesenterprise/js-contract-sdk",
-  "version": "0.0.1-rc.12",
+  "name": "@wavesenterprise/contracts",
+  "version": "0.0.1-rc.22",
   "description": "",
   "private": false,
   "type": "commonjs",
@@ -9,11 +9,13 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/src/index.js",
-    "dev": "tsc -w -p tsconfig.json",
-    "generate-pb": "node ./scripts/generate-pb.cjs",
-    "build-docker": "node scripts/build-docker-image.js"
+    "dev": "tsc -w -p tsconfig.json"
   },
-  "author": "",
+  "author": {
+    "name": "Timofey Semenyuk",
+    "email": "rustfy@gmail.com",
+    "url": "https://github.com/stfy"
+  },
   "license": "MIT",
   "dependencies": {
     "@grpc/grpc-js": "^1.6.2",
