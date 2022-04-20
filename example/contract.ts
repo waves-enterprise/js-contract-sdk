@@ -1,5 +1,5 @@
-import {Action, Context, Contract, ContractState, Param, State} from "../packages/contract-core/src";
-import {Ctx} from "../packages/contract-core/src/core/decorators/state";
+import {Action, Context, Contract, ContractState, Ctx, Param, State, assert} from "../packages/contract-core";
+
 
 @Contract()
 export class TestContract {
@@ -12,7 +12,7 @@ export class TestContract {
         this.state.set('currentMover', 'x')
     }
 
-    @Action
+    @Action({})
     async move(
         @Param('player') player: string,
         @Param('cell') cell: number,
@@ -20,6 +20,8 @@ export class TestContract {
 
         const moveNum = await this.state.get<number>('moveNum');
         const currentMover = await this.state.get<string>('currentMover')
+
+        assert(moveNum !== -1, "Some message");
 
         if (currentMover !== player) {
             throw new Error('Current move should make ' + currentMover);

@@ -1,0 +1,17 @@
+{
+  "name": "@waves-enterprise/toolkit",
+  "version": "1.0.0",
+  "description": "Waves Enterprise contract toolkit",
+  "main": "index.js",
+  "bin": {
+    "@waves-enterprise/toolkit": "index.js",
+    "we-toolkit": "index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@wavesenterprise/js-sdk": "^3.4.7",
+    "commander": "^9.1.0",
+    "node-fetch": "^2.6.7"
+  }
+}

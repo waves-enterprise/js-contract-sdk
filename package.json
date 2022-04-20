@@ -1,17 +1,11 @@
 {
-  "name": "@waves-enterprise/js-contract-sdk",
+  "name": "we-toolkit",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "type": "commonjs",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "build": "tsc -p tsconfig.json",
-    "start": "node dist/src/index.js",
-    "dev": "tsc -w -p tsconfig.json",
-    "generate-pb": "node ./scripts/generate-pb.cjs",
-    "build-docker": "node scripts/build-docker-image.js"
+    "bootstrap": "lerna bootstrap"
   },
   "author": "",
   "license": "MIT",
@@ -23,3 +17,8 @@
     "reflect-metadata": "^0.1.13"
   }
 }
+
+
+
+
+

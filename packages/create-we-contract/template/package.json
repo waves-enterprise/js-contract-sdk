@@ -4,7 +4,10 @@
   "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "deploy": "we-toolkit deploy -n mainnet",
+    "deploy:testnet": "we-toolkit deploy -n testnet",
+    "deploy:sandbox": "we-toolkit deploy -n sandbox"
   },
   "dependencies": {
     "@waves-enterprise/js-contract-grpc-client": "^1.8.2",

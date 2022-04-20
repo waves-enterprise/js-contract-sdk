@@ -23,7 +23,7 @@ program
   .argument('name', 'Contract name in CamelCase')
   .option('-t, --target <char>', 'Target Path', 'we-contract-starter')
   .option('-o, --overwrite', 'Overwrite target path', false)
-  .option('-name, --name', 'Package name')
+  .option('-n, --name', 'Package name')
   .action(async (arg, options) => {
     const {target, overwrite, name} = options;
 

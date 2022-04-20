@@ -16,6 +16,8 @@ export const isNum = (v: any): v is number => {
     return typeof v === 'number';
 }
 
+
+
 export function getValueStateKey(v: any): keyof Omit<DataEntry, 'key'> {
     if (isBool(v)) {
         return 'boolValue';
