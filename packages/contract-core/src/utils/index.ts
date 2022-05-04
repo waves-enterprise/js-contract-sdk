@@ -1,6 +1,7 @@
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
+import {TValue} from "../intefaces/contract";
 
-export const isUndefined = (v: any) => {
+export const isUndefined = (v: any): v is undefined => {
     return v === undefined;
 }
 
@@ -16,7 +17,9 @@ export const isNum = (v: any): v is number => {
     return typeof v === 'number';
 }
 
-
+export function nil() {
+    return undefined;
+}
 
 export function getValueStateKey(v: any): keyof Omit<DataEntry, 'key'> {
     if (isBool(v)) {
@@ -34,7 +37,7 @@ export function getValueStateKey(v: any): keyof Omit<DataEntry, 'key'> {
     return 'stringValue'
 }
 
-export function parseDataEntry(d: DataEntry): string | number | boolean | Buffer | undefined {
+export function parseDataEntry(d: DataEntry): TValue {
     if (!isUndefined(d.stringValue)) {
         return d.stringValue
     }
@@ -50,4 +53,6 @@ export function parseDataEntry(d: DataEntry): string | number | boolean | Buffer
     if (!isUndefined(d.binaryValue)) {
         return Buffer.from(d.binaryValue);
     }
+
+    throw new Error('Data entry parse error');
 }

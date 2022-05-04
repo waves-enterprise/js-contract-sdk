@@ -26,22 +26,20 @@ export class Storage {
     }
 
     get(config: GetConfig): Promise<TValue[]>;
-    get(key): Promise<TValue>;
+    get<T extends TValue>(key): Promise<T>;
     get(keys: string[], config?: Omit<GetConfig, 'matches'>): Promise<TValue[]>;
     async get(...args: any[]): Promise<any> {
         if (isString(args[0])) {
             const key = args[0];
+            const contractId = this.contractId;
 
             if (this.internalState.has(key)) {
                 return this.internalState.get(key);
             }
 
-            const resp = await this.client.getContractKey({
-                    key,
-                    contractId: this.contractId
-                }
-            );
-            const value = parseDataEntry(resp.entry);
+            const resp = await this.client.getContractKey({key, contractId});
+
+            const value = parseDataEntry(resp.entry as DataEntry);
 
             this._cache.set(key, value);
 
@@ -91,7 +89,7 @@ export class Storage {
             key
         })
 
-        return Boolean(!!entry || entry.stringValue === DEL);
+        return Boolean(entry && entry.stringValue !== DEL);
     }
 
     set(key: string, value: TValue): void {
@@ -101,7 +99,6 @@ export class Storage {
     delete(key: string) {
         this.internalState.write(key, DEL);
     }
-
 
     getEntries(): DataEntry[] {
         return this.internalState.getEntries();

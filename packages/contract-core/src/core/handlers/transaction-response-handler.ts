@@ -19,7 +19,7 @@ export class TransactionResponseHandler {
     handle = (resp: ContractTransactionResponse) => {
         const ctx = new Context(resp);
 
-        this.log.info('ContractId=', resp.transaction.contractId);
+        this.log.info('ContractId=', resp.transaction?.contractId);
 
         this.rpc.Contract.setAuth(ctx.auth.metadata());
 
@@ -29,8 +29,14 @@ export class TransactionResponseHandler {
             .then(() => {
                 this.log.info('Contract Transaction proceed');
             })
-            .catch(e => {
+            .catch(async e => {
                 this.log.error('Contract Transaction error', e);
+
+                await this.rpc.Contract.commitExecutionError({
+                    txId: ctx.transaction.id,
+                    code: e.number || 0,
+                    message: e.message
+                })
             })
     }
 }

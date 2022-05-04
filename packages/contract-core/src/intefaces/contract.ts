@@ -1,1 +1,1 @@
-export type TValue = string | number | boolean | Buffer | undefined
+export type TValue = string | number | boolean | Buffer;

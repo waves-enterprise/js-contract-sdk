@@ -7,10 +7,8 @@ export class ContractError extends Error {
     }
 }
 
-
 export class UnavailableContractParamException extends Error {
 }
-
 
 export class UnavailableContractActionException extends Error {
 }
@@ -24,10 +22,14 @@ export class InvokeContractActionException extends ContractError {
 export class CommitExecutionException extends Error {
 }
 
-
 export class ReadContractStateException extends Error {
 }
 
-
 export class ConstraintValidationError extends ContractError {
+}
+
+export class UnavailableStateKeyException extends ContractError {
+}
+
+export class WrongStateKeyTypeException extends ContractError {
 }

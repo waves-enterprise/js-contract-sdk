@@ -1,28 +1,38 @@
 import {Context} from "../context";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
-import {isBool, isNum, isString} from "../../utils";
+import {isBool, isNum, isString, nil} from "../../utils";
 import {logger} from "../logger";
 import {TValue} from "../../intefaces/contract";
 import {RPC} from "../../rpc";
 import {Mapping} from "./collections/mapping";
 import {Storage} from "./storage";
+import {UnavailableStateKeyException, WrongStateKeyTypeException} from "../exceptions";
+import {Optional} from "../../intefaces/helpers";
 
-interface IState {
+export interface IState {
     setString(key: string, value: string): void;
 
     getString(key: string): Promise<string>;
+
+    tryGetString(key: string): Promise<Optional<string>>;
 
     setBool(key: string, value: boolean): void;
 
     getBool(key: string): Promise<boolean>;
 
+    tryGetBool(key: string): Promise<Optional<boolean>>;
+
     setInt(key: string, value: number): void;
 
     getInt(key: string): Promise<number>;
 
+    tryGetInt(key: string): Promise<Optional<number>>;
+
     setBinary(key: string, value: Buffer): void;
 
     getBinary(key: string): Promise<Buffer>;
+
+    tryGetBinary(key: string): Promise<Optional<Buffer>>;
 
     set(key: string, value: TValue): void
 }
@@ -45,18 +55,30 @@ export class ContractState implements IState {
         if (Buffer.isBuffer(value)) {
             return value;
         }
+
+        throw new WrongStateKeyTypeException();
     }
 
     setBinary(key: string, value: Buffer) {
         this.storage.set(key, value);
     }
 
+    tryGetBinary(key: string): Promise<Optional<Buffer>> {
+        return this.withException(() => this.getBinary(key));
+    }
+
     async getString(key: string): Promise<string> {
-        const value = await this.internalRead(key);
+        const value = await this.storage.get(key);
 
         if (isString(value)) {
-            return value;
+            return value as string;
         }
+
+        throw new WrongStateKeyTypeException('');
+    }
+
+    tryGetString(key: string): Promise<Optional<string>> {
+        return this.withException(() => this.getString(key));
     }
 
     setString(key: string, value: string): void {
@@ -69,6 +91,12 @@ export class ContractState implements IState {
         if (isBool(value)) {
             return value;
         }
+
+        throw new WrongStateKeyTypeException();
+    }
+
+    tryGetBool(key: string): Promise<Optional<boolean>> {
+        return this.withException(() => this.getBool(key));
     }
 
     setBool(key: string, value: boolean): void {
@@ -81,6 +109,12 @@ export class ContractState implements IState {
         if (isNum(value)) {
             return value;
         }
+
+        throw new WrongStateKeyTypeException();
+    }
+
+    tryGetInt(key: string): Promise<Optional<number>> {
+        return this.withException(() => this.getString(key));
     }
 
     setInt(key: string, value: number) {
@@ -88,7 +122,11 @@ export class ContractState implements IState {
     }
 
     get<T extends TValue>(key: string): Promise<T> {
-        return this.storage.get(key) as Promise<T>;
+        return this.storage.get(key);
+    }
+
+    tryGet<T extends TValue>(key: string): Promise<Optional<T>> {
+        return this.withException(() => this.storage.get(key));
     }
 
     set(key: string, value: any) {
@@ -109,6 +147,18 @@ export class ContractState implements IState {
 
     private async internalRead(key: string) {
         return this.storage.get(key);
+    }
+
+    private withException = async (fn) => {
+        try {
+            return await fn();
+        } catch (e) {
+            if (e instanceof UnavailableStateKeyException) {
+                return nil();
+            }
+
+            throw e;
+        }
     }
 }
 

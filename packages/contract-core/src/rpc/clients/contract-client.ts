@@ -13,15 +13,14 @@ import {
     ExecutionSuccessRequest
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 import {logger} from "../../core/logger";
-import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
+import {ApiErrors} from "../../core/api-errors";
+import {UnavailableStateKeyException} from "../../core/exceptions";
 
 
 export type IContractClient = GenericClient<Omit<ContractServiceClient, 'connect'>>;
 
 export class ContractClient implements IContractClient {
     log = logger(this);
-
-    private strict = false;
 
     private config: RPCConnectionConfig;
     private auth: Metadata;
@@ -77,10 +76,24 @@ export class ContractClient implements IContractClient {
     }
 
     getContractKey(req: ContractKeyRequest) {
-        return this.internalCall<ContractKeyRequest, ContractKeyResponse>(
-            (handler) => this.impl.getContractKey(req, this.auth, handler),
-            () => ContractKeyResponse.fromPartial({entry: DataEntry.fromPartial({})})
-        )
+        return new Promise<ContractKeyResponse>(((resolve, reject) => {
+            this.impl.getContractKey(req, this.auth, (err: ServiceError, resp: ContractKeyResponse) => {
+                if (!err) {
+                    return resolve(resp);
+                }
+
+                const {metadata} = err;
+                const [errorCode] = metadata.get('error-code');
+
+                if (ApiErrors.DataKeyNotExists === +errorCode) {
+                    reject(new UnavailableStateKeyException(`Empty state entry ${req.key}`));
+
+                    return;
+                }
+
+                reject(err);
+            });
+        }))
     }
 
     getContractKeys(req: Partial<ContractKeysRequest>) {
@@ -89,8 +102,7 @@ export class ContractClient implements IContractClient {
                 ContractKeysRequest.fromPartial(req),
                 this.auth,
                 handler
-            ),
-            () => ContractKeysResponse.fromPartial({entries: []})
+            )
         )
     }
 
@@ -116,7 +128,6 @@ export class ContractClient implements IContractClient {
 
     private internalCall<P, R>(
         fn: (h: (e: ServiceError, r: R) => void) => void,
-        errorEnhancer?: () => any
     ) {
         return new Promise<R>((resolve, reject) => {
             const handler = (err: ServiceError, resp: R) => {
@@ -124,19 +135,13 @@ export class ContractClient implements IContractClient {
                     return resolve(resp);
                 }
 
-                const { metadata } = err as any
-                const { internalRepr } = metadata
-                const internalReprKeysAndValues = []
-                for (const [key, value] of internalRepr.entries()) {
-                    internalReprKeysAndValues.push(`${key}: ${value}`)
-                }
+                const {metadata} = err;
+                const [errorCode] = metadata.get('error-code');
 
-                console.log(err, resp, internalReprKeysAndValues.join(', '))
+                if (ApiErrors.DataKeyNotExists === +errorCode) {
+                    reject(new UnavailableStateKeyException('Key'));
 
-                if (this.strict === false && errorEnhancer) {
-                    resolve(errorEnhancer());
-
-                    return
+                    return;
                 }
 
                 reject(err);

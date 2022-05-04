@@ -2,6 +2,7 @@ import {TValue} from "../../intefaces/contract";
 import {ReadContractStateException} from "../exceptions";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 import {getValueStateKey} from "../../utils";
+import {Optional} from "../../intefaces/helpers";
 
 export class InternalContractState {
     private internalState = new Map<string, TValue>();
@@ -17,14 +18,12 @@ export class InternalContractState {
         return this.internalState.has(key) || this._cache.has(key);
     }
 
-    get(key: string): TValue {
+    get(key: string): Optional<TValue> {
         if (this.internalState.has(key)) {
             return this.internalState.get(key)
         } else if (this._cache.has(key)) {
             return this._cache.get(key)
         }
-
-        throw new ReadContractStateException(`No internal state value founded in key "${key}"`);
     }
 
     getEntries(): DataEntry[] {

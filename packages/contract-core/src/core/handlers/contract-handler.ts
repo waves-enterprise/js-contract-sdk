@@ -12,6 +12,10 @@ export class ContractHandler {
         const contract = ContractRegistry.getDefault();
         const actionResolver = new ActionResolver();
 
+        if (!contract) {
+            throw new Error('Contract handler class not provided');
+        }
+
         try {
             await actionResolver.invoke(contract, ctx, state);
 

@@ -1,2 +1,2 @@
 export {Storage} from './storage';
-export {ContractState} from './contract-state';
+export {ContractState, IState} from './contract-state';

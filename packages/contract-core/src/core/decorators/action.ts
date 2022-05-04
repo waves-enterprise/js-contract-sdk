@@ -23,9 +23,9 @@ const defaultContractOptions: TContractActionOptions = {
 
 
 export function Action(target: Object, propertyName: string | Symbol, descriptor): void;
-export function Action(options?: TContractActionOptions): Function;
+export function Action(options?: TContractActionOptions): MethodDecorator;
 
-export function Action(...args): MethodDecorator {
+export function Action(...args): any {
     let config;
 
     if (arguments.length > 1) {

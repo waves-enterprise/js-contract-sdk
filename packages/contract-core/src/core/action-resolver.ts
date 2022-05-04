@@ -7,6 +7,7 @@ import {TArgs} from "./decorators/param";
 import {logger} from "./logger";
 import {UnavailableContractActionException, UnavailableContractParamException} from "./exceptions";
 import {isUndefined} from "../utils";
+import {TValue} from "../intefaces/contract";
 
 export class ActionResolver {
     log = logger(this);
@@ -30,7 +31,7 @@ export class ActionResolver {
 
         const argsMetadata: TArgs = this.getArgsMetadata(contract, actionData.propertyName);
 
-        const actionArgs = [];
+        const actionArgs = [] as TValue[];
 
         for (let value of Object.values(argsMetadata)) {
             const arg = ctx.params.get(value.paramKey);
