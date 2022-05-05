@@ -45,7 +45,6 @@ function run(
       out: ''
     }
 
-
     childProc.on('error', (err) => {
       reject(err)
     });
