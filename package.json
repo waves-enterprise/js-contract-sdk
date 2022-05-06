@@ -1,13 +1,17 @@
 {
   "name": "we-toolkit",
   "version": "1.0.0",
-  "description": "",
-  "private": true,
+  "description": "Toolkit for development, test and deploy smart-contracts on Waves Enterprise ecosystem.",
+  "private": false,
   "type": "commonjs",
   "scripts": {
     "bootstrap": "lerna bootstrap"
   },
-  "author": "",
+  "author": {
+    "name": "Timofey Semenyuk",
+    "email": "rustfy@gmail.com",
+    "url": "https://github.com/stfy"
+  },
   "license": "MIT",
   "devDependencies": {
     "lerna": "^4.0.0"

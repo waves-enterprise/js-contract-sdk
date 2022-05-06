@@ -1,16 +1,17 @@
 {
   "name": "create-we-contract",
   "version": "1.0.0",
-  "description": "",
+  "description": "Scaffold Waves Enterprise JS Contract project",
   "main": "index.js",
   "bin": {
     "create-contract": "./index.js"
   },
-  "scripts": {
-    "test": ""
+  "author": {
+    "name": "Timofey Semenyuk",
+    "email": "rustfy@gmail.com",
+    "url": "https://github.com/stfy"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "commander": "^9.1.0"
   }

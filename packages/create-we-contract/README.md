@@ -1,14 +1,25 @@
-# WE Create Contract
+# create-we-contract
 
-## Scaffolding Your First WE mainnet contract
+Quickstart with Waves Enterprise platform contracts
 
-With NPM:
+## Prerequisites
 
-in any folder
+* Node.js
 
-```bash
-$ npm i -g @wavesenterprise/create-contract
+## Getting Started
 
-$ create-contract FirstContract -t first-contract
+Run following command for create first project with default configuration
+
+```sh
+npm create MyContractName
 ```
+
+Options:
+
+* `-t path-to-folder` - specify folder to scaffold project, default we-contract-starter
+* `-n package-name` - specify name in package.json of your project
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 

@@ -1,10 +1,9 @@
-import {Action, Context, Contract, ContractState, Ctx, Param, State, assert} from "../packages/contract-core";
-
+import {Action, assert, Context, Contract, ContractState, Ctx, Param, State} from "../packages/contract-core/src";
 
 @Contract()
 export class TestContract {
-    @State() state: ContractState;
-    @Ctx() context: Context;
+    @State state: ContractState;
+    @Ctx context: Context;
 
     @Action({onInit: true})
     async init() {
@@ -12,7 +11,7 @@ export class TestContract {
         this.state.set('currentMover', 'x')
     }
 
-    @Action({})
+    @Action
     async move(
         @Param('player') player: string,
         @Param('cell') cell: number,
