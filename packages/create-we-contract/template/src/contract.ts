@@ -1,4 +1,4 @@
-import {Action, Contract, Param} from "@waves-enterprise/js-contract-sdk";
+import {Action, Contract, Param} from "@wavesenterprise/contract-core";
 
 @Contract()
 export class #{contractName} {
