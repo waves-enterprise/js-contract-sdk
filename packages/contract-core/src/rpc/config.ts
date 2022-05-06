@@ -11,9 +11,8 @@ export class RPCConnectionConfig {
         private _connectionId: string,
         private _connectionToken: string,
         private _node: string,
-        private _nodePort: string
-    ) {
-    }
+        private _nodePort: string,
+    ) {}
 
     public connectionId() {
         return this._connectionId;
@@ -32,12 +31,6 @@ export class RPCConnectionConfig {
     }
 }
 
-
 export const envConfig = (): RPCConnectionConfig => {
-    return new RPCConnectionConfig(
-        CONNECTION_ID,
-        CONNECTION_TOKEN,
-        NODE,
-        NODE_PORT
-    )
-}
+    return new RPCConnectionConfig(CONNECTION_ID, CONNECTION_TOKEN, NODE, NODE_PORT);
+};

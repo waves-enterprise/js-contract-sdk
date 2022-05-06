@@ -1,15 +1,14 @@
-import {logger} from "../logger";
-import {ContractClient} from "../../rpc/clients/contract-client";
-import {TValue} from "../../intefaces/contract";
-import {ContractKeysRequest} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {isString, parseDataEntry} from "../../utils";
-import {InternalContractState} from "./internal-contract-state";
-import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
+import { logger } from '../logger';
+import { ContractClient } from '../../rpc/clients/contract-client';
+import { TValue } from '../../intefaces/contract';
+import { ContractKeysRequest } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
+import { isString, parseDataEntry } from '../../utils';
+import { InternalContractState } from './internal-contract-state';
+import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry';
 
 const DEL = '@@__deleted';
 
 type GetConfig = Omit<ContractKeysRequest, 'contractId'>;
-
 
 export class Storage {
     private internalState: InternalContractState;
@@ -19,9 +18,8 @@ export class Storage {
     constructor(
         private readonly contractId: string,
         private readonly client: ContractClient,
-        private readonly _cache: Map<string, TValue> = new Map()
+        private readonly _cache: Map<string, TValue> = new Map(),
     ) {
-
         this.internalState = new InternalContractState(_cache);
     }
 
@@ -37,7 +35,7 @@ export class Storage {
                 return this.internalState.get(key);
             }
 
-            const resp = await this.client.getContractKey({key, contractId});
+            const resp = await this.client.getContractKey({ key, contractId });
 
             const value = parseDataEntry(resp.entry as DataEntry);
 
@@ -45,19 +43,19 @@ export class Storage {
 
             return value;
         } else if (Array.isArray(args[0])) {
-            const request = args[1] || {}
+            const request = args[1] || {};
             const keys = args[0];
 
             // TODO: get from internal state
 
             const response = await this.client.getContractKeys({
                 ...request,
-                matches: strToRegexp(...keys)
-            })
+                matches: strToRegexp(...keys),
+            });
 
-            const entries = response.entries.map(e => {
-                return [e.key, parseDataEntry(e)] as [string, TValue]
-            })
+            const entries = response.entries.map((e) => {
+                return [e.key, parseDataEntry(e)] as [string, TValue];
+            });
 
             for (const [key, val] of entries) {
                 this._cache.set(key, val);
@@ -65,12 +63,12 @@ export class Storage {
             return entries.map(([, val]) => val);
         }
 
-        const response = await this.client.getContractKeys(args[0])
+        const response = await this.client.getContractKeys(args[0]);
 
         // TODO: cache request by config
-        const entries = response.entries.map(e => {
-            return [e.key, parseDataEntry(e)] as [string, TValue]
-        })
+        const entries = response.entries.map((e) => {
+            return [e.key, parseDataEntry(e)] as [string, TValue];
+        });
 
         for (const [key, val] of entries) {
             this._cache.set(key, val);
@@ -84,10 +82,10 @@ export class Storage {
             return Promise.resolve(true);
         }
 
-        const {entry} = await this.client.getContractKey({
+        const { entry } = await this.client.getContractKey({
             contractId: this.contractId,
-            key
-        })
+            key,
+        });
 
         return Boolean(entry && entry.stringValue !== DEL);
     }
@@ -108,5 +106,5 @@ export class Storage {
 function strToRegexp(...str: string[]) {
     const prefix = '^';
 
-    return `${prefix}(${str.join('|')})`
+    return `${prefix}(${str.join('|')})`;
 }

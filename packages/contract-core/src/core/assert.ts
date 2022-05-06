@@ -1,11 +1,10 @@
-import {isBool} from "../utils";
-import {ConstraintValidationError} from "./exceptions";
+import { isBool } from '../utils';
+import { ConstraintValidationError } from './exceptions';
 
 type AssertCondition = boolean | (() => boolean);
 
 export function assert(condition: AssertCondition, message?: string) {
     if (isBool(condition)) {
-
         if (!condition) {
             throw new ConstraintValidationError(message ?? 'Unhandled error');
         }

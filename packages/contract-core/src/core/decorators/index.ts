@@ -1,4 +1,4 @@
-export {Contract} from './contract';
-export {Action} from './action';
-export {Param} from './param';
-export {State} from './state';
+export { Contract } from './contract';
+export { Action } from './action';
+export { Param } from './param';
+export { State } from './state';

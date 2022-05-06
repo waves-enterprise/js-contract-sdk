@@ -1,15 +1,13 @@
-import {TValue} from "../../../intefaces/contract";
-import {ContractState} from "../contract-state";
-import {Optional} from "../../../intefaces/helpers";
+import { TValue } from '../../../intefaces/contract';
+import { ContractState } from '../contract-state';
+import { Optional } from '../../../intefaces/helpers';
 
-const MAPPING_DELIMITER = "_";
-
+const MAPPING_DELIMITER = '_';
 
 export class Mapping {
     prefix: string;
 
-    constructor(private state: ContractState) {
-    }
+    constructor(private state: ContractState) {}
 
     setPrefix(prefix: string) {
         this.prefix = prefix + MAPPING_DELIMITER;

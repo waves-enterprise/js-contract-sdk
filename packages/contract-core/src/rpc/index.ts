@@ -1,20 +1,16 @@
-import {ContractClient} from "./clients/contract-client";
-import {RPCConnectionConfig} from "./config";
+import { ContractClient } from './clients/contract-client';
+import { RPCConnectionConfig } from './config';
 
-export {
-    RPCConnectionConfig,
-    ContractClient
-}
+export { RPCConnectionConfig, ContractClient };
 
 export class RPC {
-    clients = {}
+    clients = {};
 
     public get Contract() {
         return (this.clients as any).contract as ContractClient;
     }
 
     constructor(private config: RPCConnectionConfig) {
-
         this.addClient('contract', ContractClient);
     }
 

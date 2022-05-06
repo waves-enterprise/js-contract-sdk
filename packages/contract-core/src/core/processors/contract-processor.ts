@@ -1,19 +1,17 @@
-import {Context} from "../context";
-import {ServiceContainer} from "../service-container";
-import {ContractHandler} from "../handlers/contract-handler";
-import {ParamsMapper} from "../mappers/params-mapper";
-import {ContractState} from "../state";
-import {logger} from "../logger";
-import {RPC} from "../../rpc";
+import { Context } from '../context';
+import { ServiceContainer } from '../service-container';
+import { ContractHandler } from '../handlers/contract-handler';
+import { ParamsMapper } from '../mappers/params-mapper';
+import { ContractState } from '../state';
+import { logger } from '../logger';
+import { RPC } from '../../rpc';
 
 export class ContractProcessor {
     log = logger(this);
 
     private paramsProcessor: ParamsMapper;
 
-    constructor(
-        private rpc: RPC
-    ) {
+    constructor(private rpc: RPC) {
         this.paramsProcessor = new ParamsMapper();
     }
 
@@ -31,9 +29,9 @@ export class ContractProcessor {
 
         await contract.commitExecutionSuccess({
             txId: ctx.transaction.id,
-            results: state.getStateEntries()
-        })
+            results: state.getStateEntries(),
+        });
 
-        this.log.info('Contract state committed successfully', JSON.stringify(state.getStateEntries()))
+        this.log.info('Contract state committed successfully', JSON.stringify(state.getStateEntries()));
     }
 }

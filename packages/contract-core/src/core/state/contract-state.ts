@@ -1,13 +1,13 @@
-import {Context} from "../context";
-import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
-import {isBool, isNum, isString, nil} from "../../utils";
-import {logger} from "../logger";
-import {TValue} from "../../intefaces/contract";
-import {RPC} from "../../rpc";
-import {Mapping} from "./collections/mapping";
-import {Storage} from "./storage";
-import {UnavailableStateKeyException, WrongStateKeyTypeException} from "../exceptions";
-import {Optional} from "../../intefaces/helpers";
+import { Context } from '../context';
+import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry';
+import { isBool, isNum, isString, nil } from '../../utils';
+import { logger } from '../logger';
+import { TValue } from '../../intefaces/contract';
+import { RPC } from '../../rpc';
+import { Mapping } from './collections/mapping';
+import { Storage } from './storage';
+import { UnavailableStateKeyException, WrongStateKeyTypeException } from '../exceptions';
+import { Optional } from '../../intefaces/helpers';
 
 export interface IState {
     setString(key: string, value: string): void;
@@ -34,23 +34,20 @@ export interface IState {
 
     tryGetBinary(key: string): Promise<Optional<Buffer>>;
 
-    set(key: string, value: TValue): void
+    set(key: string, value: TValue): void;
 }
 
 export class ContractState implements IState {
-    private log = logger(this)
+    private log = logger(this);
 
-    public storage: Storage
+    public storage: Storage;
 
-    constructor(
-        private rpc: RPC,
-        private ctx: Context
-    ) {
+    constructor(private rpc: RPC, private ctx: Context) {
         this.storage = new Storage(ctx.contractId, rpc.Contract);
     }
 
     async getBinary(key: string): Promise<Buffer> {
-        const value = await this.internalRead(key)
+        const value = await this.internalRead(key);
 
         if (Buffer.isBuffer(value)) {
             return value;
@@ -138,7 +135,7 @@ export class ContractState implements IState {
     }
 
     getMapping(prefix: string) {
-        const mapping = new Mapping(this)
+        const mapping = new Mapping(this);
 
         mapping.setPrefix(prefix);
 
@@ -159,9 +156,5 @@ export class ContractState implements IState {
 
             throw e;
         }
-    }
+    };
 }
-
-
-
-

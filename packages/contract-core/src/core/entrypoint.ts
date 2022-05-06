@@ -1,14 +1,14 @@
-import {envConfig, RPCConnectionConfig} from "../rpc/config";
-import {logger} from "./logger";
-import {RPC} from "../rpc";
-import {TransactionResponseHandler} from "./handlers/transaction-response-handler";
+import { envConfig, RPCConnectionConfig } from '../rpc/config';
+import { logger } from './logger';
+import { RPC } from '../rpc';
+import { TransactionResponseHandler } from './handlers/transaction-response-handler';
 
 type ContractConfig = {
     strictState: boolean;
-}
+};
 
 export class Entrypoint {
-    log = logger(this)
+    log = logger(this);
 
     /**
      * Contract RPC client
@@ -22,8 +22,8 @@ export class Entrypoint {
      */
     private readonly rpcConfig: RPCConnectionConfig;
 
-    constructor(private config: ContractConfig = {strictState: false}) {
-        this.rpcConfig = envConfig()
+    constructor(private config: ContractConfig = { strictState: false }) {
+        this.rpcConfig = envConfig();
         this.rpc = new RPC(this.rpcConfig);
     }
 
@@ -34,17 +34,16 @@ export class Entrypoint {
 
         contractRPC.connect();
 
-        const responseHandler = new TransactionResponseHandler(this.rpc)
+        const responseHandler = new TransactionResponseHandler(this.rpc);
 
-        contractRPC
-            .addResponseHandler(responseHandler.handle)
+        contractRPC.addResponseHandler(responseHandler.handle);
     }
 }
 
 export function start(contract: any) {
     Promise.resolve().then(async () => {
         try {
-            const entry = new Entrypoint()
+            const entry = new Entrypoint();
             entry.start();
 
             process.on('SIGINT', async () => {
@@ -56,7 +55,6 @@ export function start(contract: any) {
                     process.exit(1);
                 }
             });
-
         } catch (err) {
             console.error(err);
             process.exit(1);

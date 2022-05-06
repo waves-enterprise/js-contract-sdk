@@ -1,4 +1,4 @@
-import * as console from "console";
+import * as console from 'console';
 
 type LogLevel = 'info' | 'error';
 
@@ -9,39 +9,20 @@ export class Logger {
 
     public static lastTimeStamp = Date.now();
 
-
     setComponent(name: string) {
         this.component = name;
     }
 
     info(message: string, ...additionalParams: any[]) {
-        const prefixes = [
-            `[${Logger.globalPrefix}]`,
-            this.component && `[${this.component}]`,
-            Logger.timestampDiff()
-        ]
+        const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()];
 
-        this.printMessage(
-            'info',
-            ...prefixes,
-            message,
-            ...additionalParams
-        )
+        this.printMessage('info', ...prefixes, message, ...additionalParams);
     }
 
     error(message: string, ...additionalParams: any[]) {
-        const prefixes = [
-            `[${Logger.globalPrefix}]`,
-            this.component && `[${this.component}]`,
-            Logger.timestampDiff()
-        ]
+        const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()];
 
-        this.printMessage(
-            'info',
-            ...prefixes,
-            message,
-            ...additionalParams
-        )
+        this.printMessage('info', ...prefixes, message, ...additionalParams);
     }
 
     private printMessage(logLevel: LogLevel, ...args) {
@@ -49,14 +30,13 @@ export class Logger {
     }
 
     public static timestampDiff(): string {
-        const result = `+${Date.now() - Logger.lastTimeStamp}ms`
+        const result = `+${Date.now() - Logger.lastTimeStamp}ms`;
 
         Logger.lastTimeStamp = Date.now();
 
         return result;
     }
 }
-
 
 export function logger(c: { constructor: any }): Logger {
     const logger = new Logger();

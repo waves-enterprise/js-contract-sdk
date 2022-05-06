@@ -1,3 +1,3 @@
 export enum ApiErrors {
-    DataKeyNotExists = 304
+    DataKeyNotExists = 304,
 }

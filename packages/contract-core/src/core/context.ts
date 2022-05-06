@@ -1,28 +1,26 @@
 import {
     ContractTransaction,
-    ContractTransactionResponse
-} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {Metadata} from "@grpc/grpc-js";
-import {TxId} from "./consts";
-import {ParamsMap, ParamsMapper} from "./mappers/params-mapper";
+    ContractTransactionResponse,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
+import { Metadata } from '@grpc/grpc-js';
+import { TxId } from './consts';
+import { ParamsMap, ParamsMapper } from './mappers/params-mapper';
 
 export class Auth {
-    constructor(private _authToken: string) {
-    }
+    constructor(private _authToken: string) {}
 
     public authToken() {
         return this._authToken;
     }
 
     public metadata(): Metadata {
-        const metadata = new Metadata()
+        const metadata = new Metadata();
 
-        metadata.set('authorization', this._authToken)
+        metadata.set('authorization', this._authToken);
 
         return metadata;
     }
 }
-
 
 export class Context {
     /**
@@ -47,12 +45,11 @@ export class Context {
         this.auth = new Auth(transactionResponse.authToken);
 
         if (!transactionResponse.transaction) {
-            throw new Error('Transaction not provided')
+            throw new Error('Transaction not provided');
         }
 
         this.transaction = transactionResponse.transaction;
-        this.paramsMap = new ParamsMapper()
-            .parse(transactionResponse.transaction)
+        this.paramsMap = new ParamsMapper().parse(transactionResponse.transaction);
     }
 
     public get contractId(): string {
