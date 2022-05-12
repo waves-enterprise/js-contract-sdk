@@ -13,4 +13,4 @@ publish:
    - wavesenterprise
  only:
    variables:
-     ${RELEASE} == "yes"
+     $RELEASE == "yes"
