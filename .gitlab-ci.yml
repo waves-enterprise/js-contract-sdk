@@ -10,8 +10,8 @@ publish:
  stage: publish
  script:
     # Конфигурация git
-    - git config --global user.email &quot;support@wavesenterprise.com&quot;
-    - git config --global user.name &quot;wavesenterprise&quot;
+    - git config --global user.email support@wavesenterprise.com;
+    - git config --global user.name wavesenterprise;
     #   
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
     - yarn
