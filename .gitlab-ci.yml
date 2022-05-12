@@ -3,6 +3,9 @@ image: "node:16-slim"
 stages:
  - publish
 
+before_script:
+  - apt-get update && apt-get install git -y
+
 publish:
  stage: publish
  script:
