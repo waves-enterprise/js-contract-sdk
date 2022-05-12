@@ -1,5 +1,8 @@
 image: "node:16-slim"
 
+variables:
+  RELEASE: no
+
 stages:
  - publish
 
