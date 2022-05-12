@@ -9,6 +9,8 @@ publish:
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
     - yarn
     - yarn publish --new-version ${VERSION}
-only:
-  variables:
-    ${RELEASE} == "yes"
+ tags:
+   - wavesenterprise
+ only:
+   variables:
+     ${RELEASE} == "yes"
