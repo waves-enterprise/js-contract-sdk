@@ -1,6 +1,6 @@
 {
-  "name": "we-toolkit",
-  "version": "1.0.0",
+  "name": "@wavesenterprise/js-contract-sdk",
+  "version": "0.0.1-rc.27",
   "description": "Toolkit for development, test and deploy smart-contracts on Waves Enterprise ecosystem.",
   "private": false,
   "type": "commonjs",
