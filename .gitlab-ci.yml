@@ -1,8 +1,5 @@
 image: "node:16-slim"
 
-variables:
-  RELEASE: no
-
 stages:
  - publish
 
@@ -16,4 +13,4 @@ publish:
    - wavesenterprise
  only:
    variables:
-     $RELEASE == "yes"
+     - $RELEASE == "yes"
