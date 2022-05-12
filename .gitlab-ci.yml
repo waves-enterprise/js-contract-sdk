@@ -20,4 +20,4 @@ publish:
    - wavesenterprise
  only:
    variables:
-     - $RELEASE == "yes"
+     - $VERSION
