@@ -1,6 +1,6 @@
 {
   "name": "@wavesenterprise/js-contract-sdk",
-  "version": "0.0.1-rc.32",
+  "version": "1.0.0",
   "description": "Toolkit for development, test and deploy smart-contracts on Waves Enterprise ecosystem.",
   "private": false,
   "type": "commonjs",
@@ -19,7 +19,8 @@
   "dependencies": {
     "@wavesenterprise/js-sdk": "^3.4.7",
     "reflect-metadata": "^0.1.13"
-  }
+  },
+  "workspaces": ["packages/*"]
 }
 
 
