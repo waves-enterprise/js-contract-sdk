@@ -1,6 +1,6 @@
 {
   "name": "@wavesenterprise/contract-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Implements JS Contract SDK core functionality, rpc services, tools and utilities.",
   "private": false,
   "type": "commonjs",
@@ -31,9 +31,9 @@
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.6.2",
     "husky": "^7.0.4",
     "lerna": "^4.0.0",
+    "prettier": "^2.6.2",
     "typescript": "^4.6.2"
   },
   "husky": {
