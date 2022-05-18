@@ -1,6 +1,6 @@
 {
   "name": "create-we-contract",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Scaffold Waves Enterprise JS Contract project",
   "main": "index.js",
   "bin": {
