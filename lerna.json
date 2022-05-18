@@ -3,5 +3,5 @@
     "packages/*"
   ],
   "npmClient": "npm",
-  "version": "independent:"
+  "version": "independent"
 }
