@@ -23,7 +23,7 @@ export class ContractClient implements IContractClient {
 
     private config: RPCConnectionConfig;
     private auth: Metadata;
-    private impl: ContractServiceClient;
+    public impl: ContractServiceClient;
 
     connection: ClientReadableStream<ContractTransactionResponse>;
 

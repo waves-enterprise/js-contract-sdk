@@ -1,50 +1,10 @@
-import { envConfig, RPCConnectionConfig } from '../rpc/config';
-import { logger } from './logger';
-import { RPC } from '../rpc';
-import { TransactionResponseHandler } from './handlers/transaction-response-handler';
+import {Kernel} from "./handlers/kernel";
 
-type ContractConfig = {
-    strictState: boolean;
-};
-
-export class Entrypoint {
-    log = logger(this);
-
-    /**
-     * Contract RPC client
-     * @private
-     */
-    private readonly rpc: RPC;
-
-    /**
-     * RPC connection config
-     * @private
-     */
-    private readonly rpcConfig: RPCConnectionConfig;
-
-    constructor(private config: ContractConfig = { strictState: false }) {
-        this.rpcConfig = envConfig();
-        this.rpc = new RPC(this.rpcConfig);
-    }
-
-    public start() {
-        this.log.info('RPC connection created');
-
-        const contractRPC = this.rpc.Contract;
-
-        contractRPC.connect();
-
-        const responseHandler = new TransactionResponseHandler(this.rpc);
-
-        contractRPC.addResponseHandler(responseHandler.handle);
-    }
-}
-
-export function start(contract: any) {
+export function start(contractPath: string) {
     Promise.resolve().then(async () => {
         try {
-            const entry = new Entrypoint();
-            entry.start();
+            new Kernel({contractPath})
+                .start();
 
             process.on('SIGINT', async () => {
                 try {

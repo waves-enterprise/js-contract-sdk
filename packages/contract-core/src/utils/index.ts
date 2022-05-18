@@ -1,3 +1,4 @@
+import os from 'os'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry';
 import { TValue } from '../intefaces/contract';
 
@@ -56,3 +57,5 @@ export function parseDataEntry(d: DataEntry): TValue {
 
     throw new Error('Data entry parse error');
 }
+
+export const getCpusCount = () => os.cpus().length
