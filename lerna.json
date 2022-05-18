@@ -3,5 +3,6 @@
     "packages/*"
   ],
   "npmClient": "npm",
-  "version": "independent"
+  "version": "independent",
+  "useWorkspaces": true
 }
