@@ -1,23 +1,22 @@
 module.exports = {
-  image: "contract-image=name",
-  name: 'Contract Name',
-  version: '1.2.3', // default=latest
+  image: "contract-image",
+  name: 'Your Contract Name',
+  version: '0.0.1', // default=latest
   networks: {
     testnet: {
-      seed: 'admin seed phrase',
+      seed: '#paste your seed phrase here',
     },
 
     mainnet: {
-      seed: 'mainnet env seed'
+      seed: '#paste your seed phrase here'
     },
     sandbox: {
       registry: 'localhost:5000',
       nodeAddress: 'http://localhost:6862',
-      seed: 'admin seed phrase',
-
+      seed: '#paste your seed phrase here',
       params: {
         init: () => ({
-            test: 'string'
+            param: '${value}'
         })
       }
     }

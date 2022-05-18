@@ -5,13 +5,13 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "deploy": "we-toolkit deploy -n mainnet",
-    "deploy:testnet": "we-toolkit deploy -n testnet",
-    "deploy:sandbox": "we-toolkit deploy -n sandbox"
+    "deploy": "we-cli deploy -n mainnet",
+    "deploy:testnet": "we-cli deploy -n testnet",
+    "deploy:sandbox": "we-cli deploy -n sandbox"
   },
   "dependencies": {
-    "@waves-enterprise/js-contract-grpc-client": "^1.8.2",
-    "@waves-enterprise/js-contract-sdk": "^1.0.0",
+    "@waves-enterprise/js-contract-grpc-client": "^1.8.0",
+    "@waves-enterprise/contract-core": "^1.0.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

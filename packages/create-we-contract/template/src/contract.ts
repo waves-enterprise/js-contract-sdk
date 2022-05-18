@@ -4,8 +4,6 @@ import {Action, Contract, Param} from "@wavesenterprise/contract-core";
 export class #{contractName} {
     @Action({onInit: true})
     init() {
-
-
     }
 
     @Action
@@ -14,5 +12,6 @@ export class #{contractName} {
         @Param('third') param2: string,
     ) {
 
+        // Write your logic here
     }
 }
