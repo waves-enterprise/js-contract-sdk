@@ -1,12 +1,6 @@
----
-name: Contract SDK
-route: /core
----
-
 ## Core concepts
 
-The basics of making contract class is specifying class an annotations per methods.
-The most important annotations is:
+The basics of making a contract class is to specify class annotations per method. The most important annotations are:
 
 * `Contract` - register class as contract
 * `Action` - register action handler of contract
@@ -25,22 +19,20 @@ export class ExampleContract {
 }
 ```
 
-## Manage State
+## Methods
 
-ContractState class expose useful methods to write to contract state. Currently available data types in contract state you can find in node documentation.
-Contract SDK supports all currently available data types in contract state.
+## Methods to manage smart contract state
 
+```ContractState``` class exposes useful methods to write to contract state. You can find the list of data types currently available in contract state in the node documentation. Contract SDK supports all the data types currently available in the contract state.
 
 ### Write
 
-Easiest way is to use `set` method to write state. Internal this method automatically cast type of data.
-
+The easiest way to write the state is to use ```set``` method. This method automatically casts data type.
 ```ts
-    this.state.set('key', 'value')
+this.state.set('key', 'value')
 ```
 
 For explicit type casting you should use methods in example below:
-
 
 ```ts
 // for binary
@@ -57,12 +49,10 @@ this.state.setString('string', 'example');
 ```
 
 
-
 ### Read
 
-Read state is currently async, and behavior of reading is different by contract configuration.
-By default Contract Strict mode is false, and trying to get unavailable keys is not throws error.
 
+Reading the state is currently asynchronous, and reading behavior depends on the contract configuration.
 
 ```ts
 @Contract
@@ -71,7 +61,7 @@ export class ExampleContract {
 
     @Action
     async exampleAction(@Param('name') name: string) {
-        const stateValue: string  = await this.state.get('value', 'default-value');
+        const stateValue: string = await this.state.get('value', 'default-value');
     }
 }
 ```
@@ -80,14 +70,13 @@ Caution: Method state.get can't know about internal state type in runtime, for e
 `getBinary`, `getString`, `getBool`, `getNum`
 
 
-
 ## Write Actions
 
 The key decorators is `Action` and `Param`
 
 ### Init action
 
-For describe on create contract action provide to the action decorator param `onInit=true`
+To describe create contract action set the ```onInit``` action decorator parameter to ```true```.
 
 ```ts
 @Contract
@@ -102,7 +91,8 @@ export class ExampleContract {
 }
 ```
 
-By default name of contract method is action used, for describe specific name of action provide param `name` to decorator
+By default action is used as the name of contract method. To set a different action name, assign it to the ```name``` parameter of the decorator.
+
 
 ```ts
 @Contract

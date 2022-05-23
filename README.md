@@ -2,6 +2,13 @@
 
 Toolkit for development, test and deploy smart-contracts on Waves Enterprise ecosystem.
 
+
+## Documentation
+
+All JS contract SDK documentation, can be found at:
+https://docs.wavesenterprise.com/ru/1.8.4/usage/docker-sc/sc-opensource.html
+
+
 ## Quickstart
 
 The fastest way to get started with JS Contract SDK is to use contract starter CLI commands.
