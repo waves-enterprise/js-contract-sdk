@@ -1,11 +1,11 @@
-# we-cli
+# @wavesenterprise/contract-cli
 
 Command line interface for deploying, testing, and updating Waves Enterprise contracts.
 
 ### Getting started
 
 ```
-npm install -g we-cli
+npm install -D @wavesenterprise/contract-cli
 ```
 
 ### Overview

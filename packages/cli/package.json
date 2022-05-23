@@ -1,8 +1,12 @@
 {
-  "name": "we-cli",
-  "version": "1.0.1",
+  "name": "@wavesenterprise/contract-cli",
+  "version": "0.0.1",
   "description": "Waves Enterprise Contracts CLI",
   "main": "index.js",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "we-cli": "index.js"
   },
