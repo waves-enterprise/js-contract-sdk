@@ -1,4 +1,4 @@
-# JS SDK CONTRACT CORE
+# @wavesenterpise/contract-core
 
 Implements JS Contract SDK core functionality, rpc services, tools and utilities.
 

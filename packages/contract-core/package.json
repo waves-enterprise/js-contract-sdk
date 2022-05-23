@@ -2,10 +2,13 @@
   "name": "@wavesenterprise/contract-core",
   "version": "1.0.1",
   "description": "Implements JS Contract SDK core functionality, rpc services, tools and utilities.",
-  "private": false,
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/src/index.js",
