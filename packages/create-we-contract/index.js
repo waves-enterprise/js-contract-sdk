@@ -18,7 +18,6 @@ program
 
 
 program
-  .command('generate')
   .description('Generates TS boilerplate')
   .argument('name', 'Contract name in CamelCase')
   .option('-t, --target <char>', 'Target Path', 'we-contract-starter')

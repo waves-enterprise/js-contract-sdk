@@ -11,7 +11,7 @@ Quickstart with Waves Enterprise platform contracts
 Run following command for create first project with default configuration
 
 ```sh
-npm create MyContractName
+npm create we-contract [options] MyContractName 
 ```
 
 Options:

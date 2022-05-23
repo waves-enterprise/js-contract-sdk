@@ -1,8 +1,12 @@
 {
   "name": "create-we-contract",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Scaffold Waves Enterprise JS Contract project",
   "main": "index.js",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "create-contract": "./index.js"
   },
