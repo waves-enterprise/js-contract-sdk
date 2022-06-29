@@ -17,6 +17,7 @@ export class ContractProcessor {
         ServiceContainer.set(ctx);
         ServiceContainer.set(state);
 
+        this.log.info('Process incoming tx', ctx)
         await contractHandler.handle(ctx, state);
 
         return state.getStateEntries();

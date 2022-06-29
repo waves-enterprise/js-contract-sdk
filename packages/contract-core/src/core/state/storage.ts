@@ -27,6 +27,8 @@ export class Storage {
     get<T extends TValue>(key): Promise<T>;
     get(keys: string[], config?: Omit<GetConfig, 'matches'>): Promise<TValue[]>;
     async get(...args: any[]): Promise<any> {
+        this.log.info('Get entry', args);
+
         if (isString(args[0])) {
             const key = args[0];
             const contractId = this.contractId;
@@ -71,6 +73,8 @@ export class Storage {
         });
 
         for (const [key, val] of entries) {
+            this.log.info('Cache settled', `${key} = ${val}`)
+
             this._cache.set(key, val);
         }
 
@@ -91,10 +95,14 @@ export class Storage {
     }
 
     set(key: string, value: TValue): void {
+        this.log.info('Set state entry', `${key}=${value}`)
+
         this.internalState.write(key, value);
     }
 
     delete(key: string) {
+        this.log.info('Delete entry', `${key}`)
+
         this.internalState.write(key, DEL);
     }
 
