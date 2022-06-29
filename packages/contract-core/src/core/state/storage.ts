@@ -1,5 +1,5 @@
 import { logger } from '../logger';
-import { ContractClient } from '../../rpc/clients/contract-client';
+import { ContractClient } from '../../rpc';
 import { TValue } from '../../intefaces/contract';
 import { ContractKeysRequest } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
 import { isString, parseDataEntry } from '../../utils';
@@ -50,7 +50,7 @@ export class Storage {
 
             const response = await this.client.getContractKeys({
                 ...request,
-                matches: strToRegexp(...keys),
+                keysFilter: [...keys],
             });
 
             const entries = response.entries.map((e) => {
@@ -101,10 +101,4 @@ export class Storage {
     getEntries(): DataEntry[] {
         return this.internalState.getEntries();
     }
-}
-
-function strToRegexp(...str: string[]) {
-    const prefix = '^';
-
-    return `${prefix}(${str.join('|')})`;
 }
