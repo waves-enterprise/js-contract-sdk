@@ -96,6 +96,8 @@ export class ContractClient implements IContractClient {
     }
 
     getContractKeys(req: Partial<ContractKeysRequest>) {
+        this.log.info('Call state-rpc getContractKeys ', req);
+
         return this.internalCall<ContractKeysRequest, ContractKeysResponse>((handler) =>
             this.impl.getContractKeys(ContractKeysRequest.fromPartial(req), this.auth, handler),
         );

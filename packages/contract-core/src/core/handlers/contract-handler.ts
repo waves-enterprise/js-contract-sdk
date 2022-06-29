@@ -20,6 +20,8 @@ export class ContractHandler {
             throw new Error('Contract handler class not provided');
         }
         try {
+            this.log.info('Invoke handler ', this.contractClass.name)
+
             await this.actionResolver.invoke(this.contractClass, ctx, state);
 
             this.log.info('Contract handler executed successfully');
