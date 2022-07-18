@@ -1,4 +1,4 @@
-import os from 'os'
+import * as os from 'os'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry';
 import { TValue } from '../intefaces/contract';
 
