@@ -6,6 +6,7 @@ const fs = require('fs');
 
 
 const {Command} = require('commander');
+const {pascalCase} = require("pascal-case");
 const program = new Command();
 
 
@@ -26,6 +27,8 @@ program
   .action(async (arg, options) => {
     const {target, overwrite, name} = options;
 
+    const contractName = pascalCase(arg);
+
     const templatePath = path.join(__dirname, 'template');
     const rootPath = path.join(CURR_DIR, target);
 
@@ -34,7 +37,7 @@ program
 
     const templateFiles = {
       [path.join('src', 'contract.ts')]: {
-        contractName: arg
+        contractName: contractName
       }
     }
 
