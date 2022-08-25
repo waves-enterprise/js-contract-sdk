@@ -2,7 +2,8 @@ import { GenericClient } from '../types';
 import { RPCConnectionConfig } from '../config';
 import { ClientReadableStream, credentials, Metadata, ServiceError } from '@grpc/grpc-js';
 import {
-    CommitExecutionResponse,
+    CalculateAssetIdRequest,
+    CommitExecutionResponse, ContractBalancesRequest, ContractBalancesResponse,
     ContractKeyRequest,
     ContractKeyResponse,
     ContractKeysRequest,
@@ -11,6 +12,7 @@ import {
     ContractTransactionResponse,
     ExecutionErrorRequest,
     ExecutionSuccessRequest,
+    AssetId
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
 import { logger } from '../../core/logger';
 import { ApiErrors } from '../../core/api-errors';
@@ -111,6 +113,48 @@ export class ContractClient implements IContractClient {
         return this.internalCall<ExecutionErrorRequest, CommitExecutionResponse>((handler) =>
             this.impl.commitExecutionError(req, this.auth, handler),
         );
+    }
+
+    getContractBalances(req: ContractBalancesRequest){
+        return new Promise<ContractBalancesResponse>((resolve, reject) => {
+            this.impl.getContractBalances(req, this.auth, (err: ServiceError, resp: ContractBalancesResponse) => {
+                if (!err) {
+                    return resolve(resp);
+                }
+
+                const { metadata } = err;
+                const [errorCode] = metadata.get('error-code');
+
+                if (ApiErrors.DataKeyNotExists === +errorCode) {
+                    reject(new UnavailableStateKeyException(`Empty response for ${req.assetsIds}`));
+
+                    return;
+                }
+
+                reject(err);
+            });
+        });
+    }
+
+    calculateAssetId(req: CalculateAssetIdRequest) {
+        return new Promise<AssetId>((resolve, reject) => {
+            this.impl.calculateAssetId(req, this.auth, (err: ServiceError, resp: AssetId) => {
+                if (!err) {
+                    return resolve(resp);
+                }
+
+                const { metadata } = err;
+                const [errorCode] = metadata.get('error-code');
+
+                if (ApiErrors.DataKeyNotExists === +errorCode) {
+                    reject(new UnavailableStateKeyException(`Empty response for ${req.nonce}`));
+
+                    return;
+                }
+
+                reject(err);
+            });
+        });
     }
 
     addResponseHandler(handler: (r: ContractTransactionResponse) => void) {

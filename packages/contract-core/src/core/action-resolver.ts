@@ -1,12 +1,12 @@
-import { Constructable } from '../intefaces/helpers';
-import { Context } from './context';
-import { ContractState } from './state';
-import { TArgs } from './decorators/param';
-import { logger } from './logger';
-import { UnavailableContractActionException, UnavailableContractParamException } from './exceptions';
-import { isUndefined } from '../utils';
-import { TAction, TValue } from '../intefaces/contract';
-import { getArgsMetadata, getContractMetadata } from '../utils/reflect';
+import {Constructable} from '../intefaces/helpers';
+import {Context} from './context';
+import {ContractState} from './state';
+import {TArgs} from './decorators/param';
+import {logger} from './logger';
+import {UnavailableContractActionException} from './exceptions';
+import {TAction} from '../intefaces/contract';
+import {getArgsMetadata, getContractMetadata} from '../utils/reflect';
+import {ServiceContainer} from "./service-container";
 
 export class ActionResolver {
     log = logger(this);
@@ -29,16 +29,35 @@ export class ActionResolver {
 
         const argsMetadata: TArgs = getArgsMetadata(contract, actionData.propertyName);
 
-        const actionArgs = [] as TValue[];
 
-        for (const value of Object.values(argsMetadata)) {
-            const arg = ctx.params.get(value.paramKey);
+        const paramTypes = Reflect.getMetadata(
+            'design:paramtypes',
+            contract.prototype,
+            actionData.propertyName
+        ) as Array<any>;
 
-            if (isUndefined(arg)) {
-                throw new UnavailableContractParamException();
+        const actionArgs = new Array(paramTypes.length)
+
+        for (const [paramIndex, param] of paramTypes.entries()) {
+            if (param.prototype === String.prototype) {
+                const argAtIndex = Object
+                    .values(argsMetadata)
+                    .find(t => t.index === paramIndex);
+
+                if (!argAtIndex) {
+                    throw new Error(`Parameter at index "${paramIndex}" not founded`)
+                }
+
+                actionArgs[paramIndex] = ctx.params.get(argAtIndex.paramKey);
+            } else {
+                const resolvedDependency = ServiceContainer.get(param)
+
+                if (!resolvedDependency) {
+                    throw new Error(`Action ${actionData.propertyName} Parameter at index "${paramIndex}" not founded. Instance of ${param.name} not provided`)
+                }
+
+                actionArgs[paramIndex] = resolvedDependency;
             }
-
-            actionArgs[value.index] = arg;
         }
 
         try {
@@ -47,5 +66,9 @@ export class ActionResolver {
         } catch (e) {
             return Promise.reject(e);
         }
+    }
+
+    tryInjectParam() {
+
     }
 }

@@ -5,6 +5,7 @@ import {
 import { Metadata } from '@grpc/grpc-js';
 import { TxId } from './consts';
 import { ParamsMap, ParamsMapper } from './mappers/params-mapper';
+import {AssetOperationsRegistry} from "./assets/asset-operations-registry";
 
 export class Auth {
     constructor(private _authToken: string) {}
@@ -33,7 +34,7 @@ export class Context {
      * Transaction response from rpc
      *
      */
-    public transaction: ContractTransaction;
+    public tx: ContractTransaction;
 
     /**
      * Mapped transaction params
@@ -41,23 +42,26 @@ export class Context {
      */
     public paramsMap: ParamsMap;
 
-    constructor(transactionResponse: ContractTransactionResponse) {
+    constructor(
+        transactionResponse: ContractTransactionResponse,
+        public assetOperations = new AssetOperationsRegistry()
+    ) {
         this.auth = new Auth(transactionResponse.authToken);
 
         if (!transactionResponse.transaction) {
             throw new Error('Transaction not provided');
         }
 
-        this.transaction = transactionResponse.transaction;
+        this.tx = transactionResponse.transaction;
         this.paramsMap = new ParamsMapper().parse(transactionResponse.transaction);
     }
 
     public get contractId(): string {
-        return this.transaction.contractId;
+        return this.tx.contractId;
     }
 
     public get isInit() {
-        return this.transaction.type === TxId.create;
+        return this.tx.type === TxId.create;
     }
 
     public get params() {
