@@ -1,10 +1,11 @@
 import {TAssetOperation} from "../../intefaces/contract";
+import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
 
 
 export class AssetOperationsRegistry {
-    operations: TAssetOperation[] = [];
+    operations: ContractAssetOperation[] = [];
 
-    addOperation(operation: TAssetOperation) {
+    addOperation(operation: ContractAssetOperation) {
         this.operations.push(operation)
     }
 }

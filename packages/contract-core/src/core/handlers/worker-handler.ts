@@ -3,6 +3,7 @@ import {Context} from "../context";
 import {ContractTransactionResponse} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 import {ContractProcessor} from "../processors/contract-processor";
 import {envConfig} from "../../rpc/config";
+import {ServiceContainer} from "../service-container";
 
 export class WorkerHandler {
     private readonly processor: ContractProcessor;
@@ -22,8 +23,7 @@ export class WorkerHandler {
         const ctx = new Context(resp);
 
 
-
-
+        ServiceContainer.set(this.rpc)
         this.rpc.Contract
             .setAuth(ctx.auth.metadata());
 
@@ -33,7 +33,7 @@ export class WorkerHandler {
             await this.rpc.Contract.commitExecutionSuccess({
                 results: entries,
                 txId: ctx.tx.id,
-                assetOperations: []
+                assetOperations: ctx.assetOperations.operations
             })
         } catch (e) {
             await this.rpc.Contract.commitExecutionError({

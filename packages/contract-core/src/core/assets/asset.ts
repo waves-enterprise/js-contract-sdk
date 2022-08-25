@@ -6,6 +6,8 @@ import {
     ContractTransferOut
 } from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out";
 import {Context} from "../context";
+import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
+import {RPC} from "../../rpc";
 
 export type TIssueParams = {
     assetId: string;
@@ -35,6 +37,11 @@ export type TransferOutParams = {
 }
 
 export class Asset {
+    static getRPCConnection() {
+        return ServiceContainer
+            .get(RPC);
+    }
+
     static getExecutionContext() {
         return ServiceContainer
             .get(Context);
@@ -55,7 +62,9 @@ export class Asset {
 
         Asset.getExecutionContext()
             .assetOperations
-            .addOperation(operation)
+            .addOperation(ContractAssetOperation.fromPartial({
+                contractIssue: operation
+            }))
     }
 
     reissue(t: TReissueParams) {
@@ -66,7 +75,9 @@ export class Asset {
 
         Asset.getExecutionContext()
             .assetOperations
-            .addOperation(operation)
+            .addOperation(ContractAssetOperation.fromPartial({
+                contractReissue: operation
+            }))
     }
 
     burn(t: TBurnParams) {
@@ -77,7 +88,9 @@ export class Asset {
 
         Asset.getExecutionContext()
             .assetOperations
-            .addOperation(operation)
+            .addOperation(ContractAssetOperation.fromPartial({
+                contractBurn: operation
+            }))
     }
 
     transfer(recipient: string, amount: number) {
@@ -89,6 +102,22 @@ export class Asset {
 
         Asset.getExecutionContext()
             .assetOperations
-            .addOperation(operation)
+            .addOperation(ContractAssetOperation.fromPartial({
+                contractTransferOut: operation
+            }))
+    }
+    
+    static calculateAssetId(nonce: number) {
+        return Asset.getRPCConnection().Contract
+            .calculateAssetId({
+                nonce
+            })
+    }
+
+    balanceOf(assetId) {
+        return Asset.getRPCConnection().Contract
+            .getContractBalances({
+                assetsIds: [assetId]
+            })
     }
 }
