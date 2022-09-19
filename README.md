@@ -1,6 +1,6 @@
 # JS Contract SDK
 
-Toolkit for development, test and deploy smart-contracts on Waves Enterprise ecosystem.
+Toolkit for development, test and create smart-contracts on Waves Enterprise ecosystem.
 
 
 ## Documentation
@@ -48,10 +48,10 @@ export default class MyContract {
 ```
 
 
-Once you finish write your contract actions, you can deploy your contract to network, i.e to deploy to local sandbox network run following: 
+Once you finish write your contract actions, you can create your contract to network, i.e to create to local sandbox network run following: 
 
 ```npm 
-npm run deploy:sandbox
+npm run create:sandbox
 ```
 
 Make sure you setup your network credentials in ```contract.config.js```

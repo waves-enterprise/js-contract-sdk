@@ -7,7 +7,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="js-grpc-client" />
     <orderEntry type="module" module-name="we-create-contract" />
+    <orderEntry type="module" module-name="sdk" />
     <orderEntry type="module" module-name="we-contract-starter" />
-    <orderEntry type="module" module-name="node-sandbox" />
+    <orderEntry type="module" module-name="node-startup" />
+    <orderEntry type="module" module-name="tests-sdk" />
   </component>
 </module>

@@ -1,20 +1,20 @@
 
 # Command line interface
 
-```we-cli``` - tool that helps you to deploy contract to different environments.
+```we-cli``` - tool that helps you to create contract to different environments.
 
 
 ## Deploy
 
-Smart contracts are executed once they are deployed in the blockchain. To deploy a contract run the deploy command in WE Contract CLI:
+Smart contracts are executed once they are deployed in the blockchain. To create a contract run the create command in WE Contract CLI:
 
 ```bash
-we-cli deploy -n testnet
+we-cli create -n testnet
 ```
-where ```testnet``` is the name of the network specified in the configuration file. For example, to deploy a contract to the sandbox network run the following command:
+where ```testnet``` is the name of the network specified in the configuration file. For example, to create a contract to the sandbox network run the following command:
 
 ```bash
-we-cli deploy -n sandbox
+we-cli create -n sandbox
 ```
 
 Make sure you setup your network credentials in ```contract.config.js```

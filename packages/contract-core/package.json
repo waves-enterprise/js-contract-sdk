@@ -1,6 +1,6 @@
 {
   "name": "@wavesenterprise/contract-core",
-  "version": "1.0.6-rc.8",
+  "version": "1.0.8",
   "description": "Implements JS Contract SDK core functionality, rpc services, tools and utilities.",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -25,7 +25,7 @@
   "license": "MIT",
   "dependencies": {
     "@grpc/grpc-js": "^1.6.2",
-    "@wavesenterprise/js-contract-grpc-client": "1.10.0-rc1",
+    "@wavesenterprise/js-contract-grpc-client": "1.10.0-rc3",
     "@wavesenterprise/sdk": "^1.0.3",
     "reflect-metadata": "^0.1.13"
   },

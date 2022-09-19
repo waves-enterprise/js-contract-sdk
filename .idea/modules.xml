@@ -4,8 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/js-contract-sdk.iml" filepath="$PROJECT_DIR$/.idea/js-contract-sdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/../js-grpc-client/.idea/js-grpc-client.iml" filepath="$PROJECT_DIR$/../js-grpc-client/.idea/js-grpc-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../node-sandbox/.idea/node-sandbox.iml" filepath="$PROJECT_DIR$/../node-sandbox/.idea/node-sandbox.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../we-contract-starter/.idea/we-contract-starter.iml" filepath="$PROJECT_DIR$/../we-contract-starter/.idea/we-contract-starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../@wavesenterpise/node-startup/.idea/node-startup.iml" filepath="$PROJECT_DIR$/../@wavesenterpise/node-startup/.idea/node-startup.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../@wavesenterpise/sdk/.idea/sdk.iml" filepath="$PROJECT_DIR$/../@wavesenterpise/sdk/.idea/sdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../@wavesenterpise/tests-sdk/.idea/tests-sdk.iml" filepath="$PROJECT_DIR$/../@wavesenterpise/tests-sdk/.idea/tests-sdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../@wavesenterpise/we-contract-starter/.idea/we-contract-starter.iml" filepath="$PROJECT_DIR$/../@wavesenterpise/we-contract-starter/.idea/we-contract-starter.iml" />
       <module fileurl="file://$PROJECT_DIR$/../we-create-contract/.idea/we-create-contract.iml" filepath="$PROJECT_DIR$/../we-create-contract/.idea/we-create-contract.iml" />
     </modules>
   </component>

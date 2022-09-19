@@ -64,6 +64,8 @@ export class ActionResolver {
             await (c[actionData.propertyName] as TAction)(...actionArgs);
             this.log.info('Action proccesed');
         } catch (e) {
+            console.log(e)
+
             return Promise.reject(e);
         }
     }

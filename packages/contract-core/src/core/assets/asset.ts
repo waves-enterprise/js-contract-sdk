@@ -8,10 +8,11 @@ import {
 import {Context} from "../context";
 import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
 import {RPC} from "../../rpc";
+import {mapAssetId, mapContractBalance} from "../mappers/asset-operations";
 
 
 export type TIssueParams = {
-    assetId: string;
+    assetId?: string;
     name: string;
     description: string;
     quantity: number;
@@ -21,18 +22,18 @@ export type TIssueParams = {
 }
 
 export type TReissueParams = {
-    assetId: string;
+    assetId?: string;
     quantity: number;
     isReissuable: boolean;
 }
 
 export type TBurnParams = {
-    assetId: Uint8Array | undefined;
+    assetId?: string;
     amount: number;
 }
 
 export type TransferOutParams = {
-    assetId: string;
+    assetId?: string;
     recipient: string;
     amount: number;
 }
@@ -47,7 +48,7 @@ export class Asset {
     }
 
     constructor(
-        private assetId: string
+        private assetId?: string
     ) {
     }
 
@@ -104,19 +105,30 @@ export class Asset {
             }))
     }
 
-    static calculateAssetId(nonce: number) {
-        return Asset.getRPCConnection().Contract
+    static async calculateAssetId(nonce: number): Promise<string> {
+        const res = await Asset.getRPCConnection().Contract
             .calculateAssetId({
                 nonce
             })
+
+        return res.value;
     }
 
-    balanceOf(assetId: string) {
-        return Asset.getRPCConnection().Contract
+    static async balancesOf(assetIds: string[]) {
+        const res = await Asset.getRPCConnection().Contract
             .getContractBalances({
-                assetsIds: [{
-                    value: assetId
-                }]
+                assetsIds: assetIds.map(mapAssetId)
             })
+
+        return res.assetsBalances.map(mapContractBalance);
+    }
+
+    static async balanceOf(assetId: string) {
+        const res = await Asset.getRPCConnection().Contract
+            .getContractBalances({
+                assetsIds: [mapAssetId(assetId)]
+            })
+
+        return res.assetsBalances.map(mapContractBalance);
     }
 }
