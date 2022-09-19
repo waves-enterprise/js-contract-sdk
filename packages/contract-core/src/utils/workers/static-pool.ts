@@ -22,6 +22,13 @@ export class Task {
 function validatePoolSize(size: number) {
 }
 
+
+async function wait() {
+    return new Promise(resolve => {
+        setTimeout(resolve, 2000);
+    })
+}
+
 export class StaticPool extends EventEmitter {
     private readonly size : number;
     private readonly contractPath: string;
@@ -36,7 +43,12 @@ export class StaticPool extends EventEmitter {
      * Tasks queued
      * @private
      */
-    private taskQueue: Task[] = []
+    private taskQueue: Task[] = [];
+
+    /**
+     * is workers initialized
+     */
+    public workersReady: Promise<boolean>
 
     constructor(opts: PoolOptions) {
         super();
@@ -51,19 +63,30 @@ export class StaticPool extends EventEmitter {
         this.fill(task);
     }
 
-    private fill(task: string) {
-        const size = this.size;
+    private async fill(task: string) {
+        this.workersReady = new Promise(async resolve => {
+            const size = this.size;
 
-        for (let i = 0; i < size; i++) {
-            const worker = new PoolWorker(task, {
-                workerData: {index: i, contractPath: this.contractPath},
-                env: SHARE_ENV,
-            })
+            const workersReady = new Set();
 
-            worker.on('ready', (worker) => this.emit('worker-ready', worker));
+            for (let i = 0; i < size; i++) {
+                const worker = new PoolWorker(task, {
+                    workerData: {index: i, contractPath: this.contractPath},
+                    env: SHARE_ENV,
+                })
 
-            this.workers.push(worker);
-        }
+                worker.once('ready', (worker) => {
+                    workersReady.add(i);
+                    this.emit('worker-ready', worker);
+
+                    if (workersReady.size === size) {
+                        resolve(true);
+                    }
+                });
+
+                this.workers.push(worker);
+            }
+        })
     }
 
     private getIdleWorker(): PoolWorker | null {

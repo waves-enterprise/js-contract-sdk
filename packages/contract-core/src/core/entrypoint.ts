@@ -3,7 +3,7 @@ import {Kernel} from "./handlers/kernel";
 export function start(contractPath: string) {
     Promise.resolve().then(async () => {
         try {
-            new Kernel({contractPath})
+            await new Kernel({contractPath})
                 .start();
 
             process.on('SIGINT', async () => {

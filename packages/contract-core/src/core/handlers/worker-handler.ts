@@ -4,8 +4,11 @@ import {ContractTransactionResponse} from "@wavesenterprise/js-contract-grpc-cli
 import {ContractProcessor} from "../processors/contract-processor";
 import {envConfig} from "../../rpc/config";
 import {ServiceContainer} from "../service-container";
+import {logger} from "../logger";
 
 export class WorkerHandler {
+    log = logger(this)
+
     private readonly processor: ContractProcessor;
     private readonly rpc: RPC;
 
@@ -22,7 +25,6 @@ export class WorkerHandler {
     handle = async (resp: ContractTransactionResponse) => {
         const ctx = new Context(resp);
 
-
         ServiceContainer.set(this.rpc)
         this.rpc.Contract
             .setAuth(ctx.auth.metadata());
@@ -30,12 +32,26 @@ export class WorkerHandler {
         try {
             const entries = await this.processor.process(ctx, this.contractClass);
 
-            await this.rpc.Contract.commitExecutionSuccess({
+            this.log.info(JSON.stringify({
+                entries,
+                operations: ctx.assetOperations.operations,
+                tx: ctx.tx.id
+            }, null, 2))
+
+            const resp = await this.rpc.Contract.commitExecutionSuccess({
+                results: entries,
+                txId: ctx.tx.id,
+                assetOperations: ctx.assetOperations.operations
+            });
+
+            this.log.info('Commit success', {
                 results: entries,
                 txId: ctx.tx.id,
                 assetOperations: ctx.assetOperations.operations
             })
         } catch (e) {
+            this.log.error(e.message || 'Unexpected error')
+
             await this.rpc.Contract.commitExecutionError({
                 txId: ctx.tx.id,
                 code: e.code || 0,

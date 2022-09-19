@@ -1,4 +1,3 @@
-import {TAssetOperation} from "../../intefaces/contract";
 import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
 
 

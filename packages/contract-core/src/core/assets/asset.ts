@@ -9,6 +9,7 @@ import {Context} from "../context";
 import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
 import {RPC} from "../../rpc";
 
+
 export type TIssueParams = {
     assetId: string;
     name: string;
@@ -38,13 +39,11 @@ export type TransferOutParams = {
 
 export class Asset {
     static getRPCConnection() {
-        return ServiceContainer
-            .get(RPC);
+        return ServiceContainer.get(RPC);
     }
 
     static getExecutionContext() {
-        return ServiceContainer
-            .get(Context);
+        return ServiceContainer.get(Context);
     }
 
     constructor(
@@ -55,9 +54,7 @@ export class Asset {
     issue(t: TIssueParams) {
         const operation = ContractIssue.fromPartial({
             ...t,
-            name: new Uint8Array(Buffer.from(t.name)),
-            assetId: new Uint8Array(Buffer.from(this.assetId)),
-            description: new Uint8Array(Buffer.from(t.description))
+            assetId: this.assetId,
         });
 
         Asset.getExecutionContext()
@@ -70,7 +67,7 @@ export class Asset {
     reissue(t: TReissueParams) {
         const operation = ContractReissue.fromPartial({
             ...t,
-            assetId: new Uint8Array(Buffer.from(this.assetId)),
+            assetId: this.assetId,
         });
 
         Asset.getExecutionContext()
@@ -83,7 +80,7 @@ export class Asset {
     burn(t: TBurnParams) {
         const operation = ContractBurn.fromPartial({
             ...t,
-            assetId: new Uint8Array(Buffer.from(this.assetId)),
+            assetId: this.assetId,
         });
 
         Asset.getExecutionContext()
@@ -95,8 +92,8 @@ export class Asset {
 
     transfer(recipient: string, amount: number) {
         const operation = ContractTransferOut.fromPartial({
-            assetId: new Uint8Array(Buffer.from(this.assetId)),
-            recipient: new Uint8Array(Buffer.from(recipient)),
+            assetId: this.assetId,
+            recipient: recipient,
             amount: amount
         });
 
@@ -106,7 +103,7 @@ export class Asset {
                 contractTransferOut: operation
             }))
     }
-    
+
     static calculateAssetId(nonce: number) {
         return Asset.getRPCConnection().Contract
             .calculateAssetId({
@@ -114,10 +111,12 @@ export class Asset {
             })
     }
 
-    balanceOf(assetId) {
+    balanceOf(assetId: string) {
         return Asset.getRPCConnection().Contract
             .getContractBalances({
-                assetsIds: [assetId]
+                assetsIds: [{
+                    value: assetId
+                }]
             })
     }
 }

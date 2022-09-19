@@ -1,13 +1,8 @@
-import {TArgs} from "./param";
-import {ContractTransferIn} from "@wavesenterprise/js-contract-grpc-client/contract_transfer_in";
-
 export class Payments extends Array<{ assetId: string, amount: number }> {
-    static parseTx(
-        transfersIn: ContractTransferIn[]
-    ) {
+    parseTx(transfersIn: any[]) {
         const res = transfersIn.map(t => {
             return {
-                assetId: String.fromCharCode.apply(null, t.assetId) as string,
+                assetId: t.assetId,
                 amount: t.amount
             }
         })

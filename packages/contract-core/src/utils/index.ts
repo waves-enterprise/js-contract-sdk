@@ -1,6 +1,7 @@
 import * as os from 'os'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry';
 import { TValue } from '../intefaces/contract';
+import Long from "long";
 
 export const isUndefined = (v: any): v is undefined => {
     return v === undefined;
@@ -44,7 +45,7 @@ export function parseDataEntry(d: DataEntry): TValue {
     }
 
     if (!isUndefined(d.intValue)) {
-        return d.intValue;
+        return Long.fromValue(d.intValue).toNumber();
     }
 
     if (!isUndefined(d.boolValue)) {
@@ -56,6 +57,13 @@ export function parseDataEntry(d: DataEntry): TValue {
     }
 
     throw new Error('Data entry parse error');
+}
+
+export function isPrimitive(v: any) {
+
+    return v.prototype === String.prototype
+        || v.prototype === Number.prototype
+        || v.prototype === Boolean.prototype
 }
 
 export const getCpusCount = () => os.cpus().length

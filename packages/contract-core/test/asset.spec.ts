@@ -4,7 +4,7 @@ import {ContractTransferIn} from "@wavesenterprise/js-contract-grpc-client/contr
 import {ContractProcessor} from "../src/core/processors/contract-processor";
 import {RPC} from "../src/rpc";
 import {Action, Asset, Context, ContractState, Payments, State} from "../src";
-import {Param, ServiceContainer} from "../dist";
+import {Param} from "../dist";
 
 jest.spyOn(RPC.prototype, 'addClient')
     .mockImplementation(
@@ -15,7 +15,6 @@ jest.spyOn(RPC.prototype, 'addClient')
 
 
 const tIn = ContractTransferIn.fromPartial({
-    assetId: new Uint8Array(Buffer.from('WEST')),
     amount: 100000
 })
 
@@ -54,7 +53,7 @@ describe('Test asset Operations', () => {
                 contractId: 'test-contract',
                 params: [
                     {
-                        stringValue: 'testAction',
+                        stringValue: 'testAction1',
                         key: 'action'
                     },
                     {
@@ -83,5 +82,12 @@ describe('Test asset Operations', () => {
         expect(entries[0].key).toEqual('test');
         expect(entries[0].stringValue).toEqual('a');
         expect(ctx.assetOperations.operations[0]).toBeDefined();
+    });
+
+
+    it('should caught error on action', async function () {
+        const ctx = new Context(mockTx);
+
+        await expect(processor.process(ctx, ExampleContract)).toThrowError();
     });
 })

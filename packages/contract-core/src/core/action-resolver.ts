@@ -7,6 +7,7 @@ import {UnavailableContractActionException} from './exceptions';
 import {TAction} from '../intefaces/contract';
 import {getArgsMetadata, getContractMetadata} from '../utils/reflect';
 import {ServiceContainer} from "./service-container";
+import {isPrimitive} from "../utils";
 
 export class ActionResolver {
     log = logger(this);
@@ -29,7 +30,6 @@ export class ActionResolver {
 
         const argsMetadata: TArgs = getArgsMetadata(contract, actionData.propertyName);
 
-
         const paramTypes = Reflect.getMetadata(
             'design:paramtypes',
             contract.prototype,
@@ -39,7 +39,7 @@ export class ActionResolver {
         const actionArgs = new Array(paramTypes.length)
 
         for (const [paramIndex, param] of paramTypes.entries()) {
-            if (param.prototype === String.prototype) {
+            if (isPrimitive(param)) {
                 const argAtIndex = Object
                     .values(argsMetadata)
                     .find(t => t.index === paramIndex);
@@ -66,9 +66,5 @@ export class ActionResolver {
         } catch (e) {
             return Promise.reject(e);
         }
-    }
-
-    tryInjectParam() {
-
     }
 }
