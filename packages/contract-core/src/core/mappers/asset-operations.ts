@@ -1,7 +1,8 @@
 import {
     AssetId,
-    ContractBalanceResponse
+    ContractBalanceResponse,
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
+
 
 export function mapAssetId(t: string): AssetId {
     return {

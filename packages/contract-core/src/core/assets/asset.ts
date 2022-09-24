@@ -9,6 +9,7 @@ import {Context} from "../context";
 import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
 import {RPC} from "../../rpc";
 import {mapAssetId, mapContractBalance} from "../mappers/asset-operations";
+import {AssetId} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 
 
 export type TIssueParams = {
@@ -117,16 +118,16 @@ export class Asset {
     static async balancesOf(assetIds: string[]) {
         const res = await Asset.getRPCConnection().Contract
             .getContractBalances({
-                assetsIds: assetIds.map(mapAssetId)
+                assetsIds: assetIds
             })
 
         return res.assetsBalances.map(mapContractBalance);
     }
 
-    static async balanceOf(assetId: string) {
+    static async balanceOf(assetId?: string) {
         const res = await Asset.getRPCConnection().Contract
             .getContractBalances({
-                assetsIds: [mapAssetId(assetId)]
+                assetsIds: [assetId ?? '']
             })
 
         return res.assetsBalances.map(mapContractBalance);

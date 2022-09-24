@@ -30,6 +30,9 @@ export class Context {
      */
     public auth: Auth;
 
+
+    public sender: string;
+
     /**
      * Transaction response from rpc
      *
@@ -52,6 +55,7 @@ export class Context {
             throw new Error('Transaction not provided');
         }
 
+        this.sender = transactionResponse.transaction.sender;
         this.tx = transactionResponse.transaction;
         this.paramsMap = new ParamsMapper().parse(transactionResponse.transaction);
     }
