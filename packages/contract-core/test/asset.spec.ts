@@ -16,7 +16,7 @@ jest.spyOn(RPC.prototype, 'addClient')
 
 const tIn = ContractTransferIn.fromPartial({
     amount: 100000,
-    assetId: "some-asset-id"
+    assetId: ["some-asset-id"]
 })
 
 
@@ -35,7 +35,7 @@ class ExampleContract {
         const payment = payments[0]
 
         new Asset(payment.assetId)
-            .transfer('some-vault', payment.amount * 0.5);
+            .transfer('some-vault', payment.amount.multiply(0.5).toNumber());
     }
 }
 
