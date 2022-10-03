@@ -10,8 +10,9 @@
     "deploy:sandbox": "we-cli deploy -n sandbox"
   },
   "dependencies": {
-    "@wavesenterprise/js-contract-grpc-client": "^1.8.0",
-    "@wavesenterprise/contract-core": "^1.0.1"
+    "@grpc/grpc-js": "^1.7.1",
+    "@wavesenterprise/contract-core": "^1.0.14",
+    "@wavesenterprise/crypto-utils": "^1.0.0-rc.1"
   },
   "devDependencies": {
     "typescript": "^4.6.2",

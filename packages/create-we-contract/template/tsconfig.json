@@ -7,6 +7,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "es2017",
+    "esModuleInterop": true,
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": ".",
@@ -18,8 +19,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
-    "paths": {
-      "@waves-enterprise/js-contract-grpc-client/*": ["node_modules/my-protos/*"],
-    },
-  }
+  },
+  "include": ["src", "index.ts"]
 }
