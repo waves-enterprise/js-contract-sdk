@@ -12,11 +12,10 @@ import {execa} from "execa";
 import pkg from '../package.json'
 
 const {realpath} = fs;
-const prog = sade('we-create-contract');
+const prog = sade('we-create-contract [contractName]', true);
 
 prog
     .version(pkg.version)
-    .command('create <pkg>')
     .option('--path', `Folder to create contract`, 'we-contract-starter')
     .describe('Create a new contract')
     .example('create mypackage')
@@ -30,6 +29,19 @@ prog
         );
 
         const bootSpinner = ora(`Scaffolding Waves Enterpise JS Contract in ${chalk.bold.green(opts.path)}`);
+        bootSpinner.start()
+
+        if (!contractName) {
+            bootSpinner.fail()
+
+            console.log(`
+Contract name is not specified.
+Try ${chalk.yellowBright('we-create-contract MyContract')}
+        `)
+
+            process.exit(0);
+        }
+
         bootSpinner.info()
 
         const realPath = await realpath(process.cwd());
@@ -102,7 +114,7 @@ prog
 Successfully scaffolded project in ${chalk.blue(projectPath)}
 Start build contract by change ${chalk.greenBright(relContractPath)}
         `)
-    });
+    })
+    .parse(process.argv)
 
-prog.parse(process.argv);
 
