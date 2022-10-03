@@ -2,13 +2,14 @@ import {
     ContractTransaction,
     ContractTransactionResponse,
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
-import { Metadata } from '@grpc/grpc-js';
-import { TxId } from './consts';
-import { ParamsMap, ParamsMapper } from './mappers/params-mapper';
+import {Metadata} from '@grpc/grpc-js';
+import {TxId} from './consts';
+import {ParamsMap, ParamsMapper} from './mappers/params-mapper';
 import {AssetOperationsRegistry} from "./assets/asset-operations-registry";
 
 export class Auth {
-    constructor(private _authToken: string) {}
+    constructor(private _authToken: string) {
+    }
 
     public authToken() {
         return this._authToken;
