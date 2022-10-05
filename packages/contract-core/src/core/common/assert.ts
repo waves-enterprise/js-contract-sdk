@@ -1,5 +1,5 @@
-import { isBool } from '../utils';
-import { ConstraintValidationError } from './exceptions';
+import {isBool} from '../../utils';
+import {ConstraintValidationError} from '../exceptions';
 
 type AssertCondition = boolean | (() => boolean);
 

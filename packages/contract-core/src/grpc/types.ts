@@ -1,8 +1,8 @@
-import type * as ContractTypes from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
-import type * as TransactionTypes from '@wavesenterprise/js-contract-grpc-client/contract/contract_transaction_service';
-import type * as AddressTypes from '@wavesenterprise/js-contract-grpc-client/contract/contract_address_service';
-import type * as UtilsTypes from '@wavesenterprise/js-contract-grpc-client/contract/contract_util_service';
-import { Client } from '@grpc/grpc-js';
+import type * as ContractTypes from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
+import type * as TransactionTypes from "@wavesenterprise/js-contract-grpc-client/contract/contract_transaction_service";
+import type * as AddressTypes from "@wavesenterprise/js-contract-grpc-client/contract/contract_address_service";
+import type * as UtilsTypes from "@wavesenterprise/js-contract-grpc-client/contract/contract_util_service";
+import { Client } from "@grpc/grpc-js";
 
 type GenericClientTypes<T> = Omit<T, keyof Client>;
 

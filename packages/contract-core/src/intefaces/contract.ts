@@ -1,12 +1,7 @@
-import {ContractIssue} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue";
-import {ContractReissue} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue";
-import {ContractBurn} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn";
-import {
-    ContractTransferOut
-} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out";
+import { TInt } from "../core/data-types/integer";
 
 export type TValue = string | number | boolean | Buffer;
 
-export type TAction = (...args: any) => void;
+export type TVal = string | TInt | boolean | Buffer;
 
-export type TAssetOperation = ContractIssue | ContractReissue | ContractBurn | ContractTransferOut;
+export type TAction = (...args: any) => void;

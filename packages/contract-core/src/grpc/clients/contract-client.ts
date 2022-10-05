@@ -1,9 +1,12 @@
-import { GenericClient } from '../types';
-import { RPCConnectionConfig } from '../config';
-import { ClientReadableStream, credentials, Metadata, ServiceError } from '@grpc/grpc-js';
+import {GenericClient} from '../types';
+import {RPCConnectionConfig} from '../config';
+import {ClientReadableStream, credentials, Metadata, ServiceError} from '@grpc/grpc-js';
 import {
+    AssetId,
     CalculateAssetIdRequest,
-    CommitExecutionResponse, ContractBalancesRequest, ContractBalancesResponse,
+    CommitExecutionResponse,
+    ContractBalancesRequest,
+    ContractBalancesResponse,
     ContractKeyRequest,
     ContractKeyResponse,
     ContractKeysRequest,
@@ -11,65 +14,38 @@ import {
     ContractServiceClient,
     ContractTransactionResponse,
     ExecutionErrorRequest,
-    ExecutionSuccessRequest,
-    AssetId
+    ExecutionSuccessRequest
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
-import { logger } from '../../core/logger';
-import { ApiErrors } from '../../core/api-errors';
-import { UnavailableStateKeyException } from '../../core/exceptions';
+import {logger} from '../../core/common/logger';
+import {ApiErrors} from '../../core/types/errors';
+import {UnavailableStateKeyException} from '../../core/exceptions';
 
 export type IContractClient = GenericClient<Omit<ContractServiceClient, 'connect'>>;
 
 export class ContractClient implements IContractClient {
     log = logger(this);
 
-    private config: RPCConnectionConfig;
     private auth: Metadata;
     public impl: ContractServiceClient;
 
     connection: ClientReadableStream<ContractTransactionResponse>;
 
-    constructor(config: RPCConnectionConfig) {
-        this.config = config;
-
-        const address = `${this.config.node()}:${this.config.nodePort()}`;
-
-        this.impl = new ContractServiceClient(address, credentials.createInsecure());
+    constructor(private config: RPCConnectionConfig) {
+        this.impl = new ContractServiceClient(
+            this.config.address,
+            credentials.createInsecure()
+        );
     }
 
     connect() {
-        const connectionMeta = new Metadata();
-
-        connectionMeta.set('authorization', this.config.connectionToken());
-
         this.connection = this.impl.connect(
             {
                 connectionId: this.config.connectionId(),
             },
-            connectionMeta,
+            this.getConnectionMetadata(),
         );
 
-        this.connection.on('close', () => {
-            this.log.info('Connection stream closed');
-        });
-        this.connection.on('end', () => {
-            this.log.info('Connection stream ended');
-        });
-        this.connection.on('error', (error) => {
-            this.log.info('Connection stream error: ', error);
-        });
-        this.connection.on('readable', () => {
-            this.log.info('Connection stream readable');
-            this.connection.read();
-        });
-        this.connection.on('pause', () => {
-            this.log.info('Connection stream paused');
-        });
-        this.connection.on('resume', () => {
-            this.log.info('Connection stream resume');
-        });
-
-        this.log.info('RPC connection created');
+        this.applyHandlers(this.connection);
     }
 
     setAuth(auth: Metadata) {
@@ -83,7 +59,7 @@ export class ContractClient implements IContractClient {
                     return resolve(resp);
                 }
 
-                const { metadata } = err;
+                const {metadata} = err;
                 const [errorCode] = metadata.get('error-code');
 
                 if (ApiErrors.DataKeyNotExists === +errorCode) {
@@ -115,14 +91,14 @@ export class ContractClient implements IContractClient {
         );
     }
 
-    getContractBalances(req: ContractBalancesRequest){
+    getContractBalances(req: ContractBalancesRequest) {
         return new Promise<ContractBalancesResponse>((resolve, reject) => {
             this.impl.getContractBalances(req, this.auth, (err: ServiceError, resp: ContractBalancesResponse) => {
                 if (!err) {
                     return resolve(resp);
                 }
 
-                const { metadata } = err;
+                const {metadata} = err;
                 const [errorCode] = metadata.get('error-code');
 
                 if (ApiErrors.DataKeyNotExists === +errorCode) {
@@ -143,7 +119,7 @@ export class ContractClient implements IContractClient {
                     return resolve(resp);
                 }
 
-                const { metadata } = err;
+                const {metadata} = err;
                 const [errorCode] = metadata.get('error-code');
 
                 if (ApiErrors.DataKeyNotExists === +errorCode) {
@@ -172,7 +148,7 @@ export class ContractClient implements IContractClient {
                     return resolve(resp);
                 }
 
-                const { metadata } = err;
+                const {metadata} = err;
                 const [errorCode] = metadata.get('error-code');
 
                 if (ApiErrors.DataKeyNotExists === +errorCode) {
@@ -186,5 +162,37 @@ export class ContractClient implements IContractClient {
 
             fn(handler);
         });
+    }
+
+    private getConnectionMetadata() {
+        const connectionMeta = new Metadata();
+
+        connectionMeta.set('authorization', this.config.connectionToken());
+
+        return connectionMeta
+    }
+
+    private applyHandlers(conn: ClientReadableStream<ContractTransactionResponse>) {
+        conn.on('close', () => {
+            this.log.info('Connection stream closed');
+        });
+        conn.on('end', () => {
+            this.log.info('Connection stream ended');
+        });
+        conn.on('error', (error) => {
+            this.log.info('Connection stream error: ', error);
+        });
+        conn.on('readable', () => {
+            this.log.info('Connection stream readable');
+            this.connection.read();
+        });
+        conn.on('pause', () => {
+            this.log.info('Connection stream paused');
+        });
+        conn.on('resume', () => {
+            this.log.info('Connection stream resume');
+        });
+
+        this.log.info('RPC connection created');
     }
 }

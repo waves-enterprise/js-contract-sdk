@@ -14,8 +14,9 @@
     "start": "node dist/src/index.js",
     "dev": "tsc -w -p tsconfig.json",
     "prettier:fix": "prettier --write src/**/*.ts",
-    "lint": "eslint */**/*.{js,ts} --quiet --fix",
-    "test": "jest --watch"
+    "lint": "eslint src/**/*.ts --quiet --fix",
+    "test": "jest --watch",
+    "prepublish": "npm run build"
   },
   "author": {
     "name": "Timofey Semenyuk",
@@ -25,8 +26,10 @@
   "license": "MIT",
   "dependencies": {
     "@grpc/grpc-js": "^1.6.2",
+    "@types/bn.js": "^5.1.1",
     "@wavesenterprise/js-contract-grpc-client": "1.10.0",
     "@wavesenterprise/sdk": "^1.0.3",
+    "bn.js": "^5.2.1",
     "google-protobuf": "^3.21.0",
     "reflect-metadata": "^0.1.13"
   },

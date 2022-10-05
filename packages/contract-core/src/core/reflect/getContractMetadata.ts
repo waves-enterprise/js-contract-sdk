@@ -1,7 +1,7 @@
-import { Constructable } from '../intefaces/helpers';
-import { TArgs } from '../core/decorators/param';
-import { ACTION_METADATA, ARGS_METADATA } from '../core/consts';
-import { TContractActionsMetadata } from '../core/decorators/action';
+import {Constructable} from "../../intefaces/helpers";
+import {TArgs} from "../decorators/param";
+import {ACTION_METADATA, ARGS_METADATA} from "../consts";
+import {TContractActionsMetadata} from "../decorators/action";
 
 export function getArgsMetadata(contract: Constructable<any>, property: string): TArgs {
     return Reflect.getMetadata(ARGS_METADATA, contract, property) || {};

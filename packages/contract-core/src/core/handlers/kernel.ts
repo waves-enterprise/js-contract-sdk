@@ -1,13 +1,15 @@
 import {ContractTransactionResponse} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 import {StaticPool} from "../../utils/workers/static-pool";
-import {ContractClient, RPC} from "../../rpc";
-import {envConfig} from "../../rpc/config";
-import {logger} from "../logger";
+import {ContractClient, envConfig, RPC} from "../../grpc";
+import {logger} from "../common/logger";
 import * as path from "path";
-import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
+import {TransactionConverter} from "../converters/transaction";
+import {IncomingTransactionResp} from "../types/core";
 
 export class Kernel {
     log = logger(this)
+
+    private transactionConverter = new TransactionConverter()
 
     private workerPool: StaticPool;
     private rpc: RPC;
@@ -21,7 +23,6 @@ export class Kernel {
         })
 
         this.rpc = new RPC(envConfig());
-
         this.contractClient = this.rpc.Contract;
     }
 
@@ -42,9 +43,18 @@ export class Kernel {
         }
 
         try {
-            await this.workerPool.runTask<ContractTransactionResponse, DataEntry[]>(resp);
+            await this.workerPool.runTask<IncomingTransactionResp, any>({
+                authToken: resp.authToken,
+                tx: this.transactionConverter.parse(resp.transaction)
+            });
         } catch (e) {
             this.log.error('Worker execution error', e)
+
+            // await this.rpc.Contract.commitExecutionError({
+            //     message: e.message || 'unhandled error',
+            //     code: 1,
+            //     txId: resp.transaction.id
+            // })
         }
     }
 }

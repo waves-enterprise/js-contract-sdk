@@ -1,15 +1,14 @@
-import {ServiceContainer} from "../service-container";
+import {ServiceContainer} from "../common";
 import {ContractIssue} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue";
 import {ContractReissue} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue";
 import {ContractBurn} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn";
 import {
     ContractTransferOut
 } from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out";
-import {Context} from "../context";
 import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
-import {RPC} from "../../rpc";
-import {mapAssetId, mapContractBalance} from "../mappers/asset-operations";
-import {AssetId} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
+import {RPC} from "../../grpc";
+import {mapContractBalance} from "../mappers/asset-operations";
+import {ExecutionContext} from "../execution/execution-context";
 
 
 export type TIssueParams = {
@@ -45,7 +44,7 @@ export class Asset {
     }
 
     static getExecutionContext() {
-        return ServiceContainer.get(Context);
+        return ServiceContainer.get(ExecutionContext);
     }
 
     constructor(

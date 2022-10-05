@@ -1,7 +1,7 @@
-import { ContractClient } from './clients/contract-client';
-import { RPCConnectionConfig } from './config';
+import { ContractClient } from "./clients/contract-client";
+import { RPCConnectionConfig, envConfig } from "./config";
 
-export { RPCConnectionConfig, ContractClient };
+export { RPCConnectionConfig, ContractClient, envConfig };
 
 export class RPC {
     clients = {};
@@ -11,7 +11,7 @@ export class RPC {
     }
 
     constructor(private config: RPCConnectionConfig) {
-        this.addClient('contract', ContractClient);
+        this.addClient("contract", ContractClient);
     }
 
     addClient(key: string, constructor: any) {

@@ -4,7 +4,7 @@ import { ContractTransaction } from '@wavesenterprise/js-contract-grpc-client/co
 export class ParamsMap extends Map {}
 
 export class ParamsMapper {
-    parse(tx: ContractTransaction): ParamsMap {
+    static parse(tx: ContractTransaction): ParamsMap {
         const paramsMap = new ParamsMap();
 
         tx.params.map((p) => {

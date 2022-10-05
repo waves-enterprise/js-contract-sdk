@@ -1,6 +1,8 @@
 import 'reflect-metadata'
 import {isMainThread, parentPort, workerData} from 'node:worker_threads';
-import {WorkerHandler} from './worker-handler';
+import {ContractProcessor} from "../execution/contract-processor";
+import {envConfig, RPC} from "../../grpc";
+import {IncomingTransactionResp} from "../types/core";
 
 if (isMainThread) {
     throw new Error('Main thread error')
@@ -14,7 +16,18 @@ if (isMainThread) {
     const ContractClass = await import(workerData.contractPath)
         .then(({default: ContractClass}) => ContractClass)
 
-    const handler = new WorkerHandler(parentPort as unknown as MessagePort, ContractClass);
+    const rpc = new RPC(envConfig());
+    rpc.Contract.connect()
 
-    parentPort!.on('message', handler.handle)
+    const processor = new ContractProcessor(ContractClass, rpc)
+
+    parentPort!.on('message', async (incoming: IncomingTransactionResp) => {
+        try {
+            await processor.handleIncomingTx(incoming);
+        } catch (e) {
+            console.log('Uncathed error', e, 'tx may not be committed')
+        } finally {
+            this.messagePort.postMessage('done');
+        }
+    })
 })();
