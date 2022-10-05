@@ -221,11 +221,4 @@ describe('ContractProcessor', () => {
             {txId: 'some-tx-id', message: 'Somethin went wrong', code: 1}
         )
     });
-
-
-    it('should ', async function () {
-        const parsed = cnv.parse(mockRespTx('params').transaction!)
-
-        await processor.handleIncomingTx({authToken: 'test', tx: parsed})
-    });
 })

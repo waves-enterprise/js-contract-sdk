@@ -3,6 +3,12 @@ import {ContractState} from '../state';
 import {ExecutionContext} from '../execution/execution-context';
 import {Constructable} from '../../intefaces/helpers';
 
+function getState() {
+    return ServiceContainer.get(ExecutionContext).state
+}
+
+
+
 export function State(): PropertyDecorator;
 export function State(target: object, propertyKey: string): any;
 export function State(...args: any[]) {
@@ -16,7 +22,7 @@ export function State(...args: any[]) {
 const decorateState = (target: Constructable<any>, propertyKey: string) => {
     Object.defineProperty(target, propertyKey, {
         get(): any {
-            return ServiceContainer.get(ContractState);
+            return getState();
         },
         set(v: any) {
             throw new Error('Contract state is initialized');

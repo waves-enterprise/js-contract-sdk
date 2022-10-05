@@ -1,6 +1,6 @@
 import { TInt } from "../core/data-types/integer";
 
-export type TValue = string | number | boolean | Buffer;
+export type TValue = string | number | boolean | Uint8Array;
 
 export type TVal = string | TInt | boolean | Buffer;
 

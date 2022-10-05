@@ -57,7 +57,7 @@ export class ContractState implements IState {
         throw new WrongStateKeyTypeException();
     }
 
-    setBinary(key: string, value: Buffer) {
+    setBinary(key: string, value: Uint8Array) {
         this.storage.set(key, value);
     }
 

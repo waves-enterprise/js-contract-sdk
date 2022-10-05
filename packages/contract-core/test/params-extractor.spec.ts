@@ -24,7 +24,7 @@ jest.spyOn(RPC.prototype, 'addClient')
     })
 
 
-describe('ParamsExtractor', () => {
+describe('State', () => {
     let extractor: ContractActionArgumentsExtractor;
     let txCnv: TransactionConverter;
 

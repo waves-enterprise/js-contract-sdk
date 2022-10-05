@@ -33,7 +33,7 @@ export function getValueStateKey(v: any): keyof Omit<DataEntry, "key"> {
         return "intValue";
     }
 
-    if (Buffer.isBuffer(v)) {
+    if (v instanceof Uint8Array) {
         return "binaryValue";
     }
 

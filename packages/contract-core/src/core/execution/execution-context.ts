@@ -1,8 +1,7 @@
 import {ContractState} from "../state";
 import {AssetOperationsRegistry} from "../assets/asset-operations-registry";
 import {Auth} from "./auth";
-import {Param} from "../converters/params";
-import {ParamsMap} from "../mappers/params-mapper";
+
 import {RPC} from "../../grpc";
 import {IncomingTransactionResp} from "../types/core";
 
@@ -34,7 +33,7 @@ export class ExecutionContext {
     }
 
     public get params(): Map<string, string> {
-        const paramsMap = new ParamsMap();
+        const paramsMap = new Map();
 
         for (const p of this.tx.params) {
             paramsMap.set(p.key, p.value);

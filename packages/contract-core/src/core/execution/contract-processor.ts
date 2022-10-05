@@ -8,6 +8,7 @@ import {ContractActionMetadataExtractor} from "./extractors/action-extractor";
 import {ContractActionArgumentsExtractor} from "./extractors/arguments-extractor";
 import {IncomingTransactionResp} from "../types/core";
 import {ERROR_CODE} from "../types/errors";
+import {ServiceContainer} from "../common";
 
 export class ContractProcessor {
     private actionExtractor = new ContractActionMetadataExtractor();
@@ -27,6 +28,8 @@ export class ContractProcessor {
 
         const actionMetadata = this.actionExtractor.extract(this.contract, executionContext);
         const actionArguments = this.actionArgsExtractor.extract(this.contract, executionContext, actionMetadata)
+
+        ServiceContainer.set(executionContext);
 
         const c = this.contract;
         const contractInstance = new c();
