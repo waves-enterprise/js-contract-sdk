@@ -72,6 +72,12 @@ Try ${chalk.yellowBright('we-create-contract MyContract')}
                 {overwrite: true}
             );
 
+            await fs.move(
+                path.resolve(projectPath, './index'),
+                path.resolve(projectPath, './index.ts'),
+                {overwrite: true}
+            );
+
             let contractTpl: string = await fs.readFile(contractPath, {encoding: 'utf-8'})
 
             contractTpl = contractTpl.replace('#{contractName}', pascalCase(contractName))
