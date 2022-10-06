@@ -2,11 +2,7 @@ import {ServiceContainer} from '../common/service-container';
 import {ContractState} from '../state';
 import {ExecutionContext} from '../execution/execution-context';
 import {Constructable} from '../../intefaces/helpers';
-
-function getState() {
-    return ServiceContainer.get(ExecutionContext).state
-}
-
+import {getState} from "./common";
 
 
 export function State(): PropertyDecorator;

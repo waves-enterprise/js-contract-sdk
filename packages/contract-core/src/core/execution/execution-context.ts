@@ -6,6 +6,8 @@ import {RPC} from "../../grpc";
 import {IncomingTransactionResp} from "../types/core";
 
 export class ExecutionContext {
+    private nonce = 0;
+
     public state: ContractState;
     private auth: Auth
 
@@ -18,6 +20,13 @@ export class ExecutionContext {
 
         this.auth = new Auth(incomingTxResp.authToken)
         this.rpcConnection.Contract.setAuth(this.auth.metadata());
+    }
+
+
+    public getNonce() {
+        this.nonce = this.nonce + 1;
+
+        return this.nonce
     }
 
     public get tx() {
