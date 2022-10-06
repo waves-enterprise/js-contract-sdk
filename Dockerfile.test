@@ -9,5 +9,6 @@ COPY .eslintignore .eslintignore
 COPY .eslintrc.js .eslintrc.js
 COPY packages packages
 COPY example example
+COPY lerna.json lerna.json
 RUN npm ci -q
 CMD npm run test-ci
