@@ -1,38 +1,38 @@
-export const CONNECTION_ID = process.env.CONNECTION_ID || "";
-export const CONNECTION_TOKEN = process.env.CONNECTION_TOKEN || "";
-export const NODE = process.env.NODE || "";
-export const NODE_PORT = process.env.NODE_PORT || "";
-export const HOST_NETWORK = process.env.HOST_NETWORK || "";
+export const CONNECTION_ID = process.env.CONNECTION_ID || ''
+export const CONNECTION_TOKEN = process.env.CONNECTION_TOKEN || ''
+export const NODE = process.env.NODE || ''
+export const NODE_PORT = process.env.NODE_PORT || ''
+export const HOST_NETWORK = process.env.HOST_NETWORK || ''
 
 export class RPCConnectionConfig {
-    constructor(
-        private _connectionId: string,
-        private _connectionToken: string,
-        private _node: string,
-        private _nodePort: string,
-    ) {}
+  constructor(
+    private _connectionId: string,
+    private _connectionToken: string,
+    private _node: string,
+    private _nodePort: string,
+  ) {}
 
-    public connectionId() {
-        return this._connectionId;
-    }
+  connectionId() {
+    return this._connectionId
+  }
 
-    public connectionToken() {
-        return this._connectionToken;
-    }
+  connectionToken() {
+    return this._connectionToken
+  }
 
-    public node() {
-        return this._node;
-    }
+  node() {
+    return this._node
+  }
 
-    public nodePort() {
-        return this._nodePort;
-    }
+  nodePort() {
+    return this._nodePort
+  }
 
-    public get address() {
-        return `${this.node()}:${this.nodePort()}`;
-    }
+  get address() {
+    return `${this.node()}:${this.nodePort()}`
+  }
 }
 
 export const envConfig = (): RPCConnectionConfig => {
-    return new RPCConnectionConfig(CONNECTION_ID, CONNECTION_TOKEN, NODE, NODE_PORT);
-};
+  return new RPCConnectionConfig(CONNECTION_ID, CONNECTION_TOKEN, NODE, NODE_PORT)
+}

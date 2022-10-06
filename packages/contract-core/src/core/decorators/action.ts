@@ -1,68 +1,68 @@
-import {ACTION_METADATA} from '../consts';
-import {Constructable} from '../../intefaces/helpers';
+import { ACTION_METADATA } from '../consts'
+import { Constructable } from '../../intefaces/helpers'
 
 export type TContractActionMetadata = {
-    name: string;
-    propertyName: string;
-    params: any[];
-};
+  name: string,
+  propertyName: string,
+  params: unknown[],
+}
 
 export type TContractActionsMetadata = {
-    initializer: TContractActionMetadata;
-    actions: Record<string, TContractActionMetadata>;
-};
+  initializer: TContractActionMetadata,
+  actions: Record<string, TContractActionMetadata>,
+}
 
 type TContractActionOptions = {
-    name?: string;
-    onInit?: boolean;
-};
+  name?: string,
+  onInit?: boolean,
+}
 
 const defaultContractOptions: TContractActionOptions = {
-    onInit: false,
-};
+  onInit: false,
+}
 
-export function Action(target: object, propertyName: string | symbol, descriptor): void;
-export function Action(options?: TContractActionOptions): MethodDecorator;
+export function Action(target: object, propertyName: string | symbol, descriptor): void
+export function Action(options?: TContractActionOptions): MethodDecorator
 
 export function Action(...args): MethodDecorator | void {
-    if (arguments.length > 1) {
-        decorateMethod(args[0], args[1], args[2]);
+  if (arguments.length > 1) {
+    decorateMethod(args[0], args[1], args[2])
 
-        return;
-    }
+    return
+  }
 
-    const config = args[0];
+  const config = args[0]
 
-    return function (target: Constructable<any>, propertyName: string | symbol, descriptor): void {
-        decorateMethod(target, propertyName, descriptor, config);
-    };
+  return function (target: Constructable<unknown>, propertyName: string | symbol, descriptor): void {
+    decorateMethod(target, propertyName, descriptor, config)
+  }
 }
 
 const decorateMethod = (
-    target: Constructable<any>,
-    propertyName: string | symbol,
-    descriptor,
-    options: TContractActionOptions = defaultContractOptions,
+  target: Constructable<unknown>,
+  propertyName: string | symbol,
+  descriptor,
+  options: TContractActionOptions = defaultContractOptions,
 ) => {
-    let actionsMetadata: TContractActionsMetadata = Reflect.getMetadata(ACTION_METADATA, target.constructor);
+  let actionsMetadata: TContractActionsMetadata = Reflect.getMetadata(ACTION_METADATA, target.constructor)
 
-    if (!actionsMetadata) {
-        actionsMetadata = {actions: {} as Record<string, TContractActionMetadata>} as TContractActionsMetadata;
-    }
+  if (!actionsMetadata) {
+    actionsMetadata = { actions: {} as Record<string, TContractActionMetadata> } as TContractActionsMetadata
+  }
 
-    const actionName = options?.name ?? (propertyName as string)
-    const actionMetadata = {
-        name: options?.name ? options.name : (propertyName as string),
-        propertyName: propertyName as string,
-        params: Reflect.getMetadata('design:paramtypes', target, propertyName as string),
-    };
+  const actionName = options?.name ?? (propertyName as string)
+  const actionMetadata = {
+    name: options?.name ? options.name : (propertyName as string),
+    propertyName: propertyName as string,
+    params: Reflect.getMetadata('design:paramtypes', target, propertyName as string),
+  }
 
-    if (options.onInit) {
-        actionsMetadata['initializer'] = actionMetadata
-    } else {
-        actionsMetadata.actions[actionName] = actionMetadata
-    }
+  if (options.onInit) {
+    actionsMetadata.initializer = actionMetadata
+  } else {
+    actionsMetadata.actions[actionName] = actionMetadata
+  }
 
 
-    Reflect.defineMetadata(ACTION_METADATA, actionsMetadata, target.constructor);
-};
+  Reflect.defineMetadata(ACTION_METADATA, actionsMetadata, target.constructor)
+}

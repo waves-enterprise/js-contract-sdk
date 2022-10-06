@@ -1,296 +1,295 @@
-import {Action, ContractState, ExecutionContext, State} from "../src";
-import {ContractActionArgumentsExtractor} from "../src/core/execution/extractors/arguments-extractor";
-import {RPC} from "../src/grpc";
-import {TransactionConverter} from "../src/core/converters/transaction";
-import {mockRespTx} from "./mocks/contract-transaction-response";
-import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
+import { Action, ContractState, ExecutionContext, State } from '../src'
+import { RPC } from '../src/grpc'
+import { TransactionConverter } from '../src/core/converters/transaction'
+import { mockRespTx } from './mocks/contract-transaction-response'
+import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import {
-    ContractKeyRequest,
-    ContractTransaction
-} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {ContractProcessor} from "../src/core/execution/contract-processor";
-import {Var} from "../src/core/decorators/var";
+  ContractKeyRequest,
+  ContractTransaction,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { ContractProcessor } from '../src/core/execution/contract-processor'
+import { Var } from '../src/core/decorators/var'
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
-    .mockReturnValue({
-        setAuth() {
-        },
-        commitExecutionSuccess: jest.fn((args) => {
-            // console.log(args)
-        }),
-        commitExecutionError: jest.fn((args) => {
-            // console.log(args)
-        }),
+  .mockReturnValue({
+    setAuth() {
+    },
+    commitExecutionSuccess: jest.fn((_args) => {
+      // console.log(args)
+    }),
+    commitExecutionError: jest.fn((_args) => {
+      // console.log(args)
+    }),
 
-        getContractKey: jest.fn((args) => {
-            // console.log(args)
-        })
-    } as any)
+    getContractKey: jest.fn((_args) => {
+      // console.log(args)
+    }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any)
 
 
 jest.spyOn(ContractProcessor.prototype, 'tryCommitError')
-jest.spyOn(RPC.prototype, 'addClient')
-    .mockImplementation(() => {
-    })
+jest.spyOn(RPC.prototype, 'saveClient')
+  .mockImplementation(() => {
+  })
 
 describe('State', () => {
-    let rpc = new RPC({} as unknown as any)
-    let extractor: ContractActionArgumentsExtractor;
-    let txCnv: TransactionConverter;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rpc = new RPC({} as unknown as any)
+  let txCnv: TransactionConverter
 
-    function mockExecutionContext(tx: ContractTransaction) {
-        return new ExecutionContext({
-            authToken: '',
-            tx: txCnv.parse(tx)
-        }, rpc)
+  function mockExecutionContext(tx: ContractTransaction) {
+    return new ExecutionContext({
+      authToken: '',
+      tx: txCnv.parse(tx),
+    }, rpc)
+  }
+
+
+  beforeEach(() => {
+    txCnv = new TransactionConverter()
+  })
+
+  describe('ContractState', () => {
+    it('should set string value', async () => {
+      class TestContract {
+        @State state: ContractState
+
+        @Action
+        test() {
+          this.state.setString('strictString', 'str')
+          this.state.set('castString', 'str1')
+        }
+      }
+
+      const tx = mockRespTx('test').transaction!
+      const ec = mockExecutionContext(tx)
+
+      const processor = new ContractProcessor(
+        TestContract,
+        ec.rpcConnection,
+      )
+
+      await processor.handleIncomingTx(ec.incomingTxResp)
+
+      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+        {
+          txId: 'some-tx-id',
+          results: [
+            DataEntry.fromPartial({
+              stringValue: 'str',
+              key: 'strictString',
+            }),
+            DataEntry.fromPartial({
+              stringValue: 'str1',
+              key: 'castString',
+            }),
+          ],
+          assetOperations: [],
+        },
+      )
+    })
+
+    it('should set int value', async () => {
+      class TestContract {
+        @State state: ContractState
+
+        @Action
+        test() {
+          this.state.setInt('strictInt', 100)
+          this.state.set('castInt', 1001)
+        }
+      }
+
+      const tx = mockRespTx('test').transaction!
+      const ec = mockExecutionContext(tx)
+
+      const processor = new ContractProcessor(
+        TestContract,
+        ec.rpcConnection,
+      )
+
+      await processor.handleIncomingTx(ec.incomingTxResp)
+
+      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+        {
+          txId: 'some-tx-id',
+          results: [
+            DataEntry.fromPartial({
+              intValue: 100,
+              key: 'strictInt',
+            }),
+
+            DataEntry.fromPartial({
+              intValue: 1001,
+              key: 'castInt',
+            }),
+          ],
+          assetOperations: [],
+        },
+      )
+    })
+
+    it('should set boolean value', async () => {
+      class TestContract {
+        @State state: ContractState
+
+        @Action
+        test() {
+          this.state.setBool('strictBool', false)
+          this.state.set('castBool', true)
+        }
+      }
+
+      const tx = mockRespTx('test').transaction!
+      const ec = mockExecutionContext(tx)
+
+      const processor = new ContractProcessor(
+        TestContract,
+        ec.rpcConnection,
+      )
+
+      await processor.handleIncomingTx(ec.incomingTxResp)
+
+      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+        {
+          txId: 'some-tx-id',
+          results: [
+            DataEntry.fromPartial({
+              boolValue: false,
+              key: 'strictBool',
+            }),
+
+            DataEntry.fromPartial({
+              boolValue: true,
+              key: 'castBool',
+            }),
+          ],
+          assetOperations: [],
+        },
+      )
+    })
+
+    it('should set binary value', async () => {
+      class TestContract {
+        @State state: ContractState
+
+        @Action
+        test() {
+          this.state.setBinary('strictBinary', new Uint8Array([22, 8, 322]))
+          this.state.set('castBinary', new Uint8Array([21, 8, 322]))
+        }
+      }
+
+      const tx = mockRespTx('test').transaction!
+      const ec = mockExecutionContext(tx)
+
+      const processor = new ContractProcessor(
+        TestContract,
+        ec.rpcConnection,
+      )
+
+      await processor.handleIncomingTx(ec.incomingTxResp)
+
+      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+        {
+          txId: 'some-tx-id',
+          results: [
+            DataEntry.fromPartial({
+              binaryValue: new Uint8Array([22, 8, 322]),
+              key: 'strictBinary',
+            }),
+
+            DataEntry.fromPartial({
+              binaryValue: new Uint8Array([21, 8, 322]),
+              key: 'castBinary',
+            }),
+          ],
+          assetOperations: [],
+        },
+      )
+    })
+  })
+
+  describe('Properties', () => {
+    class TestContract {
+      @Var() myVar: { get(): unknown, set(v: unknown): void }
+      @Var({ mutable: false }) immutable: { get(): unknown, set(v: unknown): void }
+
+      @Action
+      test() {
+        this.myVar.set('test')
+      }
+
+      @Action
+      async getterTest() {
+        await this.myVar.get()
+      }
+
+      @Action
+      immutableTest() {
+        this.immutable.set('testValue')
+      }
     }
 
+    it('should throw error on try set immutable', async function () {
+      const tx = mockRespTx('immutableTest').transaction!
+      const ec = mockExecutionContext(tx)
 
-    beforeEach(() => {
-        extractor = new ContractActionArgumentsExtractor();
-        txCnv = new TransactionConverter();
+      const processor = new ContractProcessor(
+        TestContract,
+        rpc,
+      )
+
+
+      await processor.handleIncomingTx(ec.incomingTxResp)
+
+      expect(processor.tryCommitError).toBeCalled()
     })
 
-    describe('ContractState', () => {
-        it('should set string value', async () => {
-            class TestContract {
-                @State state: ContractState
+    it('should get value by propertyKey', async function () {
+      const tx = mockRespTx('getterTest').transaction!
+      const ec = mockExecutionContext(tx)
 
-                @Action
-                test() {
-                    this.state.setString('strictString', 'str')
-                    this.state.set('castString', 'str1')
-                }
-            }
+      const processor = new ContractProcessor(
+        TestContract,
+        rpc,
+      )
 
-            const tx = mockRespTx('test').transaction!;
-            const ec = mockExecutionContext(tx)
+      await processor.handleIncomingTx(ec.incomingTxResp)
 
-            const processor = new ContractProcessor(
-                TestContract,
-                ec.rpcConnection,
-            );
-
-            await processor.handleIncomingTx(ec.incomingTxResp)
-
-            expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
-                {
-                    txId: 'some-tx-id',
-                    results: [
-                        DataEntry.fromPartial({
-                            stringValue: 'str',
-                            key: 'strictString'
-                        }),
-                        DataEntry.fromPartial({
-                            stringValue: 'str1',
-                            key: 'castString'
-                        })
-                    ],
-                    assetOperations: []
-                }
-            )
-        })
-
-        it('should set int value', async () => {
-            class TestContract {
-                @State state: ContractState
-
-                @Action
-                test() {
-                    this.state.setInt('strictInt', 100)
-                    this.state.set('castInt', 1001)
-                }
-            }
-
-            const tx = mockRespTx('test').transaction!;
-            const ec = mockExecutionContext(tx)
-
-            const processor = new ContractProcessor(
-                TestContract,
-                ec.rpcConnection,
-            );
-
-            await processor.handleIncomingTx(ec.incomingTxResp)
-
-            expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
-                {
-                    txId: 'some-tx-id',
-                    results: [
-                        DataEntry.fromPartial({
-                            intValue: 100,
-                            key: 'strictInt'
-                        }),
-
-                        DataEntry.fromPartial({
-                            intValue: 1001,
-                            key: 'castInt'
-                        })
-                    ],
-                    assetOperations: []
-                }
-            )
-        })
-
-        it('should set boolean value', async () => {
-            class TestContract {
-                @State state: ContractState
-
-                @Action
-                test() {
-                    this.state.setBool('strictBool', false)
-                    this.state.set('castBool', true)
-                }
-            }
-
-            const tx = mockRespTx('test').transaction!;
-            const ec = mockExecutionContext(tx)
-
-            const processor = new ContractProcessor(
-                TestContract,
-                ec.rpcConnection,
-            );
-
-            await processor.handleIncomingTx(ec.incomingTxResp)
-
-            expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
-                {
-                    txId: 'some-tx-id',
-                    results: [
-                        DataEntry.fromPartial({
-                            boolValue: false,
-                            key: 'strictBool'
-                        }),
-
-                        DataEntry.fromPartial({
-                            boolValue: true,
-                            key: 'castBool'
-                        })
-                    ],
-                    assetOperations: []
-                }
-            )
-        })
-
-        it('should set binary value', async () => {
-            class TestContract {
-                @State state: ContractState
-
-                @Action
-                test() {
-                    this.state.setBinary('strictBinary', new Uint8Array([22, 8, 322]))
-                    this.state.set('castBinary', new Uint8Array([21, 8, 322]))
-                }
-            }
-
-            const tx = mockRespTx('test').transaction!;
-            const ec = mockExecutionContext(tx)
-
-            const processor = new ContractProcessor(
-                TestContract,
-                ec.rpcConnection,
-            );
-
-            await processor.handleIncomingTx(ec.incomingTxResp)
-
-            expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
-                {
-                    txId: 'some-tx-id',
-                    results: [
-                        DataEntry.fromPartial({
-                            binaryValue: new Uint8Array([22, 8, 322]),
-                            key: 'strictBinary'
-                        }),
-
-                        DataEntry.fromPartial({
-                            binaryValue: new Uint8Array([21, 8, 322]),
-                            key: 'castBinary'
-                        })
-                    ],
-                    assetOperations: []
-                }
-            )
-        })
+      expect(rpc.Contract.getContractKey).toBeCalledWith(
+        ContractKeyRequest.fromPartial({
+          contractId: 'test-contract',
+          key: 'myVar',
+        }),
+      )
     })
 
-    describe('Properties', () => {
-        class TestContract {
-            @Var() myVar: { get(): any, set(v: any): void };
-            @Var({ mutable: false }) immutable: { get(): any, set(v: any): void };
+    it('should initialize proxy state value', async function () {
+      const tx = mockRespTx('test').transaction!
+      const ec = mockExecutionContext(tx)
 
-            @Action
-            test() {
-                this.myVar.set('test')
-            }
+      const processor = new ContractProcessor(
+        TestContract,
+        rpc,
+      )
 
-            @Action
-            async getterTest() {
-                await this.myVar.get()
-            }
+      await processor.handleIncomingTx(ec.incomingTxResp)
 
-            @Action
-            async immutableTest() {
-                this.immutable.set('testValue')
-            }
-        }
+      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+        {
+          txId: 'some-tx-id',
+          results: [
+            DataEntry.fromPartial({
+              stringValue: 'test',
+              key: 'myVar',
+            }),
 
-        it('should throw error on try set immutable', async function () {
-            const tx = mockRespTx('immutableTest').transaction!;
-            const ec = mockExecutionContext(tx)
-
-            const processor = new ContractProcessor(
-                TestContract,
-                rpc,
-            );
-
-
-            await processor.handleIncomingTx(ec.incomingTxResp)
-
-            expect(processor.tryCommitError).toBeCalled()
-        });
-
-        it('should get value by propertyKey', async function () {
-            const tx = mockRespTx('getterTest').transaction!;
-            const ec = mockExecutionContext(tx)
-
-            const processor = new ContractProcessor(
-                TestContract,
-                rpc,
-            );
-
-            await processor.handleIncomingTx(ec.incomingTxResp)
-
-            expect(rpc.Contract.getContractKey).toBeCalledWith(
-                ContractKeyRequest.fromPartial({
-                    contractId: 'test-contract',
-                    key: 'myVar'
-                })
-            )
-        });
-
-        it('should initialize proxy state value', async function () {
-            const tx = mockRespTx('test').transaction!;
-            const ec = mockExecutionContext(tx)
-
-            const processor = new ContractProcessor(
-                TestContract,
-                rpc,
-            );
-
-            await processor.handleIncomingTx(ec.incomingTxResp)
-
-            expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
-                {
-                    txId: 'some-tx-id',
-                    results: [
-                        DataEntry.fromPartial({
-                            stringValue: 'test',
-                            key: 'myVar'
-                        }),
-
-                    ],
-                    assetOperations: []
-                }
-            )
-        });
+          ],
+          assetOperations: [],
+        },
+      )
     })
+  })
 })

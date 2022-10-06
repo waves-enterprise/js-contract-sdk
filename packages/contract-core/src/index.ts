@@ -1,2 +1,2 @@
-import 'reflect-metadata';
-export * from './core';
+import 'reflect-metadata'
+export * from './core'
