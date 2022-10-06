@@ -49,12 +49,6 @@ export class Kernel {
             });
         } catch (e) {
             this.log.error('Worker execution error', e)
-
-            // await this.rpc.Contract.commitExecutionError({
-            //     message: e.message || 'unhandled error',
-            //     code: 1,
-            //     txId: resp.transaction.id
-            // })
         }
     }
 }

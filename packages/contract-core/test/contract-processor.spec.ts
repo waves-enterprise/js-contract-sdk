@@ -11,7 +11,7 @@ import {
     UnavailableContractActionException,
     UnavailableContractParamException
 } from "../src/core/exceptions";
-import {ContractError} from "../dist/core/exceptions";
+import {ContractError} from "../src/core/exceptions";
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
     .mockReturnValue({

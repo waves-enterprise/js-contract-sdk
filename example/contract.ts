@@ -1,9 +1,9 @@
-import {Action, assert, Context, Contract, ContractState, Ctx, Param, State} from "../packages/contract-core/src";
+import {Action, assert, ExecutionContext, Contract, ContractState, Ctx, Param, State} from "../packages/contract-core/src";
 
 @Contract()
 export class TestContract {
     @State state: ContractState;
-    @Ctx context: Context;
+    @Ctx context: ExecutionContext;
 
     @Action({onInit: true})
     async init() {

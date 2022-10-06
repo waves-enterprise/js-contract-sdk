@@ -1,7 +1,6 @@
 import {Action, Contract, Param} from "../src";
 import {ContractRegistry} from "../src/core/contract-registry";
 import {getArgsMetadata, getContractMetadata} from "../src/core/reflect/getContractMetadata";
-import {TInt} from "../dist/core/data-types/integer";
 
 describe('Decorators', () => {
     describe('@Contract', () => {

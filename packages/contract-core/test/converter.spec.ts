@@ -3,7 +3,7 @@ import {ContractTransactionResponse} from "@wavesenterprise/js-contract-grpc-cli
 import {TransactionConverter} from "../src/core/converters/transaction";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 import {ContractTransferIn} from "@wavesenterprise/js-contract-grpc-client/contract_transfer_in";
-import {IncomingTx} from "../dist/core/types/core";
+import {IncomingTx} from "../src/core/types/core";
 
 describe('TransactionConverter', () => {
     let mockTx: ContractTransactionResponse;

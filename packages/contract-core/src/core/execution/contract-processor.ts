@@ -40,7 +40,6 @@ export class ContractProcessor {
             return this.tryCommitSuccess(executionContext)
         } catch (e) {
 
-
             return this.tryCommitError(executionContext, e)
         }
     }

@@ -8,7 +8,8 @@ import {
 import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
 import {RPC} from "../../grpc";
 import {mapContractBalance} from "../mappers/asset-operations";
-import {ExecutionContext} from "../execution/execution-context";
+import {getExecutionContext} from "../decorators/common";
+import {TInt} from "../data-types/integer";
 
 
 export type TIssueParams = {
@@ -44,13 +45,31 @@ export class Asset {
     }
 
     static getExecutionContext() {
-        return ServiceContainer.get(ExecutionContext);
+        return getExecutionContext();
     }
 
     constructor(
-        private assetId?: string
+        private assetId?: string,
+        nonce?: number
     ) {
     }
+
+    static from(assetId: string) {
+        return new Asset(assetId);
+    }
+
+    static system() {
+        return new Asset();
+    }
+
+    static async new(nonce?: number) {
+        const nonceAssetId = nonce || this.getExecutionContext().getNonce();
+
+        const assetId = await this.calculateAssetId(nonceAssetId)
+
+        return new Asset(assetId, nonceAssetId);
+    }
+
 
     issue(t: TIssueParams) {
         const operation = ContractIssue.fromPartial({
