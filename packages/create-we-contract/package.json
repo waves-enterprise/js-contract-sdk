@@ -1,23 +1,51 @@
 {
   "name": "create-we-contract",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Scaffold Waves Enterprise JS Contract project",
-  "main": "index.js",
   "private": false,
+  "type": "module",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
   "bin": {
-    "create-contract": "./index.js"
+    "create-contract": "./dist/index.mjs"
   },
   "author": {
     "name": "Timofey Semenyuk",
     "email": "rustfy@gmail.com",
     "url": "https://github.com/stfy"
   },
+  "scripts": {
+    "build": "unbuild"
+  },
+  "engines": {
+    "node": ">=14.16"
+  },
   "license": "MIT",
   "dependencies": {
+    "chalk": "^5.0.1",
     "commander": "^9.1.0",
-    "pascal-case": "^3.1.2"
+    "execa": "^6.1.0",
+    "fs-extra": "^10.1.0",
+    "ora": "^6.1.2",
+    "pascal-case": "^3.1.2",
+    "sade": "^1.8.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/node": "^18.8.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4",
+    "unbuild": "^0.8.11"
   }
 }

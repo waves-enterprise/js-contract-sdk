@@ -1,12 +1,10 @@
-import { logger } from '../logger';
-import { ContractClient } from '../../rpc/clients/contract-client';
-import { TValue } from '../../intefaces/contract';
-import { ContractKeysRequest } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
-import { isString, parseDataEntry } from '../../utils';
-import { InternalContractState } from './internal-contract-state';
-import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry';
-
-const DEL = '@@__deleted';
+import {logger} from '../common/logger';
+import {ContractClient} from '../../grpc';
+import {TValue} from '../../intefaces/contract';
+import {ContractKeysRequest} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
+import {isString, parseDataEntry} from '../../utils';
+import {InternalContractState} from './internal-contract-state';
+import {DataEntry} from '@wavesenterprise/js-contract-grpc-client/data_entry';
 
 type GetConfig = Omit<ContractKeysRequest, 'contractId'>;
 
@@ -35,7 +33,7 @@ export class Storage {
                 return this.internalState.get(key);
             }
 
-            const resp = await this.client.getContractKey({ key, contractId });
+            const resp = await this.client.getContractKey({key, contractId});
 
             const value = parseDataEntry(resp.entry as DataEntry);
 
@@ -82,12 +80,12 @@ export class Storage {
             return Promise.resolve(true);
         }
 
-        const { entry } = await this.client.getContractKey({
+        const {entry} = await this.client.getContractKey({
             contractId: this.contractId,
             key,
         });
 
-        return Boolean(entry && entry.stringValue !== DEL);
+        return Boolean(entry && entry.stringValue !== undefined);
     }
 
     set(key: string, value: TValue): void {
@@ -95,7 +93,7 @@ export class Storage {
     }
 
     delete(key: string) {
-        this.internalState.write(key, DEL);
+        this.internalState.write(key, undefined);
     }
 
     getEntries(): DataEntry[] {

@@ -7,6 +7,9 @@
   "scripts": {
     "bootstrap": "lerna bootstrap"
   },
+  "repository": {
+    "url": "git@github.com:waves-enterprise/js-contract-sdk.git"
+  },
   "author": {
     "name": "Timofey Semenyuk",
     "email": "rustfy@gmail.com",
@@ -14,16 +17,14 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@changesets/cli": "^2.25.0",
     "lerna": "^4.0.0"
   },
   "dependencies": {
-    "@wavesenterprise/js-sdk": "^3.4.7",
+    "@wavesenterprise/sdk": "^1.0.3",
     "reflect-metadata": "^0.1.13"
   },
-  "workspaces": ["packages/*"]
+  "workspaces": [
+    "packages/*"
+  ]
 }
-
-
-
-
-

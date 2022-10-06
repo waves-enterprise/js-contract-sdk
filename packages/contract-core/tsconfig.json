@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-    "types": ["node"],
+    "types": ["node", "jest"],
     "module": "commonjs",
     "preserveSymlinks": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "Node",
     "target": "es2017",
@@ -21,5 +23,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }

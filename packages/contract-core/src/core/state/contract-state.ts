@@ -1,13 +1,12 @@
-import { Context } from '../context';
-import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry';
-import { isBool, isNum, isString, nil } from '../../utils';
-import { logger } from '../logger';
-import { TValue } from '../../intefaces/contract';
-import { RPC } from '../../rpc';
-import { Mapping } from './collections/mapping';
-import { Storage } from './storage';
-import { UnavailableStateKeyException, WrongStateKeyTypeException } from '../exceptions';
-import { Optional } from '../../intefaces/helpers';
+import {DataEntry} from '@wavesenterprise/js-contract-grpc-client/data_entry';
+import {isBool, isNum, isString, nil} from '../../utils';
+import {logger} from '../common/logger';
+import {TValue} from '../../intefaces/contract';
+import {Mapping} from './collections/mapping';
+import {Storage} from './storage';
+import {UnavailableStateKeyException, WrongStateKeyTypeException} from '../exceptions';
+import {Optional} from '../../intefaces/helpers';
+import {ExecutionContext} from "../execution/execution-context";
 
 export interface IState {
     setString(key: string, value: string): void;
@@ -42,8 +41,10 @@ export class ContractState implements IState {
 
     public storage: Storage;
 
-    constructor(private rpc: RPC, private ctx: Context) {
-        this.storage = new Storage(ctx.contractId, rpc.Contract);
+    constructor(
+        context: ExecutionContext
+    ) {
+        this.storage = new Storage(context.contractId, context.rpcConnection.Contract);
     }
 
     async getBinary(key: string): Promise<Buffer> {
@@ -56,7 +57,7 @@ export class ContractState implements IState {
         throw new WrongStateKeyTypeException();
     }
 
-    setBinary(key: string, value: Buffer) {
+    setBinary(key: string, value: Uint8Array) {
         this.storage.set(key, value);
     }
 

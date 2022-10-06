@@ -12,14 +12,6 @@ const {info} = require("./src/log");
 const {cache} = require("./src/cache");
 const {context} = require("./src/context");
 
-const MAINNET_CONFIG = {
-  //TOOD
-}
-
-const TESTNET_CONFIG = {
-  //TOOD
-}
-
 const SANDBOX_CONFIG = {
   registry: 'localhost:5000',
   nodeUrl: 'http://localhost:6862',

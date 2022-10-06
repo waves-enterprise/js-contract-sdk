@@ -1,7 +1,13 @@
-import { ServiceContainer } from '../service-container';
-import { ContractState } from '../state';
-import { Context } from '../context';
-import { Constructable } from '../../intefaces/helpers';
+import {ServiceContainer} from '../common/service-container';
+import {ContractState} from '../state';
+import {ExecutionContext} from '../execution/execution-context';
+import {Constructable} from '../../intefaces/helpers';
+
+function getState() {
+    return ServiceContainer.get(ExecutionContext).state
+}
+
+
 
 export function State(): PropertyDecorator;
 export function State(target: object, propertyKey: string): any;
@@ -16,7 +22,7 @@ export function State(...args: any[]) {
 const decorateState = (target: Constructable<any>, propertyKey: string) => {
     Object.defineProperty(target, propertyKey, {
         get(): any {
-            return ServiceContainer.get(ContractState);
+            return getState();
         },
         set(v: any) {
             throw new Error('Contract state is initialized');
@@ -37,7 +43,7 @@ export function Ctx(...args: any[]) {
 const decorateContext = (target: Constructable<any>, propertyKey: string) => {
     Object.defineProperty(target, propertyKey, {
         get(): any {
-            return ServiceContainer.get(Context);
+            return ServiceContainer.get(ExecutionContext);
         },
         set(v: any) {
             throw new Error('Context is initialized');

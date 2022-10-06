@@ -12,7 +12,7 @@ npm install -D @wavesenterprise/contract-cli
 
 | Command                        | Description                                                                                 |
 | ------------------------------ | ------------------------------------------------------------------------------------------- |
-| `we-cli deploy`                | Deploy your contract to Waves Enterprise network based on config                            |
+| `we-cli create`                | Deploy your contract to Waves Enterprise network based on config                            |
 | `we-cli update`                | Update your contract container                                                              |
 |                                | More commands soon...                                                                      |
 

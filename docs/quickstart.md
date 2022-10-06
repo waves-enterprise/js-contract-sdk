@@ -2,7 +2,7 @@
 
 This section describes JS Сontract SDK Toolkit – a toolkit for development, testing and deploying smart contracts in Waves Enterprise public blockchain networks. Use the toolkit to fast take off with the Waves Enterprise ecosystem without using any specific programming language, because smart contracts are deployed in a Docker container. You can create a smart contract using any of the most commonly used languages, such as Typescript.
 
-Smart contracts are often deployed into different environments and networks. For example, you can scaffold local environment based on a sandbox node and deploy contracts to this network for test use-cases.
+Smart contracts are often deployed into different environments and networks. For example, you can scaffold local environment based on a sandbox node and create contracts to this network for test use-cases.
 
 Deploy your smart contract to different environments using WE Contract Command line interface (CLI).
 
@@ -51,10 +51,10 @@ export default class MyContract {
 ```
 
 
-Once you finish write your contract actions, you can deploy your contract to network, i.e to deploy to local sandbox network run following:
+Once you finish write your contract actions, you can create your contract to network, i.e to create to local sandbox network run following:
 
 ```npm 
-npm run deploy:sandbox
+npm run create:sandbox
 ```
 
 Make sure you setup your network credentials in ```contract.config.js```

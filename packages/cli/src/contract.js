@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 const docker = require("../cmd/docker");
 
-const {create, MAINNET_CONFIG} = require("@wavesenterprise/js-sdk");
+const {We} = require("@wavesenterprise/sdk");
 const {paramType} = require("./utils");
 const {info} = require("./log");
 const {contractStatus} = require("./tx-observer");
@@ -9,15 +9,7 @@ const {contractStatus} = require("./tx-observer");
 async function deploy(nodeConfig, {seed, imageName, imageHash, name, params}) {
   const {chainId, minimumFee} = await (await fetch(`${nodeConfig.nodeAddress}/node/config`)).json();
 
-  const WE = create({
-    initialConfiguration: {
-      ...MAINNET_CONFIG,
-      ...nodeConfig,
-      networkByte: chainId.charCodeAt(0),
-      minimumFee,
-    },
-    fetchInstance: fetch
-  });
+  const WE = new We()
 
   const signer = WE.Seed.fromExistingPhrase(seed)
 
@@ -29,7 +21,8 @@ async function deploy(nodeConfig, {seed, imageName, imageHash, name, params}) {
     params: transformParams(params)
   };
 
-  const tx = WE.API.Transactions.CreateContract.V2(txBody)
+  const tx = WE.API.Transactions.CreateContract.V2(txBody);
+
   const Tx = await tx.broadcast(signer.keyPair);
 
   info(`ContractId "${Tx.id}"`);

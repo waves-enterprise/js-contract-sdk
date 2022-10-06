@@ -1,4 +1,4 @@
-import { Constructable } from '../intefaces/helpers';
+import { Constructable } from "../intefaces/helpers";
 
 export class ContractRegistry {
     private static contractsMap = new Map<string, Constructable<any>>();
@@ -8,7 +8,7 @@ export class ContractRegistry {
     static add<T>(...args) {
         let component, target;
 
-        if (typeof args[0] === 'string') {
+        if (typeof args[0] === "string") {
             component = args[0];
             target = args[1];
         } else {
@@ -20,6 +20,6 @@ export class ContractRegistry {
     }
 
     static getDefault() {
-        return this.contractsMap.get('default');
+        return this.contractsMap.get("default");
     }
 }

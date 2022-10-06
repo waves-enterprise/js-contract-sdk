@@ -45,7 +45,7 @@ module.exports = {
 }
 ```
 
-* ```seed``` – if you are going to deploy a contract to the sandbox network, provide the contract initiator seed phrase;
+* ```seed``` – if you are going to create a contract to the sandbox network, provide the contract initiator seed phrase;
 * ```registry``` – if you used a specific Docker registry, provide the registry name;
-* ```nodeAddress``` – provide specific nodeAddress to deploy to.
+* ```nodeAddress``` – provide specific nodeAddress to create to.
 * ```params.init``` – to specify initialization parameters, set a function
