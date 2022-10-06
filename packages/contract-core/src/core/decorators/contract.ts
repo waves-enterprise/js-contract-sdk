@@ -1,18 +1,20 @@
-import { ContractRegistry } from '../contract-registry';
-import { Constructable } from '../../intefaces/helpers';
+/* eslint-disable no-redeclare */
+import { ContractRegistry } from '../contract-registry'
+import { Constructable } from '../../intefaces/helpers'
 
-type ContractOptions<T = unknown> = {
-    component: string;
-};
+type ContractOptions = {
+  component: string,
+}
 
-export function Contract<T extends Constructable<any>>(): any;
-export function Contract<T = unknown>(options: ContractOptions<T>): T | void;
-export function Contract<T>(options: ContractOptions<T> = { component: 'default' }): ClassDecorator {
-    return (targetConstructor) => {
-        if (options.component === 'default') {
-            ContractRegistry.add(options.component, targetConstructor as unknown as Constructable<any>);
-        }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function Contract(): any
+export function Contract<T = unknown>(options: ContractOptions): T | void
+export function Contract(options: ContractOptions = { component: 'default' }): ClassDecorator {
+  return (targetConstructor) => {
+    if (options.component === 'default') {
+      ContractRegistry.add(options.component, targetConstructor as unknown as Constructable<unknown>)
+    }
 
-        // TODO multiple contracts implementations
-    };
+    // TODO multiple contracts implementations
+  }
 }

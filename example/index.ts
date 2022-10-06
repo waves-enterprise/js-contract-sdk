@@ -1,6 +1,5 @@
-import 'reflect-metadata';
+import 'reflect-metadata'
 
-import {TestContract} from "./contract";
-import {start} from "../packages/contract-core/src";
+import { start } from '../packages/contract-core/src'
 
-start('./contract');
+start('./contract')

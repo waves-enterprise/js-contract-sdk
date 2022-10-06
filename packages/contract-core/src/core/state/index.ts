@@ -1,2 +1,2 @@
-export { Storage } from './storage';
-export { ContractState, IState } from './contract-state';
+export { Storage } from './storage'
+export { ContractState, IState } from './contract-state'

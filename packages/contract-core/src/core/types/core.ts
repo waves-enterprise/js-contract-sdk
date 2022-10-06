@@ -1,10 +1,10 @@
-import {TInt} from "../data-types/integer";
-import {TVal} from "../../intefaces/contract";
+import { TInt } from '../data-types/integer'
+import { TVal } from '../../intefaces/contract'
 
 export type TParam = {
-    key: string;
-    value: TVal
-    type: string
+  key: string,
+  value: TVal,
+  type: string,
 }
 
 
@@ -13,22 +13,22 @@ export class TransferIn {
     amount: TInt
 }
 
-export interface IncomingTx {
-    id: string;
-    type: number;
-    sender: string;
-    senderPublicKey: string;
-    contractId: string;
-    version: number;
-    fee: TInt;
-    proofs: Uint8Array;
-    timestamp: number;
-    feeAssetId?: string;
-    payments: TransferIn[];
-    params: TParam[]
+export type IncomingTx = {
+  id: string,
+  type: number,
+  sender: string,
+  senderPublicKey: string,
+  contractId: string,
+  version: number,
+  fee: TInt,
+  proofs: Uint8Array,
+  timestamp: number,
+  feeAssetId?: string,
+  payments: TransferIn[],
+  params: TParam[],
 }
 
 export type IncomingTransactionResp = {
-    authToken: string;
-    tx: IncomingTx
+  authToken: string,
+  tx: IncomingTx,
 }

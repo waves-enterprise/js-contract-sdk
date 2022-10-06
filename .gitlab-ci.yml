@@ -1,23 +1,21 @@
-image: "node:16-slim"
+image: ${REGISTRY}/it/docker:19.03.1
+
+services:
+  - name: ${REGISTRY}/it/docker:19.03.1-dind
+    alias: docker
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
 
 stages:
- - publish
+  - test
 
-before_script:
-  - apt-get update && apt-get install git -y
-
-publish:
- stage: publish
- script:
-    # Конфигурация git
-    - git config --global user.email support@wavesenterprise.com;
-    - git config --global user.name wavesenterprise;
-    #   
-    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-    - yarn
-    - yarn publish --new-version ${VERSION}
- tags:
-   - wavesenterprise
- only:
-   variables:
-     - $VERSION
+run-test-ci:
+  stage: test
+  script:
+    - docker login -u "${REGISTRY_USER}" -p "${REGISTRY_PASSWORD}" "${REGISTRY}"
+    - cat Dockerfile.test | sed "s/\${REGISTRY}/${REGISTRY}/g" | docker build --no-cache --tag test-image -f - .
+    - docker run --hostname test-0 --rm --name test-container-0 test-image
+  tags:
+    - voting

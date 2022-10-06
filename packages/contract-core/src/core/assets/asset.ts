@@ -1,153 +1,152 @@
-import {ServiceContainer} from "../common";
-import {ContractIssue} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue";
-import {ContractReissue} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue";
-import {ContractBurn} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn";
+import { ServiceContainer } from '../common'
+import { ContractIssue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue'
+import { ContractReissue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue'
+import { ContractBurn } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn'
 import {
-    ContractTransferOut
-} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out";
-import {ContractAssetOperation} from "@wavesenterprise/js-contract-grpc-client/contract_asset_operation";
-import {RPC} from "../../grpc";
-import {mapContractBalance} from "../mappers/asset-operations";
-import {getExecutionContext} from "../decorators/common";
-import {TInt} from "../data-types/integer";
+  ContractTransferOut,
+} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out'
+import { ContractAssetOperation } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
+import { RPC } from '../../grpc'
+import { mapContractBalance } from '../mappers/asset-operations'
+import { getExecutionContext } from '../decorators/common'
 
 
 export type TIssueParams = {
-    assetId?: string;
-    name: string;
-    description: string;
-    quantity: number;
-    decimals: number;
-    isReissuable: boolean;
-    nonce: number;
+  assetId?: string,
+  name: string,
+  description: string,
+  quantity: number,
+  decimals: number,
+  isReissuable: boolean,
+  nonce: number,
 }
 
 export type TReissueParams = {
-    assetId?: string;
-    quantity: number;
-    isReissuable: boolean;
+  assetId?: string,
+  quantity: number,
+  isReissuable: boolean,
 }
 
 export type TBurnParams = {
-    assetId?: string;
-    amount: number;
+  assetId?: string,
+  amount: number,
 }
 
 export type TransferOutParams = {
-    assetId?: string;
-    recipient: string;
-    amount: number;
+  assetId?: string,
+  recipient: string,
+  amount: number,
 }
 
 export class Asset {
-    static getRPCConnection() {
-        return ServiceContainer.get(RPC);
-    }
+  static getRPCConnection() {
+    return ServiceContainer.get(RPC)
+  }
 
-    static getExecutionContext() {
-        return getExecutionContext();
-    }
+  static getExecutionContext() {
+    return getExecutionContext()
+  }
 
-    constructor(
-        private assetId?: string,
-        nonce?: number
-    ) {
-    }
+  constructor(
+    private assetId?: string,
+    _nonce?: number,
+  ) {
+  }
 
-    static from(assetId: string) {
-        return new Asset(assetId);
-    }
+  static from(assetId: string) {
+    return new Asset(assetId)
+  }
 
-    static system() {
-        return new Asset();
-    }
+  static system() {
+    return new Asset()
+  }
 
-    static async new(nonce?: number) {
-        const nonceAssetId = nonce || this.getExecutionContext().getNonce();
+  static async new(nonce?: number) {
+    const nonceAssetId = nonce || this.getExecutionContext().getNonce()
 
-        const assetId = await this.calculateAssetId(nonceAssetId)
+    const assetId = await this.calculateAssetId(nonceAssetId)
 
-        return new Asset(assetId, nonceAssetId);
-    }
+    return new Asset(assetId, nonceAssetId)
+  }
 
 
-    issue(t: TIssueParams) {
-        const operation = ContractIssue.fromPartial({
-            ...t,
-            assetId: this.assetId,
-        });
+  issue(t: TIssueParams) {
+    const operation = ContractIssue.fromPartial({
+      ...t,
+      assetId: this.assetId,
+    })
 
-        Asset.getExecutionContext()
-            .assetOperations
-            .addOperation(ContractAssetOperation.fromPartial({
-                contractIssue: operation
-            }))
-    }
+    Asset.getExecutionContext()
+      .assetOperations
+      .addOperation(ContractAssetOperation.fromPartial({
+        contractIssue: operation,
+      }))
+  }
 
-    reissue(t: TReissueParams) {
-        const operation = ContractReissue.fromPartial({
-            ...t,
-            assetId: this.assetId,
-        });
+  reissue(t: TReissueParams) {
+    const operation = ContractReissue.fromPartial({
+      ...t,
+      assetId: this.assetId,
+    })
 
-        Asset.getExecutionContext()
-            .assetOperations
-            .addOperation(ContractAssetOperation.fromPartial({
-                contractReissue: operation
-            }))
-    }
+    Asset.getExecutionContext()
+      .assetOperations
+      .addOperation(ContractAssetOperation.fromPartial({
+        contractReissue: operation,
+      }))
+  }
 
-    burn(t: TBurnParams) {
-        const operation = ContractBurn.fromPartial({
-            ...t,
-            assetId: this.assetId,
-        });
+  burn(t: TBurnParams) {
+    const operation = ContractBurn.fromPartial({
+      ...t,
+      assetId: this.assetId,
+    })
 
-        Asset.getExecutionContext()
-            .assetOperations
-            .addOperation(ContractAssetOperation.fromPartial({
-                contractBurn: operation
-            }))
-    }
+    Asset.getExecutionContext()
+      .assetOperations
+      .addOperation(ContractAssetOperation.fromPartial({
+        contractBurn: operation,
+      }))
+  }
 
-    transfer(recipient: string, amount: number) {
-        const operation = ContractTransferOut.fromPartial({
-            assetId: this.assetId,
-            recipient: recipient,
-            amount: amount
-        });
+  transfer(recipient: string, amount: number) {
+    const operation = ContractTransferOut.fromPartial({
+      assetId: this.assetId,
+      recipient,
+      amount,
+    })
 
-        Asset.getExecutionContext()
-            .assetOperations
-            .addOperation(ContractAssetOperation.fromPartial({
-                contractTransferOut: operation
-            }))
-    }
+    Asset.getExecutionContext()
+      .assetOperations
+      .addOperation(ContractAssetOperation.fromPartial({
+        contractTransferOut: operation,
+      }))
+  }
 
-    static async calculateAssetId(nonce: number): Promise<string> {
-        const res = await Asset.getRPCConnection().Contract
-            .calculateAssetId({
-                nonce
-            })
+  static async calculateAssetId(nonce: number): Promise<string> {
+    const res = await Asset.getRPCConnection().Contract
+      .calculateAssetId({
+        nonce,
+      })
 
-        return res.value;
-    }
+    return res.value
+  }
 
-    static async balancesOf(assetIds: string[]) {
-        const res = await Asset.getRPCConnection().Contract
-            .getContractBalances({
-                assetsIds: assetIds
-            })
+  static async balancesOf(assetIds: string[]) {
+    const res = await Asset.getRPCConnection().Contract
+      .getContractBalances({
+        assetsIds: assetIds,
+      })
 
-        return res.assetsBalances.map(mapContractBalance);
-    }
+    return res.assetsBalances.map(mapContractBalance)
+  }
 
-    static async balanceOf(assetId?: string) {
-        const res = await Asset.getRPCConnection().Contract
-            .getContractBalances({
-                assetsIds: [assetId ?? '']
-            })
+  static async balanceOf(assetId?: string) {
+    const res = await Asset.getRPCConnection().Contract
+      .getContractBalances({
+        assetsIds: [assetId ?? ''],
+      })
 
-        return res.assetsBalances.map(mapContractBalance);
-    }
+    return res.assetsBalances.map(mapContractBalance)
+  }
 }
