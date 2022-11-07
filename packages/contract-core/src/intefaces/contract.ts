@@ -1,4 +1,4 @@
-import { TInt } from "../core/data-types/integer";
+import { TInt } from "../api";
 
 export type TValue = string | number | boolean | Uint8Array;
 

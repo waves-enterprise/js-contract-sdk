@@ -16,9 +16,9 @@ import {
     ExecutionErrorRequest,
     ExecutionSuccessRequest
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
-import {logger} from '../../core/common/logger';
-import {ApiErrors} from '../../core/types/errors';
-import {UnavailableStateKeyException} from '../../core/exceptions';
+import {logger} from '../../api';
+import {UnavailableStateKeyException} from '../../execution';
+import {ApiErrors} from "../../execution/constants";
 
 export type IContractClient = GenericClient<Omit<ContractServiceClient, 'connect'>>;
 

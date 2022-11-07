@@ -1,15 +1,16 @@
-import {Action, ContractState, ExecutionContext, State} from "../src";
-import {ContractActionArgumentsExtractor} from "../src/core/execution/extractors/arguments-extractor";
+import {Action, ContractState, State} from "../src";
 import {RPC} from "../src/grpc";
-import {TransactionConverter} from "../src/core/converters/transaction";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 import {
     ContractKeyRequest,
     ContractTransaction
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {ContractProcessor} from "../src/core/execution/contract-processor";
-import {Var} from "../src/core/decorators/var";
+import {ContractProcessor} from "../src/execution/contract-processor";
+import {Var} from "../src";
+import {ParamsExtractor} from "../src/execution/params-extractor";
+import {ExecutionContext} from "../src/execution";
+import {convertContractTransaction} from "../src/execution/converter";
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
     .mockReturnValue({
@@ -35,20 +36,18 @@ jest.spyOn(RPC.prototype, 'addClient')
 
 describe('State', () => {
     let rpc = new RPC({} as unknown as any)
-    let extractor: ContractActionArgumentsExtractor;
-    let txCnv: TransactionConverter;
+    let extractor: ParamsExtractor;
 
     function mockExecutionContext(tx: ContractTransaction) {
         return new ExecutionContext({
             authToken: '',
-            tx: txCnv.parse(tx)
+            tx: convertContractTransaction(tx)
         }, rpc)
     }
 
 
     beforeEach(() => {
-        extractor = new ContractActionArgumentsExtractor();
-        txCnv = new TransactionConverter();
+        extractor = new ParamsExtractor();
     })
 
     describe('ContractState', () => {
@@ -290,6 +289,25 @@ describe('State', () => {
                     ],
                     assetOperations: []
                 }
+            )
+        });
+
+        it('should batch preload state keys', async function () {
+            const tx = mockRespTx('getterTest').transaction!;
+            const ec = mockExecutionContext(tx)
+
+            const processor = new ContractProcessor(
+                TestContract,
+                rpc,
+            );
+
+            await processor.handleIncomingTx(ec.incomingTxResp)
+
+            expect(rpc.Contract.getContractKey).toBeCalledWith(
+                ContractKeyRequest.fromPartial({
+                    contractId: 'test-contract',
+                    key: 'myVar'
+                })
             )
         });
     })

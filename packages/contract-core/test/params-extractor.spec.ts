@@ -1,10 +1,10 @@
-import {Action, ExecutionContext, Param} from "../src";
-import {ContractActionArgumentsExtractor} from "../src/core/execution/extractors/arguments-extractor";
+import {ExecutionContext} from "../src/execution";
 import {RPC} from "../src/grpc";
-import {TransactionConverter} from "../src/core/converters/transaction";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
-import {TInt} from "../src/core/data-types/integer";
+import {Action, Param, TInt} from "../src";
+import {convertContractTransaction} from "../src/execution/converter";
+import {ParamsExtractor} from "../src/execution/params-extractor";
 
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
@@ -25,13 +25,10 @@ jest.spyOn(RPC.prototype, 'addClient')
 
 
 describe('State', () => {
-    let extractor: ContractActionArgumentsExtractor;
-    let txCnv: TransactionConverter;
+    let extractor: ParamsExtractor;
 
     beforeAll(() => {
-        extractor = new ContractActionArgumentsExtractor();
-
-        txCnv = new TransactionConverter()
+        extractor = new ParamsExtractor();
     })
 
     it('should apply decorator to class ', () => {
@@ -63,21 +60,16 @@ describe('State', () => {
             })
         )
 
-        const incomingTx = txCnv.parse(tx)
+        const incomingTx = convertContractTransaction(tx)
 
         const ec = new ExecutionContext({
             authToken: '',
             tx: incomingTx
         }, new RPC({} as unknown as any))
 
-        const args = extractor.extract(TestContract, ec, {
-            name: 'test',
-            propertyName: 'test',
-            params: []
-        });
+        const {args} = extractor.extract(TestContract, ec);
 
         expect(args[0]).toEqual('testValue')
         expect((args[1] as TInt).toNumber()).toEqual(2)
     })
-
 })

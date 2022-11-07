@@ -2,7 +2,7 @@ import * as os from "os";
 import { DataEntry } from "@wavesenterprise/js-contract-grpc-client/data_entry";
 import { TVal, TValue } from "../intefaces/contract";
 import Long from "long";
-import { TInt } from "../core/data-types/integer";
+import { TInt } from "../api";
 
 export const isUndefined = (v: any): v is undefined => {
     return v === undefined;

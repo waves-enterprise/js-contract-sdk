@@ -1,13 +1,13 @@
 import 'reflect-metadata';
 import {ContractTransactionResponse} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {TransactionConverter} from "../src/core/converters/transaction";
+
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 import {ContractTransferIn} from "@wavesenterprise/js-contract-grpc-client/contract_transfer_in";
-import {IncomingTx} from "../src/core/types/core";
+import {IncomingTx} from "../src/execution/types";
+import {convertContractTransaction} from "../src/execution/converter";
 
 describe('TransactionConverter', () => {
     let mockTx: ContractTransactionResponse;
-    const cnv = new TransactionConverter()
 
     beforeAll(() => {
         mockTx = ContractTransactionResponse.fromPartial({
@@ -51,7 +51,7 @@ describe('TransactionConverter', () => {
         let tx: IncomingTx
 
         beforeAll(() => {
-            tx = cnv.parse(mockTx.transaction!)
+            tx = convertContractTransaction(mockTx.transaction!)
         })
 
         it('should parse transaction response to incoming', async function () {
