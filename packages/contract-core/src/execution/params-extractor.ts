@@ -51,7 +51,7 @@ export class ParamsExtractor {
       'design:paramtypes',
       contract.prototype,
       actionMetadata.propertyName,
-    ) as unknown[]
+    ) as ObjectConstructor[]
 
     const actionArgs = new Array(paramTypes.length)
 

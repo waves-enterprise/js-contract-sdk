@@ -12,8 +12,8 @@ export function getContractMetadata(contract: Constructable<unknown>): TContract
   return Reflect.getMetadata(ACTION_METADATA, contract) as TContractActionsMetadata
 }
 
-export function getContractVarsMetadata(contract: Constructable<unknown>): TContractVarsMeta {
-  return Reflect.getMetadata(CONTRACT_VARS, contract) as TContractVarsMeta
+export function getContractVarsMetadata(contract: unknown): TContractVarsMeta {
+  return Reflect.getMetadata(CONTRACT_VARS, contract as object) as TContractVarsMeta
 }
 
 

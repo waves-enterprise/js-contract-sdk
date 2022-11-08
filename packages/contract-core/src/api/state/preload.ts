@@ -5,7 +5,7 @@ import {
 } from '../../execution/reflect'
 import { getState } from '../decorators/common'
 
-function getPreloadKeys(contract: unknown, keys: string[]) {
+function getPreloadKeys(contract: object, keys: string[]) {
   return Object.entries(getContractVarsMetadata(contract.constructor))
     .filter(([_, cfg]) => keys.includes(cfg.propertyKey))
 }

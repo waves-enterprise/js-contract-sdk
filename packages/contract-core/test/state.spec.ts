@@ -1,5 +1,5 @@
 import { Action, Contract, ContractState, preload, State, TVar, Var } from '../src'
-import { RPC } from '../src/grpc'
+import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { mockRespTx } from './mocks/contract-transaction-response'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import {
@@ -43,23 +43,23 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
 
       return ContractKeysResponse.fromPartial({
         entries: req.keysFilter!.keys.map((key) => {
-          return stateMock[key as unknown]
+          return stateMock[key]
         }),
       })
     }),
     getContractKey: jest.fn((args) => {
       // console.log(args)
     }),
-  } as unknown)
+  } as unknown as ContractClient)
 
 
 jest.spyOn(ContractProcessor.prototype, 'tryCommitError')
-jest.spyOn(RPC.prototype, 'addClient')
+jest.spyOn(RPC.prototype, 'saveClient')
   .mockImplementation(() => {
   })
 
 describe('State', () => {
-  const rpc = new RPC({} as unknown as unknown)
+  const rpc = new RPC({} as unknown as RPCConnectionConfig)
   let extractor: ParamsExtractor
 
   function mockExecutionContext(tx: ContractTransaction) {

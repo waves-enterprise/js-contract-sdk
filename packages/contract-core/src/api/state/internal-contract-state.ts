@@ -1,15 +1,15 @@
-import { TValue } from '../../intefaces/contract'
+import { TVal } from '../../intefaces/contract'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import { getValueStateKey } from '../../utils'
 import { Optional } from '../../intefaces/helpers'
 
 export class InternalContractState {
-    private internalState = new Map<string, TValue>()
+    private internalState = new Map<string, TVal>()
 
-    constructor(private _cache: Map<string, TValue>) {
+    constructor(private _cache: Map<string, TVal>) {
     }
 
-    write(key: string, value: TValue) {
+    write(key: string, value: TVal) {
       this.internalState.set(key, value)
     }
 
@@ -17,7 +17,7 @@ export class InternalContractState {
       return this.internalState.has(key) || this._cache.has(key)
     }
 
-    get(key: string): Optional<TValue> {
+    get(key: string): Optional<TVal> {
       if (this.internalState.has(key)) {
         return this.internalState.get(key)
       } else if (this._cache.has(key)) {

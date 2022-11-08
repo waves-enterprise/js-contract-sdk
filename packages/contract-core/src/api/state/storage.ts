@@ -1,6 +1,6 @@
 import { logger } from '../'
 import { ContractClient } from '../../grpc'
-import { TValue } from '../../intefaces/contract'
+import { TVal, TValue } from '../../intefaces/contract'
 import { ContractKeysRequest } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { _parseDataEntry, isString, parseDataEntry } from '../../utils'
 import { InternalContractState } from './internal-contract-state'
@@ -122,7 +122,7 @@ export class Storage {
       return Boolean(entry?.stringValue !== undefined)
     }
 
-    set(key: string, value: TValue): void {
+    set(key: string, value: TVal): void {
       this.internalState.write(key, value)
     }
 

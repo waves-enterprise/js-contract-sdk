@@ -1,8 +1,8 @@
 import { ExecutionContext } from '../src/execution'
-import { RPC } from '../src/grpc'
+import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { mockRespTx } from './mocks/contract-transaction-response'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
-import { Action, Contract, Param, TInt } from '../src'
+import { Action, Contract, Param } from '../src'
 import { convertContractTransaction } from '../src/execution/converter'
 import { ParamsExtractor } from '../src/execution/params-extractor'
 import BN from 'bn.js'
@@ -18,9 +18,9 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
     commitExecutionError: jest.fn((args) => {
       // console.log(args)
     }),
-  } as unknown)
+  } as unknown as ContractClient)
 
-jest.spyOn(RPC.prototype, 'addClient')
+jest.spyOn(RPC.prototype, 'saveClient')
   .mockImplementation(() => {
   })
 
@@ -67,7 +67,7 @@ describe('State', () => {
     const ec = new ExecutionContext({
       authToken: '',
       tx: incomingTx,
-    }, new RPC({} as unknown as unknown))
+    }, new RPC({} as unknown as RPCConnectionConfig))
 
     const { args } = extractor.extract(TestContract, ec)
 

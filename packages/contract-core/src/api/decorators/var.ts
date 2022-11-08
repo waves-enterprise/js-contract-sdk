@@ -14,12 +14,12 @@ const DefaultConfig: TVarConfig = {
   eager: false,
 }
 
-export function Var(target: object, propertyName: string | symbol, descriptor): unknown
-export function Var(): PropertyDecorator
-export function Var(props: TVarConfig): unknown
+
+export function Var(target: object, propertyName: string | symbol, descriptor): void
+export function Var(props?: TVarConfig): PropertyDecorator
 export function Var(...args: any[]) {
   if (args.length > 1) {
-    return decorateProperty.call(undefined, ...args, DefaultConfig)
+    return decorateProperty.call(undefined, ...args, DefaultConfig) as void
   }
 
   const config = {
@@ -80,7 +80,7 @@ export function decorateProperty(target: Constructable<unknown>, propertyKey: st
             }
 
             setContractEntry(target, contractKey, value as TVal)
-            getState().set(contractKey, value)
+            getState().set(contractKey, value as TVal)
           }
         }()
 

@@ -12,7 +12,7 @@ export class Logger {
       this.component = name
     }
 
-    info(message: string, ...additionalParams: any[]) {
+    info(message: unknown, ...additionalParams: any[]) {
       const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
 
       this.printMessage('info', ...prefixes, message, ...additionalParams)

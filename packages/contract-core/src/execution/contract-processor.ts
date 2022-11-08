@@ -9,8 +9,9 @@ import { ERROR_CODE } from './constants'
 import { Container, logger } from '../api'
 import { ParamsExtractor } from './params-extractor'
 import { setContractEntries } from './reflect'
+import { ContractError } from './exceptions'
 
-export function clearPreloadedEntries(contract: unknown): void {
+export function clearPreloadedEntries(contract: object): void {
   return setContractEntries(contract, new Map())
 }
 
@@ -25,11 +26,12 @@ export class ContractProcessor {
     async handleIncomingTx(resp: IncomingTransactionResp): Promise<unknown> {
       const executionContext = new ExecutionContext(resp, this.rpc)
 
-      const { args, actionMetadata } = this.paramsExtractor.extract(this.contract, executionContext)
+      const { args, actionMetadata } = this.paramsExtractor
+        .extract(this.contract as ObjectConstructor, executionContext)
 
       Container.set(executionContext)
 
-      const c = this.contract
+      const c = this.contract as ObjectConstructor
       const contractInstance = new c()
       clearPreloadedEntries(contractInstance)
 
@@ -57,7 +59,7 @@ export class ContractProcessor {
       }
     }
 
-    tryCommitError(executionContext: ExecutionContext, e: unknown) {
+    tryCommitError(executionContext: ExecutionContext, e: ContractError) {
       this.logger.error('Committing Error ' + (e.code || ERROR_CODE.FATAL), e.message)
       this.logger.info(e)
 

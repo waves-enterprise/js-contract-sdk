@@ -5,7 +5,7 @@ import { Container } from '../container'
 
 
 export function State(): PropertyDecorator
-export function State(target: object, propertyKey: string): unknown
+export function State(target: object, propertyKey: string): void
 export function State(...args: any[]) {
   if (args.length > 1) {
     return decorateState(args[0], args[1])

@@ -1,7 +1,7 @@
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import { isBool, isNum, isString, nil } from '../../utils'
 import { logger } from '../'
-import { TValue } from '../../intefaces/contract'
+import { TVal, TValue } from '../../intefaces/contract'
 import { Mapping } from './types/mapping'
 import { Storage } from './storage'
 import { ExecutionContext, UnavailableStateKeyException, WrongStateKeyTypeException } from '../../execution'
@@ -56,7 +56,7 @@ export class ContractState implements IState {
       throw new WrongStateKeyTypeException()
     }
 
-    setBinary(key: string, value: Uint8Array) {
+    setBinary(key: string, value: Buffer | Uint8Array) {
       this.storage.set(key, value)
     }
 
@@ -126,7 +126,7 @@ export class ContractState implements IState {
       return this.withException(() => this.storage.get(key))
     }
 
-    set(key: string, value: TValue) {
+    set(key: string, value: TVal) {
       this.storage.set(key, value)
     }
 

@@ -80,7 +80,7 @@ export function parseDataEntry(d: DataEntry): TValue {
   throw new Error('Data entry parse error')
 }
 
-export function isPrimitive(v: unknown) {
+export function isPrimitive(v: ObjectConstructor) {
   return (
     v.prototype === String.prototype ||
         v.prototype === Number.prototype ||

@@ -5,8 +5,8 @@ type ContractOptions = {
 }
 
 export function Contract(_: ContractOptions = { component: 'default' }): ClassDecorator {
-  return <T>(target: unknown) => {
+  return (target: unknown) => {
 
-    Reflect.defineMetadata(CONTRACT_PRELOADED_ENTRIES, new Map(), target as T)
+    Reflect.defineMetadata(CONTRACT_PRELOADED_ENTRIES, new Map(), target as unknown as object)
   }
 }

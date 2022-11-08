@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import { ContractTransactionResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
-import { RPC } from '../src/grpc'
+import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { ContractProcessor } from '../src/execution/contract-processor'
 import { Action, Contract, Param } from '../src'
 import Long from 'long'
@@ -23,9 +23,9 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
     commitExecutionError: jest.fn((args) => {
       // console.log(args)
     }),
-  } as unknown)
+  } as unknown as ContractClient)
 
-jest.spyOn(RPC.prototype, 'addClient')
+jest.spyOn(RPC.prototype, 'saveClient')
   .mockImplementation(() => {
   })
 
@@ -96,7 +96,7 @@ function mockAction(name: string) {
           key: 'action',
         },
       ],
-      fee: Long.fromInt(1) as unknown,
+      fee: Long.fromInt(1) as unknown as number, // todo long
       version: 5,
       proofs: new Uint8Array(),
       timestamp: new Date().getTime(),
@@ -118,7 +118,7 @@ function mockAction(name: string) {
 
 
 describe('ContractProcessor', () => {
-  const rpc = new RPC({} as unknown)
+  const rpc = new RPC({} as unknown as RPCConnectionConfig)
   const contractClient = rpc.Contract
 
   let mockResp: ContractTransactionResponse
@@ -143,7 +143,7 @@ describe('ContractProcessor', () => {
             key: 'some-key',
           },
         ],
-        fee: Long.fromInt(1) as unknown,
+        fee: Long.fromInt(1) as unknown as number,
         version: 5,
         proofs: new Uint8Array(),
         timestamp: new Date().getTime(),
@@ -189,7 +189,7 @@ describe('ContractProcessor', () => {
         senderPublicKey: 'mypc',
         contractId: 'test-contract',
         params: [],
-        fee: Long.fromInt(1) as unknown,
+        fee: Long.fromInt(1) as  unknown as number,
         version: 5,
         proofs: new Uint8Array(),
         timestamp: new Date().getTime(),
