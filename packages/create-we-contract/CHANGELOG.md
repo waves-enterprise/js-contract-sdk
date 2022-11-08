@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/waves-enterprise/js-contract-sdk/compare/create-we-contract@1.1.0...create-we-contract@1.2.0) (2022-11-08)
+
+
+### Bug Fixes
+
+* **create-we-contract:** fix npm create compatibility ([fd2a736](https://github.com/waves-enterprise/js-contract-sdk/commit/fd2a736bea3c178ee4b12e2dc168712c3bd8eb2c))
+
+
+
+
+
 ## [1.0.7](https://github.com/waves-enterprise/js-contract-sdk/compare/create-we-contract@1.0.6...create-we-contract@1.0.7) (2022-07-26)
 
 **Note:** Version bump only for package create-we-contract
