@@ -1,46 +1,46 @@
-import * as console from "console";
+import * as console from 'console'
 
-type LogLevel = "info" | "error";
+type LogLevel = 'info' | 'error'
 
 export class Logger {
-    public component: string;
+    component: string
 
-    public static globalPrefix = "WE Contract";
-    public static lastTimeStamp = Date.now();
+    static globalPrefix = 'WE Contract'
+    static lastTimeStamp = Date.now()
 
     setComponent(name: string) {
-        this.component = name;
+      this.component = name
     }
 
     info(message: string, ...additionalParams: any[]) {
-        const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()];
+      const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
 
-        this.printMessage("info", ...prefixes, message, ...additionalParams);
+      this.printMessage('info', ...prefixes, message, ...additionalParams)
     }
 
     error(message: string, ...additionalParams: any[]) {
-        const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()];
+      const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
 
-        this.printMessage("info", ...prefixes, message, ...additionalParams);
+      this.printMessage('info', ...prefixes, message, ...additionalParams)
     }
 
     private printMessage(logLevel: LogLevel, ...args) {
-        console[logLevel](...args);
+      console[logLevel](...args)
     }
 
-    public static timestampDiff(): string {
-        const result = `+${Date.now() - Logger.lastTimeStamp}ms`;
+    static timestampDiff(): string {
+      const result = `+${Date.now() - Logger.lastTimeStamp}ms`
 
-        Logger.lastTimeStamp = Date.now();
+      Logger.lastTimeStamp = Date.now()
 
-        return result;
+      return result
     }
 }
 
-export function logger(c: { constructor: any }): Logger {
-    const logger = new Logger();
+export function logger(c: { constructor: unknown }): Logger {
+  const logger = new Logger()
 
-    logger.setComponent(c.constructor.name);
+  logger.setComponent(c.constructor.name)
 
-    return logger;
+  return logger
 }

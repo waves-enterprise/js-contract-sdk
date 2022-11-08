@@ -1,5 +1,3 @@
-export type Constructable<T> = {
-    new (...args: any[]): T;
-};
+export type Constructable<T> = new (...args: any[]) => T
 
-export type Optional<T> = T | undefined;
+export type Optional<T> = T | undefined

@@ -1,20 +1,20 @@
 export enum ApiErrors {
-    DataKeyNotExists = 304,
+  DataKeyNotExists = 304,
 }
 
 export const ERROR_CODE = {
-    FATAL: 0,
-    RECOVERABLE: 1,
-};
+  FATAL: 0,
+  RECOVERABLE: 1,
+}
 
-export const ACTION_METADATA = "we:contract:actions";
-export const ARGS_METADATA = "we:contract:args";
+export const ACTION_METADATA = 'we:contract:actions'
+export const ARGS_METADATA = 'we:contract:args'
 
 export enum ReservedParamNames {
-    action = "action",
+  action = 'action',
 }
 
 export enum TxId {
-    call = 104,
-    create = 103,
+  call = 104,
+  create = 103,
 }

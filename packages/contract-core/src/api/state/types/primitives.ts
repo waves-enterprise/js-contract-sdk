@@ -1,50 +1,50 @@
 import BN from 'bn.js'
-import Long from "long";
+import Long from 'long'
 
 
-export abstract class PrimitiveType<T = any> {
-    private _internal: T;
+export abstract class PrimitiveType<T = unknown> {
+    private _internal: T
 
-    public settle(t: T) {
-        this._internal = t;
+    settle(t: T) {
+      this._internal = t
     }
 
-    castToTargetType(prototype?: any) {
-        if (BN.isBN(this._internal)) {
-            return this._internal.toNumber();
-        }
+    castToTargetType(prototype?: unknown) {
+      if (BN.isBN(this._internal)) {
+        return this._internal.toNumber()
+      }
 
-        return this._internal;
+      return this._internal
     }
 
 
-    abstract get(): Promise<any>
+    abstract get(): Promise<unknown>
 
-    abstract set(value: any)
+    abstract set(value: unknown)
 }
 
 
 export type TVar<T> = {
-    get(): Promise<T>
+  get(): Promise<T>,
 
-    set(value: T): void
+  set(value: T): void,
 }
 
 
-export interface CastTrait {
-    settle(t: any): void
+export type CastTrait = {
+  settle(t: unknown): void,
 }
 
 
 export class TInt<T extends number | BN> implements TVar<T>, CastTrait {
-    private _internal: T;
+    private _internal: T
 
-    public settle(t: T) {
-        this._internal = t;
+    settle(t: T) {
+      this._internal = t
     }
 
     get(): Promise<T> {
-        return Promise.resolve(this._internal);
+      return Promise.resolve(this._internal)
     }
 
     set(value: number | BN): void {

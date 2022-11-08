@@ -1,96 +1,96 @@
-import {Constructable} from "../../intefaces/helpers";
-import {getState} from "./common";
-import {ContractError} from "../../execution";
-import {CONTRACT_VARS} from "../contants";
-import {TContractVarsMeta, TVarMeta} from "../meta";
-import {getContractEntries, setContractEntry} from "../../execution/reflect";
-import {CastTrait, PrimitiveType} from "../state/types/primitives";
+import { Constructable } from '../../intefaces/helpers'
+import { getState } from './common'
+import { ContractError } from '../../execution'
+import { CONTRACT_VARS } from '../contants'
+import { TContractVarsMeta, TVarMeta } from '../meta'
+import { getContractEntries, setContractEntry } from '../../execution/reflect'
+import { CastTrait, PrimitiveType } from '../state/types/primitives'
 
 export type TVarConfig = Partial<TVarMeta>
 
 const DefaultConfig: TVarConfig = {
-    mutable: true,
-    eager: false
+  mutable: true,
+  eager: false,
 }
 
-export function Var(target: object, propertyName: string | symbol, descriptor): any
-export function Var(): PropertyDecorator;
-export function Var(props: TVarConfig): any;
+export function Var(target: object, propertyName: string | symbol, descriptor): unknown
+export function Var(): PropertyDecorator
+export function Var(props: TVarConfig): unknown
 export function Var(...args: any[]) {
-    if (args.length > 1) {
-        return decorateProperty.call(undefined, ...args, DefaultConfig);
-    }
+  if (args.length > 1) {
+    return decorateProperty.call(undefined, ...args, DefaultConfig)
+  }
 
-    const config = {
-        ...DefaultConfig,
-        ...(args[0] || {}),
-    }
+  const config = {
+    ...DefaultConfig,
+    ...(args[0] || {}),
+  }
 
-    return (...args_: any[]) => decorateProperty.call(undefined, ...args_, config);
+  return (...args_: any[]) => decorateProperty.call(undefined, ...args_, config)
 }
 
-export function decorateProperty(target: Constructable<any>, propertyKey: string, _, config: TVarConfig) {
-    const contractKey = config.name || propertyKey
+export function decorateProperty(target: Constructable<unknown>, propertyKey: string, _, config: TVarConfig) {
+  const contractKey = config.name || propertyKey
 
-    const meta: TContractVarsMeta = Reflect.getMetadata(CONTRACT_VARS, target.constructor) || {};
+  const meta: TContractVarsMeta = Reflect.getMetadata(CONTRACT_VARS, target.constructor) || {}
 
-    if (!!meta[contractKey]) {
-        throw new ContractError('Variable names need to be unique')
-    }
+  if (!!meta[contractKey]) {
+    throw new ContractError('Variable names need to be unique')
+  }
 
-    meta[contractKey] = {
-        propertyKey: propertyKey,
-        meta: config
-    }
+  meta[contractKey] = {
+    propertyKey,
+    meta: config,
+  }
 
-    Reflect.defineMetadata(
-        CONTRACT_VARS,
-        meta,
-        target.constructor
-    );
-
-
-    const VariableCastType: CastTrait = new (Reflect.getMetadata("design:type", target, propertyKey) as any)
+  Reflect.defineMetadata(
+    CONTRACT_VARS,
+    meta,
+    target.constructor,
+  )
 
 
-    let _settled;
+  const VariableCastType: CastTrait = new (Reflect.getMetadata('design:type', target, propertyKey) as unknown)()
 
-    Object.defineProperty(target, propertyKey, {
-        set: () => {
-            throw new Error('cannot reassign typed property')
-        },
-        get: () => {
-            if (!_settled) {
-                const res = new class extends PrimitiveType {
-                    async get() {
-                        const entries = getContractEntries(target);
 
-                        let res;
-                        if (entries.has(contractKey)) {
-                            res = entries.get(contractKey);
-                        } else {
-                            res = await getState().tryGet(contractKey)
-                        }
+  let _settled
 
-                        this.settle(res)
+  Object.defineProperty(target, propertyKey, {
+    set: () => {
+      throw new Error('cannot reassign typed property')
+    },
+    get: () => {
+      if (!_settled) {
+        const res = new class extends PrimitiveType {
+          async get() {
+            const entries = getContractEntries(target)
 
-                        return this.castToTargetType();
-                    }
-
-                    set(value: any) {
-                        if (!config.mutable) {
-                            throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
-                        }
-
-                        setContractEntry(target, contractKey, value);
-                        getState().set(contractKey, value)
-                    }
-                }
-
-                _settled = res;
+            let res
+            if (entries.has(contractKey)) {
+              res = entries.get(contractKey)
+            } else {
+              res = await getState().tryGet(contractKey)
             }
 
-            return _settled
-        }
-    });
+            this.settle(res)
+
+            return this.castToTargetType()
+          }
+
+          set(value: unknown) {
+            if (!config.mutable) {
+              throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
+            }
+
+            setContractEntry(target, contractKey, value)
+            getState().set(contractKey, value)
+          }
+        }()
+
+        _settled = res
+      }
+
+      return _settled
+    },
+  })
 }

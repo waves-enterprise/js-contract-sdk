@@ -1,34 +1,34 @@
-import { ERROR_CODE } from "./constants";
+import { ERROR_CODE } from './constants'
 
 export class ContractError extends Error {
-    constructor(public message: string = "Unhandled internal error", public code: number = ERROR_CODE.FATAL) {
-        super(message);
-    }
+  constructor(public message: string = 'Unhandled internal error', public code: number = ERROR_CODE.FATAL) {
+    super(message)
+  }
 }
 
 export class RetryableError extends ContractError {
-    constructor(public message: string = "Unhandled internal error") {
-        super(message, ERROR_CODE.RECOVERABLE);
-    }
+  constructor(public message: string = 'Unhandled internal error') {
+    super(message, ERROR_CODE.RECOVERABLE)
+  }
 }
 
 
 export class UnexpectedParamTypeException extends ContractError {
-    constructor(key: string) {
-        super(`Required call param with name "${key}" has unexpected type`);
-    }
+  constructor(key: string) {
+    super(`Required call param with name "${key}" has unexpected type`)
+  }
 }
 
 export class UnavailableContractParamException extends Error {
-    constructor(key: string) {
-        super(`Required call param with name "${key}" not founded`);
-    }
+  constructor(key: string) {
+    super(`Required call param with name "${key}" not founded`)
+  }
 }
 
 export class UnavailableContractActionException extends ContractError {
-    constructor(key: string) {
-        super(`Contract Action with name "${key}" not founded`);
-    }
+  constructor(key: string) {
+    super(`Contract Action with name "${key}" not founded`)
+  }
 }
 
 export class ConstraintValidationError extends ContractError {}

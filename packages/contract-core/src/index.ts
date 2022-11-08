@@ -1,3 +1,3 @@
-import "reflect-metadata";
+import 'reflect-metadata'
 
-export * from './api';
+export * from './api'
