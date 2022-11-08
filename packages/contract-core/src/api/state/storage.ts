@@ -2,7 +2,7 @@ import {logger} from '../';
 import {ContractClient} from '../../grpc';
 import {TValue} from '../../intefaces/contract';
 import {ContractKeysRequest} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service';
-import {isString, parseDataEntry} from '../../utils';
+import {_parseDataEntry, isString, parseDataEntry} from '../../utils';
 import {InternalContractState} from './internal-contract-state';
 import {DataEntry} from '@wavesenterprise/js-contract-grpc-client/data_entry';
 
@@ -21,9 +21,41 @@ export class Storage {
         this.internalState = new InternalContractState(_cache);
     }
 
+    read(key: string) {
+        const res = this.client.getContractKey({
+            contractId: this.contractId,
+            key: key
+        })
+
+        return res.then(r => _parseDataEntry(r.entry!));
+    }
+
+    async readBatch(keys: string[]) {
+        const res = await this.client.getContractKeys({
+            contractId: this.contractId,
+            keysFilter: {
+                keys
+            }
+        })
+
+        return res.entries.map(_parseDataEntry)
+    }
+
+    /**
+     * @deprecated use read/readBatch instead
+     */
     get(config: GetConfig): Promise<TValue[]>;
+    /**
+     * @deprecated use read/readBatch instead
+     */
     get<T extends TValue>(key): Promise<T>;
+    /**
+     * @deprecated use read/readBatch instead
+     */
     get(keys: string[], config?: Omit<GetConfig, 'matches'>): Promise<TValue[]>;
+    /**
+     * @deprecated use read/readBatch instead
+     */
     async get(...args: any[]): Promise<any> {
         if (isString(args[0])) {
             const key = args[0];
@@ -48,7 +80,9 @@ export class Storage {
 
             const response = await this.client.getContractKeys({
                 ...request,
-                matches: strToRegexp(...keys),
+                keysFilter: {
+                    keys
+                },
             });
 
             const entries = response.entries.map((e) => {

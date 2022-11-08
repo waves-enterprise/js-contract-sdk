@@ -2,33 +2,43 @@ import {
     ExecutionErrorRequest,
     ExecutionSuccessRequest,
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import { ExecutionContext } from "./execution-context";
-import { RPC } from "../grpc";
-import { IncomingTransactionResp } from "./types";
-import { ERROR_CODE } from "./constants";
-import { Container } from "../api";
-import { ParamsExtractor } from "./params-extractor";
+import {ExecutionContext} from "./execution-context";
+import {RPC} from "../grpc";
+import {IncomingTransactionResp} from "./types";
+import {ERROR_CODE} from "./constants";
+import {Container, logger} from "../api";
+import {ParamsExtractor} from "./params-extractor";
+import {setContractPreloadedEntries} from "./reflect";
+
+export function clearPreloadedEntries(contract: any): void {
+    return setContractPreloadedEntries(contract, new Map)
+}
 
 export class ContractProcessor {
+    logger = logger(this)
+
     private paramsExtractor = new ParamsExtractor();
 
-    constructor(private contract: any, private rpc: RPC) {}
+    constructor(private contract: any, private rpc: RPC) {
+    }
 
     async handleIncomingTx(resp: IncomingTransactionResp): Promise<any> {
         const executionContext = new ExecutionContext(resp, this.rpc);
 
-        const { args, actionMetadata } = this.paramsExtractor.extract(this.contract, executionContext);
+        const {args, actionMetadata} = this.paramsExtractor.extract(this.contract, executionContext);
 
         Container.set(executionContext);
 
         const c = this.contract;
         const contractInstance = new c();
+        clearPreloadedEntries(contractInstance)
 
         try {
             await contractInstance[actionMetadata.propertyName](...args);
 
             return this.tryCommitSuccess(executionContext);
         } catch (e) {
+
             return this.tryCommitError(executionContext, e);
         }
     }
@@ -43,16 +53,14 @@ export class ContractProcessor {
                 }),
             );
         } catch (e) {
-            await this.rpc.Contract.commitExecutionError(
-                ExecutionErrorRequest.fromPartial({
-                    txId: executionContext.txId,
-                    message: e.message || "Unhandled error",
-                }),
-            );
+            await this.tryCommitError(executionContext, e)
         }
     }
 
     tryCommitError(executionContext: ExecutionContext, e: any) {
+        this.logger.error("Committing Error " + (e.code || ERROR_CODE.FATAL), e.message);
+        this.logger.info(e);
+
         return this.rpc.Contract.commitExecutionError(
             ExecutionErrorRequest.fromPartial({
                 txId: executionContext.txId,

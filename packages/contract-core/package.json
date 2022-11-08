@@ -26,14 +26,14 @@
   "license": "MIT",
   "dependencies": {
     "@grpc/grpc-js": "^1.6.2",
-    "@types/bn.js": "^5.1.1",
-    "@wavesenterprise/js-contract-grpc-client": "1.10.0",
+    "@wavesenterprise/js-contract-grpc-client": "1.10.1",
     "@wavesenterprise/sdk": "^1.0.3",
     "bn.js": "^5.2.1",
     "google-protobuf": "^3.21.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
+    "@types/bn.js": "^5.1.1",
     "@types/jest": "^28.1.8",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",

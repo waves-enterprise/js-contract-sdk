@@ -1,13 +1,11 @@
 import {Constructable} from "../../intefaces/helpers";
 import {getState} from "./common";
 import {ContractError} from "../../execution";
+import {CONTRACT_VARS} from "../contants";
+import {TContractVarsMeta, TVarMeta} from "../meta";
+import {getContractPreloadedEntries} from "../../execution/reflect";
 
-export type TVarConfig = Partial<{
-    name: string;
-    mutable: boolean;
-    eager: boolean;
-}>
-
+export type TVarConfig = Partial<TVarMeta>
 
 const DefaultConfig: TVarConfig = {
     mutable: true,
@@ -33,6 +31,23 @@ export function Var(...args: any[]) {
 export function decorateProperty(target: Constructable<any>, propertyKey: string, _, config: TVarConfig) {
     const contractKey = config.name || propertyKey
 
+    const meta: TContractVarsMeta = Reflect.getMetadata(CONTRACT_VARS, target.constructor) || {};
+
+    if (!!meta[contractKey]) {
+        throw new ContractError('Variable names need to be unique')
+    }
+
+    meta[contractKey] = {
+        propertyKey: propertyKey,
+        meta: config
+    }
+
+    Reflect.defineMetadata(
+        CONTRACT_VARS,
+        meta,
+        target.constructor
+    );
+
     Object.defineProperty(target, propertyKey, {
         set: () => {
             throw new Error('cannot reassign typed property')
@@ -40,6 +55,12 @@ export function decorateProperty(target: Constructable<any>, propertyKey: string
         get: () => {
             return {
                 get() {
+                    const preloaded = getContractPreloadedEntries(target);
+
+                    if (preloaded.has(contractKey)) {
+                        return preloaded.get(contractKey);
+                    }
+
                     return getState().tryGet(contractKey)
                 },
                 set(value: any) {

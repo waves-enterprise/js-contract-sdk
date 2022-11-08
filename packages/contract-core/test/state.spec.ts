@@ -1,9 +1,9 @@
-import {Action, ContractState, State} from "../src";
+import {Action, Contract, ContractState, preload, State} from "../src";
 import {RPC} from "../src/grpc";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 import {
-    ContractKeyRequest,
+    ContractKeyRequest, ContractKeysRequest,
     ContractTransaction
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 import {ContractProcessor} from "../src/execution/contract-processor";
@@ -20,6 +20,10 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
             // console.log(args)
         }),
         commitExecutionError: jest.fn((args) => {
+            // console.log(args)
+        }),
+
+        getContractKeys: jest.fn((args) => {
             // console.log(args)
         }),
 
@@ -212,6 +216,7 @@ describe('State', () => {
     })
 
     describe('Properties', () => {
+        @Contract()
         class TestContract {
             @Var() myVar: { get(): any, set(v: any): void };
             @Var({ mutable: false }) immutable: { get(): any, set(v: any): void };
@@ -229,6 +234,10 @@ describe('State', () => {
             @Action
             async immutableTest() {
                 this.immutable.set('testValue')
+            }
+
+            @Action async preloadInAction() {
+                await preload(this, ['myVar'])
             }
         }
 
@@ -307,6 +316,28 @@ describe('State', () => {
                 ContractKeyRequest.fromPartial({
                     contractId: 'test-contract',
                     key: 'myVar'
+                })
+            )
+        });
+
+
+        it('should preload keys in a batch request', async function () {
+            const tx = mockRespTx('preloadInAction').transaction!;
+            const ec = mockExecutionContext(tx)
+
+            const processor = new ContractProcessor(
+                TestContract,
+                rpc,
+            );
+
+            await processor.handleIncomingTx(ec.incomingTxResp)
+
+            expect(rpc.Contract.getContractKeys).toBeCalledWith(
+                ContractKeysRequest.fromPartial({
+                    contractId: 'test-contract',
+                    keysFilter: {
+                        keys: ['myVar']
+                    }
                 })
             )
         });

@@ -1,8 +1,8 @@
 import * as os from "os";
-import { DataEntry } from "@wavesenterprise/js-contract-grpc-client/data_entry";
-import { TVal, TValue } from "../intefaces/contract";
+import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
+import {TVal, TValue} from "../intefaces/contract";
 import Long from "long";
-import { TInt } from "../api";
+import BN from "bn.js";
 
 export const isUndefined = (v: any): v is undefined => {
     return v === undefined;
@@ -46,7 +46,7 @@ export function _parseDataEntry(d: DataEntry): TVal {
     }
 
     if (!isUndefined(d.intValue)) {
-        return new TInt(d.intValue.toNumber());
+        return new BN(d.intValue.toNumber());
     }
 
     if (!isUndefined(d.boolValue)) {
@@ -90,7 +90,7 @@ export function isPrimitive(v: any) {
 }
 
 export function isWrappedType(v: any) {
-    return v.prototype === TInt.prototype;
+    return BN.isBN(v);
 }
 
 export const getCpusCount = () => os.cpus().length;

@@ -1,5 +1,5 @@
-import { TInt } from "../api";
-import { TVal } from "../intefaces/contract";
+import {TVal} from "../intefaces/contract";
+import BN from "bn.js";
 
 export type TParam = {
     key: string;
@@ -9,7 +9,7 @@ export type TParam = {
 
 export class TransferIn {
     assetId?: string;
-    amount: TInt;
+    amount: BN;
 }
 
 export interface IncomingTx {
@@ -19,7 +19,7 @@ export interface IncomingTx {
     senderPublicKey: string;
     contractId: string;
     version: number;
-    fee: TInt;
+    fee: BN;
     proofs: Uint8Array;
     timestamp: number;
     feeAssetId?: string;
