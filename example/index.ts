@@ -1,5 +1,5 @@
 import 'reflect-metadata'
 
-import { start } from '../packages/contract-core/src'
+import { initContract } from '../packages/contract-core/src'
 
-start('./contract')
+initContract({ contractPath: './contract' })

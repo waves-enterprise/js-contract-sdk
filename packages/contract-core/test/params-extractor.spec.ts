@@ -1,22 +1,24 @@
-import { Action, ExecutionContext, Param } from '../src'
-import { ContractActionArgumentsExtractor } from '../src/core/execution/extractors/arguments-extractor'
-import { RPC } from '../src/grpc'
-import { TransactionConverter } from '../src/core/converters/transaction'
+import { ExecutionContext } from '../src/execution'
+import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { mockRespTx } from './mocks/contract-transaction-response'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
-import { TInt } from '../src/core/data-types/integer'
+import { Action, Contract, Param } from '../src'
+import { convertContractTransaction } from '../src/execution/converter'
+import { ParamsExtractor } from '../src/execution/params-extractor'
+import BN from 'bn.js'
 
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
     setAuth() {
     },
-    commitExecutionSuccess: jest.fn(() => {
+    commitExecutionSuccess: jest.fn((args) => {
+      // console.log(args)
     }),
-    commitExecutionError: jest.fn(() => {
+    commitExecutionError: jest.fn((args) => {
+      // console.log(args)
     }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any)
+  } as unknown as ContractClient)
 
 jest.spyOn(RPC.prototype, 'saveClient')
   .mockImplementation(() => {
@@ -24,22 +26,20 @@ jest.spyOn(RPC.prototype, 'saveClient')
 
 
 describe('State', () => {
-  let extractor: ContractActionArgumentsExtractor
-  let txCnv: TransactionConverter
+  let extractor: ParamsExtractor
 
   beforeAll(() => {
-    extractor = new ContractActionArgumentsExtractor()
-
-    txCnv = new TransactionConverter()
+    extractor = new ParamsExtractor()
   })
 
   it('should apply decorator to class ', () => {
+    @Contract()
     class TestContract {
       @Action
       test(
-      @Param('key') _value: string,
-        @Param('next') _big: TInt,
-        @Param('binary') _buf: Buffer,
+      @Param('key') value: string,
+        @Param('next') big: BN,
+        @Param('binary') buf: Buffer,
       ) {
 
       }
@@ -62,22 +62,16 @@ describe('State', () => {
       }),
     )
 
-    const incomingTx = txCnv.parse(tx)
+    const incomingTx = convertContractTransaction(tx)
 
     const ec = new ExecutionContext({
       authToken: '',
       tx: incomingTx,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }, new RPC({} as unknown as any))
+    }, new RPC({} as unknown as RPCConnectionConfig))
 
-    const args = extractor.extract(TestContract, ec, {
-      name: 'test',
-      propertyName: 'test',
-      params: [],
-    })
+    const { args } = extractor.extract(TestContract, ec)
 
     expect(args[0]).toEqual('testValue')
-    expect((args[1] as TInt).toNumber()).toEqual(2)
+    expect((args[1] as BN).toNumber()).toEqual(2)
   })
-
 })

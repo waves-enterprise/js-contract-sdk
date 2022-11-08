@@ -1,18 +1,17 @@
-import { Action, Contract, Param } from '../src'
-import { ContractRegistry } from '../src/core/contract-registry'
-import { getArgsMetadata, getContractMetadata } from '../src/core/reflect/getContractMetadata'
+import { Action, Param } from '../src'
+import { getArgsMetadata, getContractMetadata } from '../src/execution/reflect'
 
 describe('Decorators', () => {
-  describe('@Contract', () => {
-    it('should apply decorator to class ', () => {
-      const target = class {
-      }
-
-      Contract()(target)
-
-      expect(ContractRegistry.getDefault()).toEqual(target)
-    })
-  })
+  // describe('@Contract', () => {
+  //     it('should apply decorator to class ', () => {
+  //         const target = class {
+  //         }
+  //
+  //         Contract()(target)
+  //
+  //         expect(ContractRegistry.getDefault()).toEqual(target)
+  //     })
+  // })
 
   describe('@Action', () => {
     it('should add action with propertyName equals method name', () => {
@@ -63,7 +62,7 @@ describe('Decorators', () => {
       class TestClass {
         @Action()
         test(
-        @Param('name') _stringValue: string,
+        @Param('name') stringValue: string,
         ) {
         }
       }
@@ -78,7 +77,7 @@ describe('Decorators', () => {
       class TestClass {
         @Action()
         test(
-        @Param('numberParam') _numberParam: number,
+        @Param('numberParam') numberParam: number,
         ) {
         }
       }

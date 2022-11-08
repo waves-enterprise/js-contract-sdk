@@ -1,7 +1,4 @@
-import { TInt } from '../core/data-types/integer'
+import BN from 'bn.js'
 
-export type TValue = string | number | boolean | Uint8Array | undefined
-
-export type TVal = string | TInt | boolean | Buffer
-
-export type TAction = (...args: unknown[]) => void
+export type TValue = string | BN | number | boolean | Buffer
+export type TVal = string | BN | number | boolean | Buffer | Uint8Array

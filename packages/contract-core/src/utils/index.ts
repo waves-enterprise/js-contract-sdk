@@ -2,7 +2,7 @@ import * as os from 'os'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import { TVal, TValue } from '../intefaces/contract'
 import Long from 'long'
-import { TInt } from '../core/data-types/integer'
+import BN from 'bn.js'
 
 export const isUndefined = (v: unknown): v is undefined => {
   return v === undefined
@@ -46,7 +46,7 @@ export function _parseDataEntry(d: DataEntry): TVal {
   }
 
   if (!isUndefined(d.intValue)) {
-    return new TInt(d.intValue.toNumber())
+    return new BN(d.intValue.toString())
   }
 
   if (!isUndefined(d.boolValue)) {
@@ -80,19 +80,17 @@ export function parseDataEntry(d: DataEntry): TValue {
   throw new Error('Data entry parse error')
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isPrimitive(v: any) {
+export function isPrimitive(v: ObjectConstructor) {
   return (
     v.prototype === String.prototype ||
-    v.prototype === Number.prototype ||
-    v.prototype === Boolean.prototype ||
-    v.prototype === Buffer.prototype
+        v.prototype === Number.prototype ||
+        v.prototype === Boolean.prototype ||
+        v.prototype === Buffer.prototype
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function isWrappedType(v: any) {
-  return v.prototype === TInt.prototype
+export function isWrappedType(v: unknown) {
+  return BN === v
 }
 
 export const getCpusCount = () => os.cpus().length

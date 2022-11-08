@@ -1,7 +1,21 @@
-changeset publish # Change Log
+# Change Log
 
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [1.1.0](https://github.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.0.15...@wavesenterprise/contract-core@1.1.0) (2022-11-08)
+
+
+### Bug Fixes
+
+* **contract-core:** add preload helper ([02d20bc](https://github.com/waves-enterprise/js-contract-sdk/commit/02d20bcd4c0ad6c95ba1e5eab6e8e6472899173b))
+* **contract-core:** edit folder structure ([509a028](https://github.com/waves-enterprise/js-contract-sdk/commit/509a0289cad9399651f320a5bd50c46102464078))
+* **contract-core:** fix params extractor ([0ea803a](https://github.com/waves-enterprise/js-contract-sdk/commit/0ea803a4ab09467384475f7815d8550ada6c1c2e))
+* **contract-core:** handle entry cache ([34d4f26](https://github.com/waves-enterprise/js-contract-sdk/commit/34d4f26b925b4a69c72a60498ed4fc238c8e8499))
+
+
+
+
 
 ## [1.0.5](https://github.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.0.2...@wavesenterprise/contract-core@1.0.5) (2022-07-26)
 

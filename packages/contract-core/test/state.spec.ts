@@ -1,31 +1,56 @@
-import { Action, ContractState, ExecutionContext, State } from '../src'
-import { RPC } from '../src/grpc'
-import { TransactionConverter } from '../src/core/converters/transaction'
+import { Action, Contract, ContractState, preload, State, TVar, Var } from '../src'
+import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { mockRespTx } from './mocks/contract-transaction-response'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import {
   ContractKeyRequest,
+  ContractKeysRequest,
+  ContractKeysResponse,
   ContractTransaction,
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
-import { ContractProcessor } from '../src/core/execution/contract-processor'
-import { Var } from '../src/core/decorators/var'
+import { ContractProcessor } from '../src/execution/contract-processor'
+import { ParamsExtractor } from '../src/execution/params-extractor'
+import { ExecutionContext } from '../src/execution'
+import { convertContractTransaction } from '../src/execution/converter'
+import * as Long from 'long'
+
+
+const mockEntry = (key: string, valueKey: string, value: unknown) => {
+  return DataEntry.fromPartial({
+    key,
+    [valueKey]: value,
+  })
+}
+
+const stateMock = {
+  'intVar': mockEntry('intVar', 'intValue', Long.fromValue(350677)),
+  'decimalVar': mockEntry('intVar', 'intValue', Long.fromString('350677121231')),
+}
+
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
     setAuth() {
     },
-    commitExecutionSuccess: jest.fn((_args) => {
+    commitExecutionSuccess: jest.fn((args) => {
       // console.log(args)
     }),
-    commitExecutionError: jest.fn((_args) => {
+    commitExecutionError: jest.fn((args) => {
       // console.log(args)
     }),
+    getContractKeys: jest.fn((req: ContractKeysRequest) => {
 
-    getContractKey: jest.fn((_args) => {
+
+      return ContractKeysResponse.fromPartial({
+        entries: req.keysFilter!.keys.map((key) => {
+          return stateMock[key]
+        }),
+      })
+    }),
+    getContractKey: jest.fn((args) => {
       // console.log(args)
     }),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any)
+  } as unknown as ContractClient)
 
 
 jest.spyOn(ContractProcessor.prototype, 'tryCommitError')
@@ -34,32 +59,31 @@ jest.spyOn(RPC.prototype, 'saveClient')
   })
 
 describe('State', () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const rpc = new RPC({} as unknown as any)
-  let txCnv: TransactionConverter
+  const rpc = new RPC({} as unknown as RPCConnectionConfig)
+  let extractor: ParamsExtractor
 
   function mockExecutionContext(tx: ContractTransaction) {
     return new ExecutionContext({
       authToken: '',
-      tx: txCnv.parse(tx),
+      tx: convertContractTransaction(tx),
     }, rpc)
   }
 
 
   beforeEach(() => {
-    txCnv = new TransactionConverter()
+    extractor = new ParamsExtractor()
   })
 
   describe('ContractState', () => {
     it('should set string value', async () => {
       class TestContract {
-        @State state: ContractState
+                @State state: ContractState
 
-        @Action
-        test() {
-          this.state.setString('strictString', 'str')
-          this.state.set('castString', 'str1')
-        }
+                @Action
+                test() {
+                  this.state.setString('strictString', 'str')
+                  this.state.set('castString', 'str1')
+                }
       }
 
       const tx = mockRespTx('test').transaction!
@@ -92,13 +116,13 @@ describe('State', () => {
 
     it('should set int value', async () => {
       class TestContract {
-        @State state: ContractState
+                @State state: ContractState
 
-        @Action
-        test() {
-          this.state.setInt('strictInt', 100)
-          this.state.set('castInt', 1001)
-        }
+                @Action
+                test() {
+                  this.state.setInt('strictInt', 100)
+                  this.state.set('castInt', 1001)
+                }
       }
 
       const tx = mockRespTx('test').transaction!
@@ -132,13 +156,13 @@ describe('State', () => {
 
     it('should set boolean value', async () => {
       class TestContract {
-        @State state: ContractState
+                @State state: ContractState
 
-        @Action
-        test() {
-          this.state.setBool('strictBool', false)
-          this.state.set('castBool', true)
-        }
+                @Action
+                test() {
+                  this.state.setBool('strictBool', false)
+                  this.state.set('castBool', true)
+                }
       }
 
       const tx = mockRespTx('test').transaction!
@@ -172,13 +196,13 @@ describe('State', () => {
 
     it('should set binary value', async () => {
       class TestContract {
-        @State state: ContractState
+                @State state: ContractState
 
-        @Action
-        test() {
-          this.state.setBinary('strictBinary', new Uint8Array([22, 8, 322]))
-          this.state.set('castBinary', new Uint8Array([21, 8, 322]))
-        }
+                @Action
+                test() {
+                  this.state.setBinary('strictBinary', new Uint8Array([22, 8, 322]))
+                  this.state.set('castBinary', new Uint8Array([21, 8, 322]))
+                }
       }
 
       const tx = mockRespTx('test').transaction!
@@ -212,24 +236,43 @@ describe('State', () => {
   })
 
   describe('Properties', () => {
+    @Contract()
     class TestContract {
-      @Var() myVar: { get(): unknown, set(v: unknown): void }
-      @Var({ mutable: false }) immutable: { get(): unknown, set(v: unknown): void }
+            @Var() intVar: TVar<number>
+            @Var() decimalVar: TVar<number>
 
-      @Action
-      test() {
-        this.myVar.set('test')
-      }
+            @Var() myVar: TVar<string>
+            @Var({ mutable: false }) immutable: TVar<string>
 
-      @Action
-      async getterTest() {
-        await this.myVar.get()
-      }
+            @Action
+            test() {
+              this.myVar.set('test')
+            }
 
-      @Action
-      immutableTest() {
-        this.immutable.set('testValue')
-      }
+            @Action
+            async getterTest() {
+              await this.myVar.get()
+            }
+
+            @Action
+            async immutableTest() {
+              this.immutable.set('testValue')
+            }
+
+            @Action
+            async preloadInAction() {
+              await preload(this, ['myVar'])
+            }
+
+            @Action
+            async preloadInActionVars() {
+              await preload(this, ['intVar', 'decimalVar'])
+
+              await this.intVar.get()
+              await this.decimalVar.get()
+
+              this.decimalVar.set(100)
+            }
     }
 
     it('should throw error on try set immutable', async function () {
@@ -289,6 +332,46 @@ describe('State', () => {
           ],
           assetOperations: [],
         },
+      )
+    })
+
+    it('should batch preload state keys', async function () {
+      const tx = mockRespTx('getterTest').transaction!
+      const ec = mockExecutionContext(tx)
+
+      const processor = new ContractProcessor(
+        TestContract,
+        rpc,
+      )
+
+      await processor.handleIncomingTx(ec.incomingTxResp)
+
+      expect(rpc.Contract.getContractKey).toBeCalledWith(
+        ContractKeyRequest.fromPartial({
+          contractId: 'test-contract',
+          key: 'myVar',
+        }),
+      )
+    })
+
+    it('should preload keys in a batch request', async function () {
+      const tx = mockRespTx('preloadInAction').transaction!
+      const ec = mockExecutionContext(tx)
+
+      const processor = new ContractProcessor(
+        TestContract,
+        rpc,
+      )
+
+      await processor.handleIncomingTx(ec.incomingTxResp)
+
+      expect(rpc.Contract.getContractKeys).toBeCalledWith(
+        ContractKeysRequest.fromPartial({
+          contractId: 'test-contract',
+          keysFilter: {
+            keys: ['myVar'],
+          },
+        }),
       )
     })
   })
