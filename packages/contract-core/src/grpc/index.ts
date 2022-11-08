@@ -1,20 +1,20 @@
-import { ContractClient } from "./clients/contract-client";
-import { RPCConnectionConfig, envConfig } from "./config";
+import { ContractClient } from './clients/contract-client'
+import { RPCConnectionConfig, envConfig } from './config'
 
-export { RPCConnectionConfig, ContractClient, envConfig };
+export { RPCConnectionConfig, ContractClient, envConfig }
 
 export class RPC {
-    clients = {};
+  contractClient: ContractClient
 
-    public get Contract() {
-        return (this.clients as any).contract as ContractClient;
-    }
+  get Contract() {
+    return this.contractClient
+  }
 
-    constructor(private config: RPCConnectionConfig) {
-        this.addClient("contract", ContractClient);
-    }
+  constructor(private config: RPCConnectionConfig) {
+    this.saveClient()
+  }
 
-    addClient(key: string, constructor: any) {
-        this.clients[key] = new constructor(this.config);
-    }
+  saveClient() {
+    this.contractClient = new ContractClient(this.config)
+  }
 }

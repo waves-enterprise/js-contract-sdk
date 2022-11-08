@@ -2,10 +2,10 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testPathIgnorePatterns: ["/dist/"],
+  testPathIgnorePatterns: ['/dist/'],
   globals: {
     'ts-jest': {
-      tsconfig: 'tsconfig.spec.json'
-    }
-  }
-};
+      tsconfig: 'tsconfig.spec.json',
+    },
+  },
+}
