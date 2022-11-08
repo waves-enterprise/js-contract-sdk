@@ -1,16 +1,33 @@
-import {Action, Contract, ContractState, preload, State} from "../src";
+import {Action, Contract, ContractState, preload, State, TInt, TVar, Var} from "../src";
 import {RPC} from "../src/grpc";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
 import {
-    ContractKeyRequest, ContractKeysRequest,
+    ContractKeyRequest,
+    ContractKeysRequest,
+    ContractKeysResponse,
     ContractTransaction
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 import {ContractProcessor} from "../src/execution/contract-processor";
-import {Var} from "../src";
 import {ParamsExtractor} from "../src/execution/params-extractor";
 import {ExecutionContext} from "../src/execution";
 import {convertContractTransaction} from "../src/execution/converter";
+import BN from "bn.js";
+import * as Long from 'long'
+
+
+const mockEntry = (key: string, valueKey: string, value: any) => {
+    return DataEntry.fromPartial({
+        key,
+        [valueKey]: value
+    })
+}
+
+const stateMock = {
+    'intVar': mockEntry('intVar', 'intValue', Long.fromValue(350677)),
+    'decimalVar': mockEntry('intVar', 'intValue', Long.fromString('350677121231'))
+}
+
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
     .mockReturnValue({
@@ -22,11 +39,15 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
         commitExecutionError: jest.fn((args) => {
             // console.log(args)
         }),
+        getContractKeys: jest.fn((req: ContractKeysRequest) => {
 
-        getContractKeys: jest.fn((args) => {
-            // console.log(args)
+
+            return ContractKeysResponse.fromPartial({
+                entries: req.keysFilter!.keys.map((key) => {
+                    return stateMock[key as any];
+                })
+            })
         }),
-
         getContractKey: jest.fn((args) => {
             // console.log(args)
         })
@@ -218,8 +239,11 @@ describe('State', () => {
     describe('Properties', () => {
         @Contract()
         class TestContract {
-            @Var() myVar: { get(): any, set(v: any): void };
-            @Var({ mutable: false }) immutable: { get(): any, set(v: any): void };
+            @Var() intVar: TVar<number>;
+            @Var() decimalVar: TVar<number>;
+
+            @Var() myVar: TVar<string>;
+            @Var({mutable: false}) immutable: TVar<string>;
 
             @Action
             test() {
@@ -236,8 +260,20 @@ describe('State', () => {
                 this.immutable.set('testValue')
             }
 
-            @Action async preloadInAction() {
+            @Action
+            async preloadInAction() {
                 await preload(this, ['myVar'])
+            }
+
+            @Action
+            async preloadInActionVars() {
+                await preload(this, ['intVar', 'decimalVar'])
+
+                await this.intVar.get();
+                await this.decimalVar.get();
+
+                this.decimalVar.set(100)
+
             }
         }
 
@@ -319,7 +355,6 @@ describe('State', () => {
                 })
             )
         });
-
 
         it('should preload keys in a batch request', async function () {
             const tx = mockRespTx('preloadInAction').transaction!;

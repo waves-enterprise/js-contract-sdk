@@ -8,10 +8,10 @@ import {IncomingTransactionResp} from "./types";
 import {ERROR_CODE} from "./constants";
 import {Container, logger} from "../api";
 import {ParamsExtractor} from "./params-extractor";
-import {setContractPreloadedEntries} from "./reflect";
+import {setContractEntries} from "./reflect";
 
 export function clearPreloadedEntries(contract: any): void {
-    return setContractPreloadedEntries(contract, new Map)
+    return setContractEntries(contract, new Map)
 }
 
 export class ContractProcessor {

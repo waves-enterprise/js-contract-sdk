@@ -3,7 +3,8 @@ import {getState} from "./common";
 import {ContractError} from "../../execution";
 import {CONTRACT_VARS} from "../contants";
 import {TContractVarsMeta, TVarMeta} from "../meta";
-import {getContractPreloadedEntries} from "../../execution/reflect";
+import {getContractEntries, setContractEntry} from "../../execution/reflect";
+import {CastTrait, PrimitiveType} from "../state/types/primitives";
 
 export type TVarConfig = Partial<TVarMeta>
 
@@ -48,29 +49,48 @@ export function decorateProperty(target: Constructable<any>, propertyKey: string
         target.constructor
     );
 
+
+    const VariableCastType: CastTrait = new (Reflect.getMetadata("design:type", target, propertyKey) as any)
+
+
+    let _settled;
+
     Object.defineProperty(target, propertyKey, {
         set: () => {
             throw new Error('cannot reassign typed property')
         },
         get: () => {
-            return {
-                get() {
-                    const preloaded = getContractPreloadedEntries(target);
+            if (!_settled) {
+                const res = new class extends PrimitiveType {
+                    async get() {
+                        const entries = getContractEntries(target);
 
-                    if (preloaded.has(contractKey)) {
-                        return preloaded.get(contractKey);
+                        let res;
+                        if (entries.has(contractKey)) {
+                            res = entries.get(contractKey);
+                        } else {
+                            res = await getState().tryGet(contractKey)
+                        }
+
+                        this.settle(res)
+
+                        return this.castToTargetType();
                     }
 
-                    return getState().tryGet(contractKey)
-                },
-                set(value: any) {
-                    if (!config.mutable) {
-                        throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
-                    }
+                    set(value: any) {
+                        if (!config.mutable) {
+                            throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
+                        }
 
-                    getState().set(contractKey, value)
+                        setContractEntry(target, contractKey, value);
+                        getState().set(contractKey, value)
+                    }
                 }
+
+                _settled = res;
             }
+
+            return _settled
         }
     });
 }

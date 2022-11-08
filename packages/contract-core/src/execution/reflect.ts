@@ -16,10 +16,21 @@ export function getContractVarsMetadata(contract: Constructable<any>): TContract
     return Reflect.getMetadata(CONTRACT_VARS, contract);
 }
 
-export function setContractPreloadedEntries(contract: any, keys: Map<string, TVal>): void {
+
+export function setContractEntry(contract: any, key: string, value: TVal): void {
+    const entries = getContractEntries(contract);
+
+    entries.set(key, value)
+
+    return Reflect.defineMetadata(CONTRACT_PRELOADED_ENTRIES, entries, contract)
+}
+
+export function setContractEntries(contract: any, keys: Map<string, TVal>): void {
     return Reflect.defineMetadata(CONTRACT_PRELOADED_ENTRIES, keys, contract.constructor)
 }
 
-export function getContractPreloadedEntries(contract: any): Map<string, TVal> {
+export function getContractEntries(contract: any): Map<string, TVal> {
     return Reflect.getMetadata(CONTRACT_PRELOADED_ENTRIES, contract.constructor)
 }
+
+

@@ -1,7 +1,7 @@
 import {
-    getContractPreloadedEntries,
+    getContractEntries,
     getContractVarsMetadata,
-    setContractPreloadedEntries
+    setContractEntries
 } from "../../execution/reflect";
 import {getState} from "../decorators/common";
 
@@ -14,7 +14,7 @@ export async function preload<T extends object>(contract: T, keys: (keyof T)[]) 
     const preloadVars = getPreloadKeys(contract, keys as string[])
     const entriesToBatchLoad = preloadVars.map(([varKey, {meta}]) => meta.name || varKey)
 
-    const preloaded = getContractPreloadedEntries(contract);
+    const preloaded = getContractEntries(contract);
 
     const res = await getState()
         .storage
@@ -27,5 +27,5 @@ export async function preload<T extends object>(contract: T, keys: (keyof T)[]) 
         preloaded.set(meta.name || varKey, preloadedValue)
     }
 
-    setContractPreloadedEntries(contract, preloaded);
+    setContractEntries(contract, preloaded);
 }
