@@ -1,4 +1,4 @@
-import {Action, Contract, ContractState, preload, State, TInt, TVar, Var} from "../src";
+import {Action, Contract, ContractState, preload, State, TVar, Var} from "../src";
 import {RPC} from "../src/grpc";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
@@ -12,7 +12,6 @@ import {ContractProcessor} from "../src/execution/contract-processor";
 import {ParamsExtractor} from "../src/execution/params-extractor";
 import {ExecutionContext} from "../src/execution";
 import {convertContractTransaction} from "../src/execution/converter";
-import BN from "bn.js";
 import * as Long from 'long'
 
 
@@ -273,7 +272,6 @@ describe('State', () => {
                 await this.decimalVar.get();
 
                 this.decimalVar.set(100)
-
             }
         }
 

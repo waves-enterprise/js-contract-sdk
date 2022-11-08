@@ -12,6 +12,13 @@ export class RetryableError extends ContractError {
     }
 }
 
+
+export class UnexpectedParamTypeException extends ContractError {
+    constructor(key: string) {
+        super(`Required call param with name "${key}" has unexpected type`);
+    }
+}
+
 export class UnavailableContractParamException extends Error {
     constructor(key: string) {
         super(`Required call param with name "${key}" not founded`);

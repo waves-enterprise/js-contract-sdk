@@ -40,7 +40,7 @@ describe('TransactionConverter', () => {
                     }),
                     ContractTransferIn.fromPartial({
                         amount: 1000000,
-                        assetId: ['assetId']
+                        assetId: 'assetId'
                     })
                 ],
             }

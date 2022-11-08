@@ -109,7 +109,7 @@ function mockAction(name: string,) {
                 }),
                 ContractTransferIn.fromPartial({
                     amount: 1000000,
-                    assetId: ['assetId']
+                    assetId: 'assetId'
                 })
             ],
         }
@@ -156,7 +156,7 @@ describe('ContractProcessor', () => {
                     }),
                     ContractTransferIn.fromPartial({
                         amount: 1000000,
-                        assetId: ['assetId']
+                        assetId: 'assetId'
                     })
                 ],
             }

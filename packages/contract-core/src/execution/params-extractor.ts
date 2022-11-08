@@ -1,10 +1,15 @@
-import { ExecutionContext } from "./execution-context";
-import { getArgsMetadata, getContractMetadata } from "./reflect";
-import { TArgs, TContractActionMetadata } from "../api/meta";
-import { isPrimitive, isWrappedType } from "../utils";
-import { Constructable } from "../@types/common";
-import { ReservedParamNames, TxId } from "./constants";
-import { ContractError, UnavailableContractActionException, UnavailableContractParamException } from "./exceptions";
+import {ExecutionContext} from "./execution-context";
+import {getArgsMetadata, getContractMetadata} from "./reflect";
+import {TArgs, TContractActionMetadata} from "../api/meta";
+import {isPrimitive, isWrappedType} from "../utils";
+import {Constructable} from "../@types/common";
+import {ReservedParamNames, TxId} from "./constants";
+import {
+    ContractError,
+    UnavailableContractActionException,
+    UnavailableContractParamException,
+    UnexpectedParamTypeException
+} from "./exceptions";
 
 function getArgKey(idx: number) {
     return `arg:${idx}`;
@@ -63,6 +68,7 @@ export class ParamsExtractor {
                     throw new UnavailableContractParamException(argFromParams.paramKey);
                 }
 
+
                 if (isPrimitive(param)) {
                     actionArgs[paramIndex] = paramValue;
                 } else if (isWrappedType(param)) {
@@ -71,6 +77,8 @@ export class ParamsExtractor {
                     } catch (e) {
                         throw new ContractError(e.message);
                     }
+                } else {
+                    throw new UnexpectedParamTypeException(argFromParams.paramKey);
                 }
             }
         }

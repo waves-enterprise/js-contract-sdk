@@ -2,9 +2,10 @@ import {ExecutionContext} from "../src/execution";
 import {RPC} from "../src/grpc";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {DataEntry} from "@wavesenterprise/js-contract-grpc-client/data_entry";
-import {Action, Param, TInt} from "../src";
+import {Action, Contract, Param, TInt} from "../src";
 import {convertContractTransaction} from "../src/execution/converter";
 import {ParamsExtractor} from "../src/execution/params-extractor";
+import BN from "bn.js";
 
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
@@ -32,11 +33,12 @@ describe('State', () => {
     })
 
     it('should apply decorator to class ', () => {
+        @Contract()
         class TestContract {
             @Action
             test(
                 @Param('key') value: string,
-                @Param('next') big: TInt,
+                @Param('next') big: BN,
                 @Param('binary') buf: Buffer
             ) {
 
@@ -70,6 +72,6 @@ describe('State', () => {
         const {args} = extractor.extract(TestContract, ec);
 
         expect(args[0]).toEqual('testValue')
-        expect((args[1] as TInt).toNumber()).toEqual(2)
+        expect((args[1] as BN).toNumber()).toEqual(2)
     })
 })

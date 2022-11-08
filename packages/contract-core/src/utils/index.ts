@@ -90,7 +90,7 @@ export function isPrimitive(v: any) {
 }
 
 export function isWrappedType(v: any) {
-    return BN.isBN(v);
+    return BN === v;
 }
 
 export const getCpusCount = () => os.cpus().length;
