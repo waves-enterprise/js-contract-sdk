@@ -37,10 +37,10 @@ export class Logger {
     }
 }
 
-export function logger(c: { constructor: unknown }): Logger {
-  const logger = new Logger()
+export function logger(c: { constructor: {name: string} }): Logger {
+  const loggerIntance = new Logger()
 
-  logger.setComponent(c.constructor.name)
+  loggerIntance.setComponent(c.constructor.name)
 
-  return logger
+  return loggerIntance
 }

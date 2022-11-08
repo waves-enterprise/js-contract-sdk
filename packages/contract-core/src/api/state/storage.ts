@@ -119,7 +119,7 @@ export class Storage {
         key,
       })
 
-      return Boolean(entry && entry.stringValue !== undefined)
+      return Boolean(entry?.stringValue !== undefined)
     }
 
     set(key: string, value: TValue): void {
@@ -127,16 +127,10 @@ export class Storage {
     }
 
     delete(key: string) {
-      this.internalState.write(key, undefined)
+      this.internalState.write(key, undefined as unknown as TValue)
     }
 
     getEntries(): DataEntry[] {
       return this.internalState.getEntries()
     }
-}
-
-function strToRegexp(...str: string[]) {
-  const prefix = '^'
-
-  return `${prefix}(${str.join('|')})`
 }

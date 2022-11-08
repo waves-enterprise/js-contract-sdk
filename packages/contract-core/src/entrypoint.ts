@@ -1,7 +1,8 @@
+/* eslint-disable no-console */
 import { ContractConfig, ContractService } from './execution/contract-service'
 
 function bindProcessHandlers() {
-  process.on('SIGINT', async () => {
+  process.on('SIGINT', () => {
     try {
       console.log('Graceful shutdown')
       process.exit(0)

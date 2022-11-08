@@ -56,7 +56,7 @@ export class Asset {
 
   constructor(
     private assetId?: string,
-    nonce?: number,
+    private nonce?: number,
   ) {
   }
 

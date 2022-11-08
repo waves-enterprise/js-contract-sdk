@@ -13,18 +13,21 @@ if (isMainThread) {
     throw new Error('parent port not found')
   }
 
-  const ContractClass = await import(workerData.contractPath).then(({ default: ContractClass }) => ContractClass)
+  const ContractClassConstructor = await import(workerData.contractPath)
+    .then(({ default: ContractClass }) => ContractClass as unknown)
 
   const rpc = new RPC(envConfig())
   rpc.Contract.connect()
 
-  const processor = new ContractProcessor(ContractClass, rpc)
+  const processor = new ContractProcessor(ContractClassConstructor, rpc)
 
   parentPort!.on('message', async (incoming: IncomingTransactionResp) => {
     try {
       await processor.handleIncomingTx(incoming)
     } catch (e) {
+      /* eslint-disable no-console */
       console.log('Uncathed error', e, 'tx may not be committed')
+      /* eslint-enable no-console */
     } finally {
       this.messagePort.postMessage('done')
     }

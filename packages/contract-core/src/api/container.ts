@@ -1,6 +1,6 @@
 import { Constructable } from '../@types/common'
 
-export class InjectionToken<W = unknown> {
+export class InjectionToken {
   constructor(public tokenString: string) {}
 }
 
@@ -31,17 +31,17 @@ export class Container {
       }
     }
 
-    static get<P>(token: InjectionToken<P>): P
+    static get<P>(token: InjectionToken): P
     static get<T>(token: Constructable<T>): T
     static get(token: unknown): unknown {
       if (token instanceof InjectionToken) {
-        return this.container.get(token.tokenString)
+        return this.container.get(token.tokenString) as unknown
       }
 
       const constructor = token as Constructable<unknown>
 
       const instanceKey = Reflect.getMetadata(PROVIDER, constructor)
 
-      return this.container.get(instanceKey)
+      return this.container.get(instanceKey) as unknown
     }
 }

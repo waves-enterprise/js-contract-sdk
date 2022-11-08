@@ -19,7 +19,7 @@ const decorateState = (target: Constructable<unknown>, propertyKey: string) => {
     get(): unknown {
       return getState()
     },
-    set(v: unknown) {
+    set(_: unknown) {
       throw new Error('Contract state is initialized')
     },
   })
@@ -40,7 +40,7 @@ const decorateContext = (target: Constructable<unknown>, propertyKey: string) =>
     get(): unknown {
       return Container.get(ExecutionContext)
     },
-    set(v: unknown) {
+    set(_: unknown) {
       throw new Error('Context is initialized')
     },
   })

@@ -126,7 +126,7 @@ export class ContractState implements IState {
       return this.withException(() => this.storage.get(key))
     }
 
-    set(key: string, value: unknown) {
+    set(key: string, value: TValue) {
       this.storage.set(key, value)
     }
 
@@ -142,16 +142,16 @@ export class ContractState implements IState {
       return mapping
     }
 
-    private async internalRead(key: string) {
+    private internalRead(key: string) {
       return this.storage.get(key)
     }
 
-    private withException = async (fn) => {
+    private withException = async <T = unknown>(fn): Promise<T> => {
       try {
-        return await fn()
+        return await fn()as unknown as T
       } catch (e) {
         if (e instanceof UnavailableStateKeyException) {
-          return nil()
+          return nil() as unknown as T
         }
 
         throw e

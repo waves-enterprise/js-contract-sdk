@@ -74,19 +74,19 @@ export class ContractClient implements IContractClient {
     }
 
     getContractKeys(req: Partial<ContractKeysRequest>) {
-      return this.internalCall<ContractKeysRequest, ContractKeysResponse>((handler) =>
+      return this.internalCall<ContractKeysResponse>((handler) =>
         this.impl.getContractKeys(ContractKeysRequest.fromPartial(req), this.auth, handler),
       )
     }
 
     commitExecutionSuccess(req: ExecutionSuccessRequest) {
-      return this.internalCall<ExecutionSuccessRequest, CommitExecutionResponse>((handler) =>
+      return this.internalCall<CommitExecutionResponse>((handler) =>
         this.impl.commitExecutionSuccess(req, this.auth, handler),
       )
     }
 
     commitExecutionError(req: ExecutionErrorRequest) {
-      return this.internalCall<ExecutionErrorRequest, CommitExecutionResponse>((handler) =>
+      return this.internalCall<CommitExecutionResponse>((handler) =>
         this.impl.commitExecutionError(req, this.auth, handler),
       )
     }
@@ -141,7 +141,7 @@ export class ContractClient implements IContractClient {
       this.connection.on('data', handler)
     }
 
-    private internalCall<P, R>(fn: (h: (e: ServiceError, r: R) => void) => void) {
+    private internalCall<R>(fn: (h: (e: ServiceError, r: R) => void) => void) {
       return new Promise<R>((resolve, reject) => {
         const handler = (err: ServiceError, resp: R) => {
           if (!err) {

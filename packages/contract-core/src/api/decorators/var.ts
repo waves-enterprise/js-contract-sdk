@@ -4,7 +4,8 @@ import { ContractError } from '../../execution'
 import { CONTRACT_VARS } from '../contants'
 import { TContractVarsMeta, TVarMeta } from '../meta'
 import { getContractEntries, setContractEntry } from '../../execution/reflect'
-import { CastTrait, PrimitiveType } from '../state/types/primitives'
+import { PrimitiveType } from '../state/types/primitives'
+import { TVal } from '../../intefaces/contract'
 
 export type TVarConfig = Partial<TVarMeta>
 
@@ -26,10 +27,10 @@ export function Var(...args: any[]) {
     ...(args[0] || {}),
   }
 
-  return (...args_: any[]) => decorateProperty.call(undefined, ...args_, config)
+  return (...args_: any[]): void => decorateProperty.call(undefined, ...args_, config) as void
 }
 
-export function decorateProperty(target: Constructable<unknown>, propertyKey: string, _, config: TVarConfig) {
+export function decorateProperty(target: Constructable<unknown>, propertyKey: string, _, config: TVarConfig):void {
   const contractKey = config.name || propertyKey
 
   const meta: TContractVarsMeta = Reflect.getMetadata(CONTRACT_VARS, target.constructor) || {}
@@ -49,11 +50,7 @@ export function decorateProperty(target: Constructable<unknown>, propertyKey: st
     target.constructor,
   )
 
-
-  const VariableCastType: CastTrait = new (Reflect.getMetadata('design:type', target, propertyKey) as unknown)()
-
-
-  let _settled
+  let _settled: object
 
   Object.defineProperty(target, propertyKey, {
     set: () => {
@@ -77,12 +74,12 @@ export function decorateProperty(target: Constructable<unknown>, propertyKey: st
             return this.castToTargetType()
           }
 
-          set(value: unknown) {
+          set(value: TVal) {
             if (!config.mutable) {
               throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
             }
 
-            setContractEntry(target, contractKey, value)
+            setContractEntry(target, contractKey, value as TVal)
             getState().set(contractKey, value)
           }
         }()
