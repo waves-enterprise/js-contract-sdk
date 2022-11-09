@@ -12,6 +12,8 @@ export class TransferIn {
   amount: BN
 }
 
+export type AttachedPayments = TransferIn[]
+
 export type IncomingTx = {
   id: string,
   type: number,
