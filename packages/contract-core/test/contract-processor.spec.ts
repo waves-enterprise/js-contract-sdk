@@ -199,7 +199,7 @@ describe('ContractProcessor', () => {
       },
     })
 
-    expect(processor.handleIncomingTx({ authToken: 'test', tx: convertContractTransaction(comockResp.transaction!) }))
+    expect(processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON((comockResp.transaction!)) }))
       .rejects.toThrowError(UnavailableContractParamException)
   })
 

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import {ContractConfig, ContractService} from './execution/contract-service'
+import { ContractConfig, ContractService } from './execution/contract-service'
 
 function bindProcessHandlers() {
   process.on('SIGINT', () => {
