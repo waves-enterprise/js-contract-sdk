@@ -1,6 +1,6 @@
 {
   "name": "@wavesenterprise/contract-core",
-  "version": "1.1.0-rc.3",
+  "version": "1.1.0-rc.4",
   "description": "Implements JS Contract SDK core functionality, rpc services, tools and utilities.",
   "type": "commonjs",
   "main": "dist/index.js",

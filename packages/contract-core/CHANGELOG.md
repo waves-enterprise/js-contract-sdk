@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0-rc.4](https://github.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.1.0-rc.3...@wavesenterprise/contract-core@1.1.0-rc.4) (2022-11-09)
+
+**Note:** Version bump only for package @wavesenterprise/contract-core
+
+
+
+
+
 # [1.1.0-rc.3](https://github.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.1.0-rc.2...@wavesenterprise/contract-core@1.1.0-rc.3) (2022-11-09)
 
 
