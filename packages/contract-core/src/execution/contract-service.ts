@@ -1,11 +1,13 @@
-import { ContractTransactionResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
-import { IncomingTransactionResp } from './types'
+import {
+  ContractTransaction,
+  ContractTransactionResponse,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { ProcessTransactionTask } from './types'
 import { StaticPool } from '../utils/workers/static-pool'
 import path from 'path'
 import { ContractClient, envConfig, RPC } from '../grpc'
 import { logger } from '../api'
 import { getCpusCount } from '../utils'
-import { convertContractTransaction } from './converter'
 
 export type ContractConfig = {
   contractPath: string,
@@ -47,9 +49,9 @@ export class ContractService {
       }
 
       try {
-        await this.workerPool.runTask<IncomingTransactionResp, unknown>({
+        await this.workerPool.runTask<ProcessTransactionTask, unknown>({
           authToken: resp.authToken,
-          tx: convertContractTransaction(resp.transaction),
+          tx: ContractTransaction.toJSON(resp.transaction) as object,
         })
       } catch (e) {
         this.logger.error('Worker execution error', e)

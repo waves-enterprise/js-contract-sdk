@@ -8,8 +8,8 @@ export type TParam = {
 }
 
 export class TransferIn {
-    assetId?: string
-    amount: BN
+  assetId?: string
+  amount: BN
 }
 
 export type IncomingTx = {
@@ -27,7 +27,13 @@ export type IncomingTx = {
   params: TParam[],
 }
 
+export type ProcessTransactionTask = {
+  authToken: string,
+  tx: unknown,
+}
+
+
 export type IncomingTransactionResp = {
   authToken: string,
-  tx: IncomingTx,
+  tx: unknown,
 }

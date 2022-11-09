@@ -6,6 +6,7 @@ import { Action, Contract, Param } from '../src'
 import { convertContractTransaction } from '../src/execution/converter'
 import { ParamsExtractor } from '../src/execution/params-extractor'
 import BN from 'bn.js'
+import {ContractTransaction} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
@@ -62,7 +63,7 @@ describe('State', () => {
       }),
     )
 
-    const incomingTx = convertContractTransaction(tx)
+    const incomingTx = ContractTransaction.toJSON(tx)
 
     const ec = new ExecutionContext({
       authToken: '',

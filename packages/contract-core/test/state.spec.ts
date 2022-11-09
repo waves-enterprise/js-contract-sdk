@@ -24,7 +24,7 @@ const mockEntry = (key: string, valueKey: string, value: unknown) => {
 
 const stateMock = {
   'intVar': mockEntry('intVar', 'intValue', Long.fromValue(350677)),
-  'decimalVar': mockEntry('intVar', 'intValue', Long.fromString('350677121231')),
+  'decimalVar': mockEntry('decimalVar', 'intValue', Long.fromString('350677121231')),
 }
 
 
@@ -86,15 +86,14 @@ describe('State', () => {
                 }
       }
 
-      const tx = mockRespTx('test').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('test')
 
       const processor = new ContractProcessor(
         TestContract,
-        ec.rpcConnection,
+        rpc
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
@@ -125,15 +124,14 @@ describe('State', () => {
                 }
       }
 
-      const tx = mockRespTx('test').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('test')
 
       const processor = new ContractProcessor(
         TestContract,
-        ec.rpcConnection,
+        rpc
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
@@ -165,15 +163,14 @@ describe('State', () => {
                 }
       }
 
-      const tx = mockRespTx('test').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('test')
 
       const processor = new ContractProcessor(
         TestContract,
-        ec.rpcConnection,
+        rpc,
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
@@ -205,15 +202,14 @@ describe('State', () => {
                 }
       }
 
-      const tx = mockRespTx('test').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('test')
 
       const processor = new ContractProcessor(
         TestContract,
-        ec.rpcConnection,
+        rpc,
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
@@ -276,8 +272,7 @@ describe('State', () => {
     }
 
     it('should throw error on try set immutable', async function () {
-      const tx = mockRespTx('immutableTest').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('immutableTest')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -285,21 +280,21 @@ describe('State', () => {
       )
 
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
+
 
       expect(processor.tryCommitError).toBeCalled()
     })
 
     it('should get value by propertyKey', async function () {
-      const tx = mockRespTx('getterTest').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('getterTest')
 
       const processor = new ContractProcessor(
         TestContract,
         rpc,
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.getContractKey).toBeCalledWith(
         ContractKeyRequest.fromPartial({
@@ -310,15 +305,14 @@ describe('State', () => {
     })
 
     it('should initialize proxy state value', async function () {
-      const tx = mockRespTx('test').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('test')
 
       const processor = new ContractProcessor(
         TestContract,
         rpc,
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
@@ -336,15 +330,14 @@ describe('State', () => {
     })
 
     it('should batch preload state keys', async function () {
-      const tx = mockRespTx('getterTest').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('getterTest')
 
       const processor = new ContractProcessor(
         TestContract,
         rpc,
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.getContractKey).toBeCalledWith(
         ContractKeyRequest.fromPartial({
@@ -355,15 +348,14 @@ describe('State', () => {
     })
 
     it('should preload keys in a batch request', async function () {
-      const tx = mockRespTx('preloadInAction').transaction!
-      const ec = mockExecutionContext(tx)
+      const resp = mockRespTx('preloadInAction')
 
       const processor = new ContractProcessor(
         TestContract,
         rpc,
       )
 
-      await processor.handleIncomingTx(ec.incomingTxResp)
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
 
       expect(rpc.Contract.getContractKeys).toBeCalledWith(
         ContractKeysRequest.fromPartial({

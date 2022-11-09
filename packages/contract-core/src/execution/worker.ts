@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import { isMainThread, parentPort, workerData } from 'node:worker_threads'
 import { ContractProcessor } from './contract-processor'
 import { envConfig, RPC } from '../grpc'
-import { IncomingTransactionResp } from './types'
+import { ProcessTransactionTask } from './types'
 
 if (isMainThread) {
   throw new Error('Main thread error')
@@ -21,7 +21,7 @@ if (isMainThread) {
 
   const processor = new ContractProcessor(ContractClassConstructor, rpc)
 
-  parentPort!.on('message', async (incoming: IncomingTransactionResp) => {
+  parentPort!.on('message', async (incoming: ProcessTransactionTask) => {
     try {
       await processor.handleIncomingTx(incoming)
     } catch (e) {
