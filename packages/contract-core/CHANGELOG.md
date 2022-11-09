@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0-rc.3](https://github.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.1.0-rc.2...@wavesenterprise/contract-core@1.1.0-rc.3) (2022-11-09)
+
+
+### Bug Fixes
+
+* **contract-core:** contract transactions serialization ([3851675](https://github.com/waves-enterprise/js-contract-sdk/commit/3851675eceb4e0a2e3367b4d40d81c568da23d04))
+
+
+### Features
+
+* **contract-core:** add @Payments, @Ctx to action params ([9c7c3f2](https://github.com/waves-enterprise/js-contract-sdk/commit/9c7c3f2c073c23eb8081513c0c7f1e9639f82b67))
+
+
+
+
+
 # [1.1.0-rc.2](https://github.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.1.0-rc.1...@wavesenterprise/contract-core@1.1.0-rc.2) (2022-11-09)
 
 
