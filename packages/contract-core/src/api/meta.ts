@@ -20,6 +20,7 @@ export type TContractActionsMetadata = {
 export type TArgs = {
   [key: string]: {
     index: number,
-    paramKey: string,
+    paramKey?: string,
+    getter?: () => unknown,
   },
 }

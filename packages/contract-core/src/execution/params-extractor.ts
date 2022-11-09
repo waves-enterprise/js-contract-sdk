@@ -59,15 +59,18 @@ export class ParamsExtractor {
       const argFromParams = argsMetadata[getArgKey(paramIndex)]
 
       if (!argFromParams) {
-        // try get from container
-        // throw new ContractError(`Argument at index ${paramIndex} should be annotated with @Param decorator`)
+        throw new ContractError(`Argument at index ${paramIndex} should be annotated with @Param decorator`)
       } else {
-        const paramValue = executionContext.params.get(argFromParams.paramKey)
-
-        if (!paramValue) {
-          throw new UnavailableContractParamException(argFromParams.paramKey)
+        if (argFromParams.getter) {
+          actionArgs[paramIndex] = argFromParams.getter()
+          continue
         }
 
+        const paramValue = executionContext.params.get(argFromParams.paramKey!)
+
+        if (!paramValue) {
+          throw new UnavailableContractParamException(argFromParams.paramKey || `#${paramIndex.toString()}`)
+        }
 
         if (isPrimitive(param)) {
           actionArgs[paramIndex] = paramValue
@@ -78,7 +81,7 @@ export class ParamsExtractor {
             throw new ContractError(e.message)
           }
         } else {
-          throw new UnexpectedParamTypeException(argFromParams.paramKey)
+          throw new UnexpectedParamTypeException(argFromParams.paramKey || `#${paramIndex.toString()}`)
         }
       }
     }

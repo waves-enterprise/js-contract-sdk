@@ -1,5 +1,8 @@
 import 'reflect-metadata'
-import { ContractTransactionResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import {
+  ContractTransaction,
+  ContractTransactionResponse
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { ContractProcessor } from '../src/execution/contract-processor'
 import { Action, Contract, Param } from '../src'
@@ -84,7 +87,7 @@ function mockRespTx(name: string) {
 function mockAction(name: string) {
   return ContractTransactionResponse.fromPartial({
     authToken: 'test-token',
-    transaction: {
+    transaction: ContractTransaction.fromPartial({
       id: 'some-tx-id',
       type: 104,
       sender: 'iam',
@@ -112,7 +115,7 @@ function mockAction(name: string) {
           assetId: 'assetId',
         }),
       ],
-    },
+    }),
   })
 }
 
@@ -164,8 +167,7 @@ describe('ContractProcessor', () => {
   })
 
   it('should execute test action successfully', async function () {
-    const parsed = convertContractTransaction(mockResp.transaction!)
-    await processor.handleIncomingTx({ authToken: 'test', tx: parsed })
+    await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(mockResp.transaction!) })
 
     expect(contractClient.commitExecutionSuccess).toBeCalled()
     expect(contractClient.commitExecutionError).not.toBeCalled()
@@ -173,9 +175,9 @@ describe('ContractProcessor', () => {
 
 
   it('should reject execution with not found action', async function () {
-    const parsed = convertContractTransaction(mockAction('__').transaction!)
+    const parsed = ContractTransaction.toJSON(mockAction('__').transaction!)
 
-    expect(processor.handleIncomingTx({ authToken: 'test', tx: parsed }))
+    expect(processor.handleIncomingTx({ authToken: 'test',  tx: parsed }))
       .rejects.toThrowError(UnavailableContractActionException)
   })
 
@@ -197,12 +199,12 @@ describe('ContractProcessor', () => {
       },
     })
 
-    expect(processor.handleIncomingTx({ authToken: 'test', tx: convertContractTransaction(comockResp.transaction!) }))
+    expect(processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON((comockResp.transaction!)) }))
       .rejects.toThrowError(UnavailableContractParamException)
   })
 
   it('should reject execution by fatal error in contract action', async function () {
-    const parsed = convertContractTransaction(mockAction('fatal').transaction!)
+    const parsed = ContractTransaction.toJSON(mockAction('fatal').transaction!)
 
     await processor.handleIncomingTx({ authToken: 'test', tx: parsed })
 
@@ -212,7 +214,7 @@ describe('ContractProcessor', () => {
   })
 
   it('should reject execution by retryable error in contract action', async function () {
-    const parsed = convertContractTransaction(mockAction('retryable').transaction!)
+    const parsed = ContractTransaction.toJSON(mockAction('retryable').transaction!)
 
     await processor.handleIncomingTx({ authToken: 'test', tx: parsed })
 

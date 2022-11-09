@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch",
     "start": "node dist/src/index.js",
     "dev": "tsc -w -p tsconfig.json",
     "lint": "eslint src/**/*.ts --quiet --fix",

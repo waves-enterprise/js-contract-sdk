@@ -1,10 +1,13 @@
 import { AssetOperationsRegistry, ContractState } from '../api'
 import { RPC } from '../grpc'
-import { IncomingTransactionResp } from './types'
+import { IncomingTransactionResp, IncomingTx } from './types'
 import { Metadata } from '@grpc/grpc-js'
+import { ContractTransaction } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { convertContractTransaction } from './converter'
 
 export class Auth {
-  constructor(private readonly _authToken: string) {}
+  constructor(private readonly _authToken: string) {
+  }
 
   authToken() {
     return this._authToken
@@ -20,47 +23,49 @@ export class Auth {
 }
 
 export class ExecutionContext {
-    private nonce = 0
+  private nonce = 0
+  private incomingTransaction: IncomingTx
 
-    state: ContractState
-    private auth: Auth
+  state: ContractState
+  private auth: Auth
 
-    constructor(
-      public incomingTxResp: IncomingTransactionResp,
-      public rpcConnection: RPC,
-      public assetOperations: AssetOperationsRegistry = new AssetOperationsRegistry(),
-    ) {
-      this.state = new ContractState(this)
+  constructor(
+    private incomingTxResp: IncomingTransactionResp,
+    public rpcConnection: RPC,
+    public assetOperations: AssetOperationsRegistry = new AssetOperationsRegistry(),
+  ) {
 
-      this.auth = new Auth(incomingTxResp.authToken)
-      this.rpcConnection.Contract.setAuth(this.auth.metadata())
+    this.incomingTransaction = convertContractTransaction(ContractTransaction.fromJSON(incomingTxResp.tx))
+    this.state = new ContractState(this)
+    this.auth = new Auth(incomingTxResp.authToken)
+    this.rpcConnection.Contract.setAuth(this.auth.metadata())
+  }
+
+  getNonce() {
+    this.nonce = this.nonce + 1
+
+    return this.nonce
+  }
+
+  get tx() {
+    return this.incomingTransaction
+  }
+
+  get txId(): string {
+    return this.tx.id
+  }
+
+  get contractId(): string {
+    return this.tx.contractId
+  }
+
+  get params(): Map<string, string> {
+    const paramsMap = new Map()
+
+    for (const p of this.tx.params) {
+      paramsMap.set(p.key, p.value)
     }
 
-    getNonce() {
-      this.nonce = this.nonce + 1
-
-      return this.nonce
-    }
-
-    get tx() {
-      return this.incomingTxResp.tx
-    }
-
-    get txId(): string {
-      return this.tx.id
-    }
-
-    get contractId(): string {
-      return this.tx.contractId
-    }
-
-    get params(): Map<string, string> {
-      const paramsMap = new Map()
-
-      for (const p of this.tx.params) {
-        paramsMap.set(p.key, p.value)
-      }
-
-      return paramsMap
-    }
+    return paramsMap
+  }
 }
