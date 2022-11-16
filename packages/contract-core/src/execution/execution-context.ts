@@ -37,7 +37,7 @@ export class ExecutionContext {
     this.tx = convertContractTransaction(ContractTransaction.fromJSON(incomingTxResp.tx))
     this.state = new ContractState(this)
     this.auth = new Auth(incomingTxResp.authToken)
-    this.rpcConnection.Contract.setAuth(this.auth.metadata())
+    this.rpcConnection.setAuth(this.auth.metadata())
   }
 
   getNonce() {

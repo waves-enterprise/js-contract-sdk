@@ -1,5 +1,6 @@
 export * from './decorators'
 export * from './state'
 export * from './assets'
+export * from './address'
 export * from './container'
 export * from './logger'

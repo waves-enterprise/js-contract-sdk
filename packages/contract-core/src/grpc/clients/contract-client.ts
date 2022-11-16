@@ -1,5 +1,4 @@
-import { GenericClient } from '../types'
-import { RPCConnectionConfig } from '../config'
+import { GenericClient, RPCClient } from '../types'
 import { ClientReadableStream, credentials, Metadata, ServiceError } from '@grpc/grpc-js'
 import {
   AssetId,
@@ -25,14 +24,13 @@ export type IContractClient = GenericClient<Omit<ContractServiceClient, 'connect
 export class ContractClient implements IContractClient {
   log = logger(this)
 
-  private auth: Metadata
   impl: ContractServiceClient
 
   connection: ClientReadableStream<ContractTransactionResponse>
 
-  constructor(private config: RPCConnectionConfig) {
+  constructor(private rpc: RPCClient) {
     this.impl = new ContractServiceClient(
-      this.config.address,
+      this.rpc.getConfig().address,
       credentials.createInsecure(),
     )
   }
@@ -40,7 +38,7 @@ export class ContractClient implements IContractClient {
   connect() {
     this.connection = this.impl.connect(
       {
-        connectionId: this.config.connectionId(),
+        connectionId: this.rpc.getConfig().connectionId(),
       },
       this.getConnectionMetadata(),
     )
@@ -48,13 +46,9 @@ export class ContractClient implements IContractClient {
     this.applyHandlers(this.connection)
   }
 
-  setAuth(auth: Metadata) {
-    this.auth = auth
-  }
-
   getContractKey(req: ContractKeyRequest) {
     return new Promise<ContractKeyResponse>((resolve, reject) => {
-      this.impl.getContractKey(req, this.auth, (err: ServiceError, resp: ContractKeyResponse) => {
+      this.impl.getContractKey(req, this.rpc.getAuth(), (err: ServiceError, resp: ContractKeyResponse) => {
         if (!err) {
           return resolve(resp)
         }
@@ -75,25 +69,25 @@ export class ContractClient implements IContractClient {
 
   getContractKeys(req: Partial<ContractKeysRequest>) {
     return this.internalCall<ContractKeysResponse>((handler) =>
-      this.impl.getContractKeys(ContractKeysRequest.fromPartial(req), this.auth, handler),
+      this.impl.getContractKeys(ContractKeysRequest.fromPartial(req), this.rpc.getAuth(), handler),
     )
   }
 
   commitExecutionSuccess(req: ExecutionSuccessRequest) {
     return this.internalCall<CommitExecutionResponse>((handler) =>
-      this.impl.commitExecutionSuccess(req, this.auth, handler),
+      this.impl.commitExecutionSuccess(req, this.rpc.getAuth(), handler),
     )
   }
 
   commitExecutionError(req: ExecutionErrorRequest) {
     return this.internalCall<CommitExecutionResponse>((handler) =>
-      this.impl.commitExecutionError(req, this.auth, handler),
+      this.impl.commitExecutionError(req, this.rpc.getAuth(), handler),
     )
   }
 
   getContractBalances(req: ContractBalancesRequest) {
     return new Promise<ContractBalancesResponse>((resolve, reject) => {
-      this.impl.getContractBalances(req, this.auth, (err: ServiceError, resp: ContractBalancesResponse) => {
+      this.impl.getContractBalances(req, this.rpc.getAuth(), (err: ServiceError, resp: ContractBalancesResponse) => {
         if (!err) {
           return resolve(resp)
         }
@@ -114,7 +108,7 @@ export class ContractClient implements IContractClient {
 
   calculateAssetId(req: CalculateAssetIdRequest) {
     return new Promise<AssetId>((resolve, reject) => {
-      this.impl.calculateAssetId(req, this.auth, (err: ServiceError, resp: AssetId) => {
+      this.impl.calculateAssetId(req, this.rpc.getAuth(), (err: ServiceError, resp: AssetId) => {
         if (!err) {
           return resolve(resp)
         }
@@ -167,7 +161,7 @@ export class ContractClient implements IContractClient {
   private getConnectionMetadata() {
     const connectionMeta = new Metadata()
 
-    connectionMeta.set('authorization', this.config.connectionToken())
+    connectionMeta.set('authorization', this.rpc.getConfig().connectionToken())
 
     return connectionMeta
   }

@@ -8,7 +8,6 @@ import {
 import {ContractProcessor} from "../src/execution/contract-processor";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {Action, Contract,Asset} from "../src";
-import {getExecutionContext} from "../src/api/decorators/common";
 
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
@@ -95,7 +94,7 @@ describe("Asset Operations", () => {
 
       @Action()
       async assetBalance() {
-        const resp =  await Asset.balanceOf('mockAssetId');
+        const resp =  await Asset.balanceOf('mockAddress');
       }
     }
 
