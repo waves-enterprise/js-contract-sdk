@@ -1,14 +1,21 @@
-import { ContractIssue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue'
-import { ContractReissue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue'
-import { ContractBurn } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn'
+import {ContractIssue} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue'
+import {ContractReissue} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue'
+import {ContractBurn} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn'
 import {
   ContractTransferOut,
 } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out'
-import { ContractAssetOperation } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
-import { getExecutionContext } from '../decorators/common'
-import { ContractBalanceResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import {ContractAssetOperation} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
+import {getExecutionContext} from '../decorators/common'
+import {ContractBalanceResponse} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 
-export function mapContractBalance(t: ContractBalanceResponse) {
+export type TBalance = {
+  assetId: string | undefined,
+  amount: number,
+  decimals: number,
+}
+
+
+export function mapContractBalance(t: ContractBalanceResponse): TBalance {
   return {
     assetId: t.assetId,
     amount: t.amount.toNumber(),
@@ -125,7 +132,7 @@ export class Asset {
     return res.value
   }
 
-  static async balancesOf(assetIds: string[]) {
+  static async balancesOf(assetIds: string[]): Promise<TBalance[]> {
     const res = await Asset.getRPCConnection().Contract
       .getContractBalances({
         assetsIds: assetIds,
@@ -134,12 +141,12 @@ export class Asset {
     return res.assetsBalances.map(mapContractBalance)
   }
 
-  static async balanceOf(assetId?: string) {
+  static async balanceOf(assetId?: string): Promise<TBalance> {
     const res = await Asset.getRPCConnection().Contract
       .getContractBalances({
         assetsIds: [assetId ?? ''],
       })
 
-    return res.assetsBalances.map(mapContractBalance)
+    return res.assetsBalances.map(mapContractBalance)[0]
   }
 }
