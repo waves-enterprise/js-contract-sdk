@@ -1,9 +1,9 @@
-import {GlobalLogger, logger} from '../'
+import { CommonLogger, logger } from '../'
 import { ContractClient } from '../../grpc'
 import { TVal, TValue } from '../../intefaces/contract'
 import {
   ContractKeysRequest,
-  ContractKeysResponse
+  ContractKeysResponse,
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { _parseDataEntry, isString, parseDataEntry } from '../../utils'
 import { InternalContractState } from './internal-contract-state'
@@ -41,7 +41,7 @@ export class Storage {
         },
       })
 
-      GlobalLogger.info('Entries Preloaded', ContractKeysResponse.toJSON(res))
+      CommonLogger.info('Entries Preloaded', ContractKeysResponse.toJSON(res))
 
       return res.entries
     }

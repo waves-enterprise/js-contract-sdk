@@ -10,7 +10,6 @@ import {
   UnavailableContractParamException,
   UnexpectedParamTypeException,
 } from './exceptions'
-import {Container} from "../api";
 
 function getArgKey(idx: number) {
   return `arg:${idx}`

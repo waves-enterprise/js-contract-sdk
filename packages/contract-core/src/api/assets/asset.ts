@@ -1,12 +1,12 @@
-import {ContractIssue} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue'
-import {ContractReissue} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue'
-import {ContractBurn} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn'
+import { ContractIssue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue'
+import { ContractReissue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue'
+import { ContractBurn } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn'
 import {
   ContractTransferOut,
 } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out'
-import {ContractAssetOperation} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
-import {getExecutionContext} from '../decorators/common'
-import {ContractBalanceResponse} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { ContractAssetOperation } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
+import { getExecutionContext } from '../decorators/common'
+import { ContractBalanceResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 
 export function mapContractBalance(t: ContractBalanceResponse) {
   return {
