@@ -10,8 +10,6 @@ import {
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { ContractProcessor } from '../src/execution/contract-processor'
 import { ParamsExtractor } from '../src/execution/params-extractor'
-import { ExecutionContext } from '../src/execution'
-import { convertContractTransaction } from '../src/execution/converter'
 import * as Long from 'long'
 
 
@@ -62,12 +60,6 @@ describe('State', () => {
   const rpc = new RPC({} as unknown as RPCConnectionConfig)
   let extractor: ParamsExtractor
 
-  function mockExecutionContext(tx: ContractTransaction) {
-    return new ExecutionContext({
-      authToken: '',
-      tx: convertContractTransaction(tx),
-    }, rpc)
-  }
 
 
   beforeEach(() => {

@@ -1,4 +1,3 @@
-import { Container } from '../container'
 import { ContractIssue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue'
 import { ContractReissue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue'
 import { ContractBurn } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn'
@@ -6,7 +5,6 @@ import {
   ContractTransferOut,
 } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out'
 import { ContractAssetOperation } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
-import { RPC } from '../../grpc'
 import { getExecutionContext } from '../decorators/common'
 import { ContractBalanceResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 
@@ -18,39 +16,14 @@ export function mapContractBalance(t: ContractBalanceResponse) {
   }
 }
 
-export type TIssueParams = {
-  assetId?: string,
-  name: string,
-  description: string,
-  quantity: number,
-  decimals: number,
-  isReissuable: boolean,
-  nonce: number,
-}
-
-export type TReissueParams = {
-  assetId?: string,
-  quantity: number,
-  isReissuable: boolean,
-}
-
-export type TBurnParams = {
-  assetId?: string,
-  amount: number,
-}
-
-export type TransferOutParams = {
-  assetId?: string,
-  recipient: string,
-  amount: number,
-}
-
 export class Asset {
   static getRPCConnection() {
-    return Container.get(RPC)
+    return getExecutionContext().rpcConnection
   }
 
   static getExecutionContext() {
+
+
     return getExecutionContext()
   }
 
@@ -76,11 +49,23 @@ export class Asset {
     return new Asset(assetId, nonceAssetId)
   }
 
+  getId() {
+    return this.assetId
+  }
 
-  issue(t: TIssueParams) {
+  getNonce() {
+    return this.nonce
+  }
+
+  issue(name: string, description: string, qty: number, decimals: number, isreissuable) {
     const operation = ContractIssue.fromPartial({
-      ...t,
+      nonce: this.nonce,
       assetId: this.assetId,
+      decimals,
+      description,
+      name,
+      isReissuable: isreissuable,
+      quantity: qty,
     })
 
     Asset.getExecutionContext()
@@ -90,10 +75,11 @@ export class Asset {
       }))
   }
 
-  reissue(t: TReissueParams) {
+  reissue(qty: number, isReissuable: boolean) {
     const operation = ContractReissue.fromPartial({
-      ...t,
       assetId: this.assetId,
+      isReissuable,
+      quantity: qty,
     })
 
     Asset.getExecutionContext()
@@ -103,9 +89,9 @@ export class Asset {
       }))
   }
 
-  burn(t: TBurnParams) {
+  burn(amount: number) {
     const operation = ContractBurn.fromPartial({
-      ...t,
+      amount,
       assetId: this.assetId,
     })
 

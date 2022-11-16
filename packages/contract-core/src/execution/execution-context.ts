@@ -24,8 +24,7 @@ export class Auth {
 
 export class ExecutionContext {
   private nonce = 0
-  private incomingTransaction: IncomingTx
-
+  tx: IncomingTx
   state: ContractState
   private auth: Auth
 
@@ -35,7 +34,7 @@ export class ExecutionContext {
     public assetOperations: AssetOperationsRegistry = new AssetOperationsRegistry(),
   ) {
 
-    this.incomingTransaction = convertContractTransaction(ContractTransaction.fromJSON(incomingTxResp.tx))
+    this.tx = convertContractTransaction(ContractTransaction.fromJSON(incomingTxResp.tx))
     this.state = new ContractState(this)
     this.auth = new Auth(incomingTxResp.authToken)
     this.rpcConnection.Contract.setAuth(this.auth.metadata())
@@ -45,10 +44,6 @@ export class ExecutionContext {
     this.nonce = this.nonce + 1
 
     return this.nonce
-  }
-
-  get tx() {
-    return this.incomingTransaction
   }
 
   get txId(): string {
