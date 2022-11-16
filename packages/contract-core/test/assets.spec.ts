@@ -9,6 +9,8 @@ import {ContractProcessor} from "../src/execution/contract-processor";
 import {mockRespTx} from "./mocks/contract-transaction-response";
 import {Action, Contract,Asset} from "../src";
 
+jest.mock('../src/grpc/clients/address-client');
+jest.mock('../src/grpc/clients/contract-client');
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
     setAuth() {
@@ -49,9 +51,6 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
 
 
 jest.spyOn(ContractProcessor.prototype, 'tryCommitError')
-jest.spyOn(RPC.prototype, 'saveClient')
-  .mockImplementation(() => {
-  })
 
 
 describe("Asset Operations", () => {

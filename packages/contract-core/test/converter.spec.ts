@@ -6,6 +6,9 @@ import { ContractTransferIn } from '@wavesenterprise/js-contract-grpc-client/con
 import { IncomingTx } from '../src/execution/types'
 import { convertContractTransaction } from '../src/execution/converter'
 
+jest.mock('../src/grpc/clients/address-client');
+jest.mock('../src/grpc/clients/contract-client');
+
 describe('TransactionConverter', () => {
   let mockTx: ContractTransactionResponse
 
