@@ -1,46 +1,88 @@
-import * as console from 'console'
+import http from 'http'
 
-type LogLevel = 'info' | 'error'
+type LogLevel = 'verbose' | 'info' | 'error'
 
-export class Logger {
-    component: string
+const { DEBUG, HOST_NETWORK, HOSTNAME, VERBOSE_LOG } = process.env
 
-    static globalPrefix = 'WE Contract'
-    static lastTimeStamp = Date.now()
+const request = (url: string, data: unknown) => {
+  const body = JSON.stringify(data)
 
-    setComponent(name: string) {
-      this.component = name
-    }
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': body.length,
+    },
+  }
 
-    info(message: unknown, ...additionalParams: any[]) {
-      const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
+  const req = http.request(url, options)
 
-      this.printMessage('info', ...prefixes, message, ...additionalParams)
-    }
-
-    error(message: string, ...additionalParams: any[]) {
-      const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
-
-      this.printMessage('info', ...prefixes, message, ...additionalParams)
-    }
-
-    private printMessage(logLevel: LogLevel, ...args) {
-      console[logLevel](...args)
-    }
-
-    static timestampDiff(): string {
-      const result = `+${Date.now() - Logger.lastTimeStamp}ms`
-
-      Logger.lastTimeStamp = Date.now()
-
-      return result
-    }
+  req.write(body)
+  req.end()
 }
 
-export function logger(c: { constructor: {name: string} }): Logger {
-  const loggerIntance = new Logger()
+export const writeLog = (...message: [LogLevel, ...unknown[]]) => {
+  if (Number(DEBUG)) {
+    const [type, ...data] = message
+    const prefix = HOSTNAME ? `[${(new Date()).toISOString()}] Host: ${HOSTNAME}` : `[${(new Date()).toISOString()}]`
+    // eslint-disable-next-line no-console
+    console[type](prefix, ...data)
+    const loggerAddress = `http://${HOST_NETWORK}:5050`
+    request(loggerAddress, [type, prefix, ...data])
+  }
+}
 
-  loggerIntance.setComponent(c.constructor.name)
+export class Logger {
+  component: string
 
-  return loggerIntance
+  private static globalPrefix = 'WE Contract'
+
+  private static lastTimeStamp = Date.now()
+
+  private static timers = new Map<string, number>()
+
+  setComponent(name: string) {
+    this.component = name
+  }
+
+  info(...args: unknown[]) {
+    const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
+
+    this.printMessage('info', ...prefixes, ...args)
+  }
+
+  verbose(...args: unknown[]) {
+    if (VERBOSE_LOG) {
+      const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
+      this.printMessage('verbose', ...prefixes, ...args)
+    }
+  }
+
+  error(...args: unknown[]) {
+    const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
+
+    this.printMessage('info', ...prefixes, ...args)
+  }
+
+  private printMessage(logLevel: LogLevel, ...args: unknown[]) {
+    writeLog(logLevel, ...args)
+  }
+
+  static timestampDiff(): string {
+    const result = `+${Date.now() - Logger.lastTimeStamp}ms`
+
+    Logger.lastTimeStamp = Date.now()
+
+    return result
+  }
+}
+
+export const CommonLogger = new Logger()
+CommonLogger.setComponent('Common log')
+
+export function logger(c: { constructor: { name: string } }): Logger {
+  const loggerInstance = new Logger()
+  loggerInstance.setComponent(c.constructor.name)
+
+  return loggerInstance
 }

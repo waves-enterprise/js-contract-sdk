@@ -41,7 +41,7 @@ export class PoolWorker extends Worker {
     })
   }
 
-  override terminate(): Promise<number> {
+  terminate(): Promise<number> {
     this.once('exit', () => {
       setImmediate(() => {
         this.removeAllListeners()
