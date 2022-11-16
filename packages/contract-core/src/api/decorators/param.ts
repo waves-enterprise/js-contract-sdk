@@ -37,7 +37,7 @@ export function Param(paramName: string) {
   return createParamsDecorator(paramName)
 }
 
-export const Payments: ParameterDecorator = (target, propertyKey, parameterIndex) => {
+export function Payments(target: object, propertyKey: string | symbol, parameterIndex: number): void {
   const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
   Reflect.defineMetadata(
     ARGS_METADATA,
@@ -48,7 +48,7 @@ export const Payments: ParameterDecorator = (target, propertyKey, parameterIndex
 }
 
 
-export const Ctx: ParameterDecorator = (target, propertyKey, parameterIndex) => {
+export function Ctx(target: object, propertyKey: string | symbol, parameterIndex: number): void {
   const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
   Reflect.defineMetadata(
     ARGS_METADATA,

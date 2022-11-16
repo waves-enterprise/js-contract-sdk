@@ -10,5 +10,8 @@ COPY .eslintrc.js .eslintrc.js
 COPY packages packages
 COPY example example
 COPY lerna.json lerna.json
+RUN npm --prefix example/sandbox ci -q
 RUN npm ci -q
+RUN npm --prefix packages/contract-core run build
+COPY packages/contract-core example/sandbox/node_modules/@wavesenterprise/contract-core
 CMD npm run test-ci

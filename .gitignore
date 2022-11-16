@@ -4,3 +4,6 @@ proto
 pb
 vendor
 .idea
+.env
+developer-keys.json
+participants.json

@@ -1,8 +1,6 @@
 import { ContractClient } from './clients/contract-client'
 import { RPCConnectionConfig, envConfig } from './config'
 
-export { RPCConnectionConfig, ContractClient, envConfig }
-
 export class RPC {
   contractClient: ContractClient
 
@@ -18,3 +16,5 @@ export class RPC {
     this.contractClient = new ContractClient(this.config)
   }
 }
+
+export { RPCConnectionConfig, envConfig, ContractClient }

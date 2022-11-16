@@ -1,0 +1,37 @@
+{
+  "name": "sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:all": "npm --prefix ../../packages/contract-core run build && tsc -p tsconfig.build.json",
+    "logger": "ts-node logger.ts",
+    "start": "ts-node run.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^18.11.9",
+    "@wavesenterprise/env-extractor": "^1.0.0",
+    "@wavesenterprise/voting-blockchain-tools": "^1.2.4",
+    "@wavesenterprise/voting-contract-api": "^2.8.1",
+    "axios": "0.27.2",
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.6.2",
+    "@types/bn.js": "^5.1.1",
+    "@wavesenterprise/js-contract-grpc-client": "1.10.0",
+    "@wavesenterprise/sdk": "^1.0.3",
+    "bn.js": "^5.2.1",
+    "google-protobuf": "^3.21.0",
+    "reflect-metadata": "^0.1.13",
+    "typescript": "^4.8.4"
+  }
+}
