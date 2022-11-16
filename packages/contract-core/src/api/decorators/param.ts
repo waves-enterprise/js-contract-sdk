@@ -52,7 +52,7 @@ export function Ctx(target: object, propertyKey: string | symbol, parameterIndex
   const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
   Reflect.defineMetadata(
     ARGS_METADATA,
-    assignMetadata(args, parameterIndex, () => getExecutionContext()),
+    assignMetadata(args, parameterIndex, getExecutionContext),
     target.constructor,
     propertyKey,
   )

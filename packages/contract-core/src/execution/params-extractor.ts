@@ -61,8 +61,11 @@ export class ParamsExtractor {
       if (!argFromParams) {
         throw new ContractError(`Argument at index ${paramIndex} should be annotated with @Param decorator`)
       } else {
+
+
         if (argFromParams.getter) {
           actionArgs[paramIndex] = argFromParams.getter()
+
           continue
         }
 

@@ -46,7 +46,7 @@ export function _parseDataEntry(d: DataEntry): TVal {
   }
 
   if (!isUndefined(d.intValue)) {
-    return new BN(d.intValue.toString())
+    return Number(d.intValue)
   }
 
   if (!isUndefined(d.boolValue)) {
