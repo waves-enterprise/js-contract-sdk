@@ -1,7 +1,7 @@
 import {ContractClient, RPC, RPCConnectionConfig} from "../src/grpc";
 import {
   AssetId,
-  CalculateAssetIdRequest,
+  CalculateAssetIdRequest, ContractBalanceResponse, ContractBalancesRequest, ContractBalancesResponse,
   ContractKeysRequest,
   ContractTransaction
 } from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
@@ -26,6 +26,17 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
     getContractKey: jest.fn((args) => {
       // console.log(args)
     }),
+
+    getContractBalances(req: ContractBalancesRequest): Promise<ContractBalancesResponse> {
+      return  Promise.resolve(ContractBalancesResponse.fromPartial({
+        assetsBalances: [
+          ContractBalanceResponse.fromPartial({
+            assetId: 'mockAssetId',
+            amount: 10000000,
+          })
+        ]
+      }))
+    },
 
     calculateAssetId: jest.fn((args) => {
       console.log(args)
@@ -61,9 +72,7 @@ describe("Asset Operations", () => {
         true
       )
 
-
       TestAsset.transfer('me', 1000)
-     console.log( getExecutionContext().assetOperations.operations)
     }
   }
 
@@ -73,6 +82,27 @@ describe("Asset Operations", () => {
 
     const processor = new ContractProcessor(
       TestContract,
+      rpc,
+    )
+
+    await processor.handleIncomingTx({authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!)})
+  })
+
+
+  it('should call getBalances contract rpc', async function () {
+    @Contract()
+    class TestingContract {
+
+      @Action()
+      async assetBalance() {
+        const resp =  await Asset.balanceOf('mockAssetId');
+      }
+    }
+
+    const resp = mockRespTx('assetBalance')
+
+    const processor = new ContractProcessor(
+      TestingContract,
       rpc,
     )
 
