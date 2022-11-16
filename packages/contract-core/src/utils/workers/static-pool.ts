@@ -70,7 +70,7 @@ export class WorkerPool<Request, Response> extends EventEmitter {
 
   private terminated = false
 
-   constructor(props: WorkerPoolProps) {
+  constructor(props: WorkerPoolProps) {
     super()
     const { size, filename, contractPath } = props
     this.on('worker-ready', (worker: WorkerPoolWorker<Request, Response>) => {
