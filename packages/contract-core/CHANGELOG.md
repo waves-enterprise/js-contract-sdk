@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.1.2...@wavesenterprise/contract-core@1.1.3) (2022-11-16)
+
+
+### Bug Fixes
+
+* **contract-core:** add address rpc service ([c75810a](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/commit/c75810a46684a460319d5a3f04095bcbba8252e0))
+* **contract-core:** fix lint ([76986c1](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/commit/76986c1516be14b85af05df416ca7d36f52a21c4))
+* **contract-core:** fix tests ([6be62f0](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/commit/6be62f024bc9c0f75414086fbbe4b57564933700))
+
+
+
+
+
 # [1.1.0-rc.4](https://github.com/waves-enterprise/js-contract-sdk/compare/@wavesenterprise/contract-core@1.1.0-rc.3...@wavesenterprise/contract-core@1.1.0-rc.4) (2022-11-09)
 
 **Note:** Version bump only for package @wavesenterprise/contract-core
