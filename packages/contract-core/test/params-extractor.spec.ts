@@ -67,8 +67,9 @@ describe('Param Extractors', () => {
       @Action
       test(
         @Ctx ctx: ExecutionContext,
+        @Payments payments: AttachedPayments
       ) {
-
+        console.log(ctx,payments)
       }
     }
 

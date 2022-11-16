@@ -10,6 +10,7 @@ import {
   UnavailableContractParamException,
   UnexpectedParamTypeException,
 } from './exceptions'
+import {Container} from "../api";
 
 function getArgKey(idx: number) {
   return `arg:${idx}`
@@ -61,8 +62,11 @@ export class ParamsExtractor {
       if (!argFromParams) {
         throw new ContractError(`Argument at index ${paramIndex} should be annotated with @Param decorator`)
       } else {
+
+
         if (argFromParams.getter) {
           actionArgs[paramIndex] = argFromParams.getter()
+
           continue
         }
 

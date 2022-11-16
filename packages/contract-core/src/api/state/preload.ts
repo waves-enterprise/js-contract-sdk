@@ -1,18 +1,18 @@
-import {
-  getContractEntries,
-  getContractVarsMetadata,
-  setContractEntries,
-} from '../../execution/reflect'
-import { getState } from '../decorators/common'
+import {getContractEntries, getContractVarsMetadata, setContractEntries,} from '../../execution/reflect'
+import {getState} from '../decorators/common'
+import {GlobalLogger} from "../logger";
+import {_parseDataEntry} from "../../utils";
+import {TVar} from "./types/primitives";
+import {TVal} from "../../intefaces/contract";
 
 function getPreloadKeys(contract: object, keys: string[]) {
   return Object.entries(getContractVarsMetadata(contract.constructor))
     .filter(([_, cfg]) => keys.includes(cfg.propertyKey))
 }
 
-export async function preload<T extends object>(contract: T, keys: Array<keyof T>) {
+export async function preload<T extends object>(contract: T, keys: Array<keyof T>): Promise<unknown[]> {
   const preloadVars = getPreloadKeys(contract, keys as string[])
-  const entriesToBatchLoad = preloadVars.map(([varKey, { meta }]) => meta.name || varKey)
+  const entriesToBatchLoad = preloadVars.map(([varKey, {meta}]) => meta.name || varKey)
 
   const preloaded = getContractEntries(contract)
 
@@ -20,12 +20,19 @@ export async function preload<T extends object>(contract: T, keys: Array<keyof T
     .storage
     .readBatch(entriesToBatchLoad)
 
-  for (const [index] of entriesToBatchLoad.entries()) {
-    const preloadedValue = res[index]
-    const [varKey, { meta }] = preloadVars[index]
+  GlobalLogger.info('Preload', keys, res)
 
-    preloaded.set(meta.name || varKey, preloadedValue)
+  for (const [, key] of entriesToBatchLoad.entries()) {
+    const preloadedEntry = res.find(r => r.key === key)
+
+    if (preloadedEntry) {
+      preloaded.set(key, _parseDataEntry(preloadedEntry))
+    } else {
+      preloaded.set(key, undefined as unknown as TVal);
+    }
   }
 
   setContractEntries(contract, preloaded)
+
+  return Promise.all(keys.map((t) => (contract[t] as unknown as TVar<unknown>).get()))
 }

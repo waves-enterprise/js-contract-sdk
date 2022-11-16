@@ -15,6 +15,9 @@ export function clearPreloadedEntries(contract: object): void {
   return setContractEntries(contract, new Map())
 }
 
+
+
+
 export class ContractProcessor {
     logger = logger(this)
 
@@ -26,10 +29,10 @@ export class ContractProcessor {
     async handleIncomingTx(resp: IncomingTransactionResp): Promise<unknown> {
       const executionContext = new ExecutionContext(resp, this.rpc)
 
+      Container.set(executionContext)
+
       const { args, actionMetadata } = this.paramsExtractor
         .extract(this.contract as ObjectConstructor, executionContext)
-
-      Container.set(executionContext)
 
       const c = this.contract as ObjectConstructor
       const contractInstance = new c()

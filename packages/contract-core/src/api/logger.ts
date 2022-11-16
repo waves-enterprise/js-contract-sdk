@@ -2,6 +2,8 @@ import * as console from 'console'
 
 type LogLevel = 'info' | 'error'
 
+
+
 export class Logger {
     component: string
 
@@ -36,6 +38,9 @@ export class Logger {
       return result
     }
 }
+
+export const GlobalLogger = new Logger();
+GlobalLogger.setComponent('')
 
 export function logger(c: { constructor: {name: string} }): Logger {
   const loggerIntance = new Logger()

@@ -1,7 +1,10 @@
-import { logger } from '../'
+import {GlobalLogger, logger} from '../'
 import { ContractClient } from '../../grpc'
 import { TVal, TValue } from '../../intefaces/contract'
-import { ContractKeysRequest } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import {
+  ContractKeysRequest,
+  ContractKeysResponse
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { _parseDataEntry, isString, parseDataEntry } from '../../utils'
 import { InternalContractState } from './internal-contract-state'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
@@ -30,7 +33,7 @@ export class Storage {
       return res.then(r => _parseDataEntry(r.entry!))
     }
 
-    async readBatch(keys: string[]) {
+    async readBatch(keys: string[]):Promise<DataEntry[]> {
       const res = await this.client.getContractKeys({
         contractId: this.contractId,
         keysFilter: {
@@ -38,7 +41,9 @@ export class Storage {
         },
       })
 
-      return res.entries.map(_parseDataEntry)
+      GlobalLogger.info('Entries Preloaded', ContractKeysResponse.toJSON(res))
+
+      return res.entries
     }
 
     /**

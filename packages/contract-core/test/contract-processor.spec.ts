@@ -5,17 +5,16 @@ import {
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { ContractProcessor } from '../src/execution/contract-processor'
-import { Action, Contract, Param } from '../src'
+import {Action, Contract, Ctx, Payments,AttachedPayments} from '../src'
 import Long from 'long'
 import { ContractTransferIn } from '@wavesenterprise/js-contract-grpc-client/contract_transfer_in'
 import {
   ContractError,
+  ExecutionContext,
   RetryableError,
   UnavailableContractActionException,
   UnavailableContractParamException,
 } from '../src/execution'
-import { convertContractTransaction } from '../src/execution/converter'
-
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
     setAuth() {
@@ -52,37 +51,13 @@ class ExampleContract {
 
   @Action()
   params(
-  @Param('key') value: string,
+    @Payments payments: AttachedPayments,
+    @Ctx ctx: ExecutionContext,
   ) {
 
-    console.log(value)
-
+    console.log(ctx, payments)
   }
 }
-
-
-function mockRespTx(name: string) {
-  return ContractTransactionResponse.fromPartial({
-    authToken: 'test-token',
-    transaction: {
-      id: 'some-tx-id',
-      type: 104,
-      sender: 'iam',
-      senderPublicKey: 'mypc',
-      contractId: 'test-contract',
-      params: [
-        {
-          stringValue: name,
-          key: 'action',
-        },
-      ],
-      version: 4,
-      proofs: new Uint8Array(),
-      timestamp: new Date().getTime(),
-    },
-  })
-}
-
 
 function mockAction(name: string) {
   return ContractTransactionResponse.fromPartial({
