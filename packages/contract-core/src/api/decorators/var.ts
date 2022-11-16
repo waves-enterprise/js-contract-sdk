@@ -6,6 +6,7 @@ import { TContractVarsMeta, TVarMeta } from '../meta'
 import { getContractEntries, setContractEntry } from '../../execution/reflect'
 import { PrimitiveType } from '../state/types/primitives'
 import { TVal } from '../../intefaces/contract'
+import { Mapping } from '../state'
 
 export type TVarConfig = Partial<TVarMeta>
 
@@ -30,10 +31,12 @@ export function Var(...args: any[]) {
   return (...args_: any[]): void => decorateProperty.call(undefined, ...args_, config) as void
 }
 
-export function decorateProperty(target: Constructable<unknown>, propertyKey: string, _, config: TVarConfig):void {
+export function decorateProperty(target: Constructable<unknown>, propertyKey: string, _, config: TVarConfig): void {
   const contractKey = config.name || propertyKey
 
   const meta: TContractVarsMeta = Reflect.getMetadata(CONTRACT_VARS, target.constructor) || {}
+  const designType = Reflect.getMetadata('design:type', target, propertyKey)
+  const isMapping = designType === Mapping
 
   if (!!meta[contractKey]) {
     throw new ContractError('Variable names need to be unique')
@@ -58,6 +61,14 @@ export function decorateProperty(target: Constructable<unknown>, propertyKey: st
     },
     get: () => {
       if (!_settled) {
+        if (isMapping) {
+          const mappingInstance = getState().getMapping(contractKey)
+
+          _settled = mappingInstance
+
+          return _settled
+        }
+
         const res = new class extends PrimitiveType {
           async get() {
             const entries = getContractEntries(target)

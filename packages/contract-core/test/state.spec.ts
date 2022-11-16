@@ -1,4 +1,4 @@
-import { Action, Contract, ContractState, preload, State, TVar, Var } from '../src'
+import {Action, Contract, ContractState, Mapping, preload, State, TVar, Var} from '../src'
 import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { mockRespTx } from './mocks/contract-transaction-response'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
@@ -6,7 +6,7 @@ import {
   ContractKeyRequest,
   ContractKeysRequest,
   ContractKeysResponse,
-  ContractTransaction,
+  ContractTransaction, ExecutionSuccessRequest,
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { ContractProcessor } from '../src/execution/contract-processor'
 import { ParamsExtractor } from '../src/execution/params-extractor'
@@ -363,6 +363,47 @@ describe('State', () => {
           keysFilter: {
             keys: ['myVar'],
           },
+        }),
+      )
+    })
+
+
+    it('should initialize mapping', async function () {
+      @Contract()
+      class TestingContract {
+        @Var() user: Mapping;
+
+        @Action()
+        mappingTest() {
+
+          this.user.set('first', 'user1')
+          this.user.set('second', 'user2')
+        }
+      }
+
+      const resp = mockRespTx('mappingTest')
+
+      const processor = new ContractProcessor(
+        TestingContract,
+        rpc,
+      )
+
+      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
+
+      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+        ExecutionSuccessRequest.fromPartial({
+          txId: 'some-tx-id',
+          assetOperations: [],
+          results: [
+            DataEntry.fromPartial({
+              key: 'user_first',
+              stringValue: 'user1'
+            }),
+            DataEntry.fromPartial({
+              key: 'user_second',
+              stringValue: 'user2'
+            })
+          ]
         }),
       )
     })
