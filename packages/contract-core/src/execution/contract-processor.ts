@@ -15,63 +15,60 @@ export function clearPreloadedEntries(contract: object): void {
   return setContractEntries(contract, new Map())
 }
 
-
-
-
 export class ContractProcessor {
-    logger = logger(this)
+  logger = logger(this)
 
-    private paramsExtractor = new ParamsExtractor()
+  private paramsExtractor = new ParamsExtractor()
 
-    constructor(private contract: unknown, private rpc: RPC) {
+  constructor(private contract: unknown, private rpc: RPC) {
+  }
+
+  async handleIncomingTx(resp: IncomingTransactionResp): Promise<unknown> {
+    const executionContext = new ExecutionContext(resp, this.rpc)
+
+    const { args, actionMetadata } = this.paramsExtractor
+      .extract(this.contract as ObjectConstructor, executionContext)
+
+    Container.set(executionContext)
+
+    const c = this.contract as ObjectConstructor
+    const contractInstance = new c()
+    clearPreloadedEntries(contractInstance)
+
+    try {
+      await contractInstance[actionMetadata.propertyName](...args)
+
+      return this.tryCommitSuccess(executionContext)
+    } catch (e) {
+
+      return this.tryCommitError(executionContext, e)
     }
+  }
 
-    async handleIncomingTx(resp: IncomingTransactionResp): Promise<unknown> {
-      const executionContext = new ExecutionContext(resp, this.rpc)
-
-      Container.set(executionContext)
-
-      const { args, actionMetadata } = this.paramsExtractor
-        .extract(this.contract as ObjectConstructor, executionContext)
-
-      const c = this.contract as ObjectConstructor
-      const contractInstance = new c()
-      clearPreloadedEntries(contractInstance)
-
-      try {
-        await contractInstance[actionMetadata.propertyName](...args)
-
-        return this.tryCommitSuccess(executionContext)
-      } catch (e) {
-
-        return this.tryCommitError(executionContext, e)
-      }
-    }
-
-    async tryCommitSuccess(executionContext: ExecutionContext) {
-      try {
-        await this.rpc.Contract.commitExecutionSuccess(
-          ExecutionSuccessRequest.fromPartial({
-            txId: executionContext.txId,
-            results: executionContext.state.getStateEntries(),
-            assetOperations: executionContext.assetOperations.operations,
-          }),
-        )
-      } catch (e) {
-        await this.tryCommitError(executionContext, e)
-      }
-    }
-
-    tryCommitError(executionContext: ExecutionContext, e: ContractError) {
-      this.logger.error('Committing Error ' + (e.code || ERROR_CODE.FATAL), e.message)
-      this.logger.info(e)
-
-      return this.rpc.Contract.commitExecutionError(
-        ExecutionErrorRequest.fromPartial({
+  async tryCommitSuccess(executionContext: ExecutionContext) {
+    try {
+      await this.rpc.Contract.commitExecutionSuccess(
+        ExecutionSuccessRequest.fromPartial({
           txId: executionContext.txId,
-          message: e.message || 'Unhandled error',
-          code: e.code || ERROR_CODE.FATAL,
+          results: executionContext.state.getStateEntries(),
+          assetOperations: executionContext.assetOperations.operations,
         }),
       )
+    } catch (e) {
+      await this.tryCommitError(executionContext, e)
     }
+  }
+
+  tryCommitError(executionContext: ExecutionContext, e: ContractError) {
+    this.logger.error('Committing Error ' + (e.code || ERROR_CODE.FATAL), e.message)
+    this.logger.verbose(e)
+
+    return this.rpc.Contract.commitExecutionError(
+      ExecutionErrorRequest.fromPartial({
+        txId: executionContext.txId,
+        message: e.message || 'Unhandled error',
+        code: e.code || ERROR_CODE.FATAL,
+      }),
+    )
+  }
 }

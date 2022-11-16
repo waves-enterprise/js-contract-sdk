@@ -1,122 +1,134 @@
+/* eslint-disable no-redeclare */
+import { SHARE_ENV, Worker, WorkerOptions } from 'worker_threads'
+import { URL } from 'node:url'
 import { EventEmitter } from 'events'
-import { PoolWorker } from './pool-worker'
-import { SHARE_ENV } from 'worker_threads'
+import { CommonLogger } from '../../api'
 
-export type PoolOptions = {
+type WorkerPoolProps = {
   size: number,
-  task: string,
+  filename: string,
   contractPath: string,
 }
 
-type ResolveFunc = (value: unknown) => void
-type RejectFunc = (reason: unknown) => void
+export class WorkerPoolWorker<Request, Response> extends Worker {
 
-export class Task {
-  constructor(
-    public param: unknown,
-    public resolve: ResolveFunc,
-    public reject: RejectFunc,
-  ) {}
-}
+  initialized = false
 
-function validatePoolSize(_size: number) {
-}
+  idle = true
 
-export class StaticPool extends EventEmitter {
-    private readonly size : number
-    private readonly contractPath: string
+  constructor(filename: string | URL, options?: WorkerOptions) {
+    super(filename, {
+      ...options,
+      // stderr: true,
+      // stdin: true,
+      // stdout: true,
+    })
+  }
 
-    /**
-     * Available pool workers
-     *
-     * @private
-     */
-    private workers: PoolWorker[] = []
-
-    /**
-     * Tasks queued
-     *
-     * @private
-     */
-    private taskQueue: Task[] = []
-
-    /**
-     * is workers initialized
-     */
-    workersReady: Promise<boolean>
-
-    constructor(opts: PoolOptions) {
-      super()
-
-      const { task, size, contractPath } = opts
-
-      validatePoolSize(size)
-
-      this.size = size
-      this.contractPath = contractPath
-
-      this.fill(task)
+  init() {
+    if (this.initialized) {
+      return
     }
+    this.once('online', () => {
+      CommonLogger.verbose('Worker is online')
+      this.initialized = true
+      this.emit('ready')
+    })
+  }
 
-    private fill(task: string) {
-      this.workersReady = new Promise(resolve => {
-        const size = this.size
-
-        const workersReady = new Set()
-
-        for (let i = 0; i < size; i++) {
-          const worker = new PoolWorker(task, {
-            workerData: { index: i, contractPath: this.contractPath },
-            env: SHARE_ENV,
-          })
-
-          worker.once('ready', (w) => {
-            workersReady.add(i)
-            this.emit('worker-ready', w)
-
-            if (workersReady.size === size) {
-              resolve(true)
-            }
-          })
-
-          this.workers.push(worker)
-        }
-      })
+  execute(value: Request): Promise<Response> {
+    if (!this.initialized || !this.idle) {
+      return Promise.reject('Worker is not ready')
     }
-
-    private getIdleWorker(): PoolWorker | null {
-      const worker = this.workers.find((w) => w.ready)
-
-      return worker ?? null
-    }
-
-    private processTask(worker: PoolWorker): void {
-      const task = this.taskQueue.shift()
-
-      if (!task) {
-        return
+    this.idle = false
+    return new Promise((resolve, reject) => {
+      this.postMessage(value)
+      const messageHandle = (value: Response) => {
+        this.idle = true
+        this.emit('ready')
+        resolve(value)
+        this.off('error', errorHandle)
       }
+      const errorHandle = (error: unknown) => {
+        this.idle = true
+        this.emit('ready')
+        reject(error)
+        this.off('message', messageHandle)
+      }
+      this.once('message', messageHandle)
+      this.once('error', errorHandle)
+    })
+  }
 
-      const { param, resolve, reject } = task
+}
 
-      worker
-        .run(param)
-        .then(resolve)
-        .catch((error) => {
-          reject(error)
-        })
+export class WorkerPool<Request, Response> extends EventEmitter {
+
+  workers: Set<WorkerPoolWorker<Request, Response>> = new Set()
+
+  waitingTasks: Array<(worker: WorkerPoolWorker<Request, Response>) => void> = []
+
+  private terminated = false
+
+  constructor(props: WorkerPoolProps) {
+    super()
+    const { size, filename, contractPath } = props
+    this.on('worker-ready', (worker: WorkerPoolWorker<Request, Response>) => {
+      if (this.waitingTasks.length > 0) {
+        this.waitingTasks.shift()!(worker)
+      }
+    })
+    for (let i = 0; i < size; i++) {
+      this.createWorker(filename, contractPath, i)
     }
+  }
 
-    runTask<TParam, TResult>(param: TParam): Promise<TResult> {
-      return new Promise((resolve, reject) => {
-        const task = new Task(param, resolve, reject)
+  private createWorker(filename: string, contractPath: string, idx: number) {
+    const worker = new WorkerPoolWorker<Request, Response>(filename, {
+      env: SHARE_ENV,
+      workerData: { contractPath, index: idx },
+    })
+    worker.init()
+    worker.on('exit', () => {
+      this.workers.delete(worker)
+      if (!this.terminated) {
+        this.createWorker(filename, contractPath, idx)
+      }
+    })
+    worker.on('ready', () => {
+      this.emit('worker-ready', worker)
+    })
+    this.workers.add(worker)
+  }
 
-        this.taskQueue.push(task)
-        const worker = this.getIdleWorker()
-
-        if (worker) {
-          this.processTask(worker)
-        }
-      })
+  private getIdleWorker(): Promise<WorkerPoolWorker<Request, Response>> | WorkerPoolWorker<Request, Response> {
+    for (const worker of this.workers) {
+      if (worker.idle && worker.initialized) {
+        return worker
+      }
     }
+    return new Promise((resolve) => {
+      this.waitingTasks.push(resolve)
+    })
+  }
+
+  async execute(value: Request): Promise<Response> {
+    if (this.terminated) {
+      throw new Error('Pool is terminated')
+    }
+    CommonLogger.verbose('Waiting for idle worker')
+    const worker = await this.getIdleWorker()
+    CommonLogger.verbose('Worker found, executing')
+    return worker.execute(value)
+  }
+
+  terminate() {
+    const terminated: Array<Promise<number>> = []
+    this.terminated = true
+    this.waitingTasks = []
+    for (const worker of this.workers) {
+      terminated.push(worker.terminate())
+    }
+    return Promise.all(terminated)
+  }
 }
