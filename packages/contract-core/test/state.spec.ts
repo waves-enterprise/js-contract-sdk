@@ -26,6 +26,8 @@ const stateMock = {
 }
 
 
+jest.mock('../src/grpc/clients/address-client');
+jest.mock('../src/grpc/clients/contract-client');
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
     setAuth() {
@@ -52,9 +54,6 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
 
 
 jest.spyOn(ContractProcessor.prototype, 'tryCommitError')
-jest.spyOn(RPC.prototype, 'saveClient')
-  .mockImplementation(() => {
-  })
 
 describe('State', () => {
   const rpc = new RPC({} as unknown as RPCConnectionConfig)

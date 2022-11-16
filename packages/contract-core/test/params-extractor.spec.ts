@@ -7,6 +7,9 @@ import {ParamsExtractor} from '../src/execution/params-extractor'
 import BN from 'bn.js'
 import {ContractTransaction} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
 
+
+jest.mock('../src/grpc/clients/address-client');
+jest.mock('../src/grpc/clients/contract-client');
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
     setAuth() {
@@ -19,9 +22,6 @@ jest.spyOn(RPC.prototype, 'Contract', 'get')
     }),
   } as unknown as ContractClient)
 
-jest.spyOn(RPC.prototype, 'saveClient')
-  .mockImplementation(() => {
-  })
 
 
 describe('Param Extractors', () => {
