@@ -10,6 +10,7 @@ import {
   UnavailableContractParamException,
   UnexpectedParamTypeException,
 } from './exceptions'
+import { ALL_PARAMS_KEY } from '../api/contants'
 
 function getArgKey(idx: number) {
   return `arg:${idx}`
@@ -65,6 +66,12 @@ export class ParamsExtractor {
 
         if (argFromParams.getter) {
           actionArgs[paramIndex] = argFromParams.getter()
+
+          continue
+        }
+
+        if (argFromParams.paramKey === ALL_PARAMS_KEY) {
+          actionArgs[paramIndex] = Object.fromEntries(executionContext.params.entries())
 
           continue
         }
