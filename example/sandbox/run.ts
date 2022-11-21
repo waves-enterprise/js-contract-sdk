@@ -67,7 +67,23 @@ const run = async () => {
     validationPolicy: {
       type: 'any',
     },
-    params: [],
+    params: [
+      {
+        key: 'initial',
+        type: 'integer',
+        value: 10,
+      },
+      {
+        key: 'nonce',
+        type: 'string',
+        value: 'nonce',
+      },
+      {
+        key: 'invisible',
+        type: 'boolean',
+        value: false,
+      },
+    ],
   }), developerKeys)
 
   console.log(`Contract id ${result.id}`)
@@ -85,7 +101,7 @@ const run = async () => {
   console.log('Create tx mined')
 
   const participants = await getParticipants()
-  await Promise.all(participants.slice(0, 20).map((p) => {
+  await Promise.all(participants.slice(0, 1).map((p) => {
     return broadcast(new CallContractTx({
       fee: 0,
       senderPublicKey: p.publicKey,

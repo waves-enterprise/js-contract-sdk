@@ -5,6 +5,7 @@ export const CONTRACT_VARS = 'we:contract:vars'
 
 export const ACTION_METADATA = 'we:contract:actions'
 export const ARGS_METADATA = 'we:contract:args'
+export const ALL_PARAMS_KEY = '__all'
 
 export enum ReservedParamNames {
   action = 'action',

@@ -1,4 +1,4 @@
-import { ARGS_METADATA } from '../contants'
+import { ALL_PARAMS_KEY, ARGS_METADATA } from '../contants'
 import { TArgs } from '../meta'
 import { getExecutionContext, getPayments, getTx } from './common'
 
@@ -35,6 +35,10 @@ const createParamsDecorator =
 
 export function Param(paramName: string) {
   return createParamsDecorator(paramName)
+}
+
+export function Params() {
+  return createParamsDecorator(ALL_PARAMS_KEY)
 }
 
 export function Payments(target: object, propertyKey: string | symbol, parameterIndex: number): void {
