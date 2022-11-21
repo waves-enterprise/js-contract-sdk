@@ -5,7 +5,12 @@ type LogLevel = 'verbose' | 'info' | 'error'
 const { DEBUG, HOST_NETWORK, HOSTNAME, VERBOSE_LOG } = process.env
 
 const request = (url: string, data: unknown) => {
-  const body = JSON.stringify(data)
+  const body = JSON.stringify(data, (key, value) => {
+    if (typeof value === 'object' && 'toNumber' in value) {
+      return value.toNumber() as number
+    }
+    return value as unknown
+  })
 
   const options = {
     method: 'POST',
@@ -33,48 +38,58 @@ export const writeLog = (...message: [LogLevel, ...unknown[]]) => {
 }
 
 export class Logger {
-  component: string
 
-  private static globalPrefix = 'WE Contract'
+  component: string
 
   private static lastTimeStamp = Date.now()
 
-  private static timers = new Map<string, number>()
+  static workerIdx: number | string = 'Main Thread'
 
   setComponent(name: string) {
     this.component = name
   }
 
   info(...args: unknown[]) {
-    const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
-
-    this.printMessage('info', ...prefixes, ...args)
+    this.printMessage('info', ...this.prefixes, ...args)
   }
 
   verbose(...args: unknown[]) {
     if (VERBOSE_LOG) {
-      const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
-      this.printMessage('verbose', ...prefixes, ...args)
+      this.printMessage('verbose', ...this.prefixes, ...args)
     }
   }
 
   error(...args: unknown[]) {
-    const prefixes = [`[${Logger.globalPrefix}]`, this.component && `[${this.component}]`, Logger.timestampDiff()]
+    this.printMessage('info', ...this.prefixes, ...args)
+  }
 
-    this.printMessage('info', ...prefixes, ...args)
+  private get prefixes() {
+    return [
+      this.component && `[${this.component}]`,
+      Logger.workerPrefix,
+      Logger.timestampDiff,
+    ]
   }
 
   private printMessage(logLevel: LogLevel, ...args: unknown[]) {
     writeLog(logLevel, ...args)
   }
 
-  static timestampDiff(): string {
+  private static get timestampDiff(): string {
     const result = `+${Date.now() - Logger.lastTimeStamp}ms`
 
     Logger.lastTimeStamp = Date.now()
 
     return result
   }
+
+  private static get workerPrefix() {
+    if (typeof Logger.workerIdx === 'number') {
+      return `Worker#${Logger.workerIdx}`
+    }
+    return Logger.workerIdx
+  }
+
 }
 
 export const CommonLogger = new Logger()

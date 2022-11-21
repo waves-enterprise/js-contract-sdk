@@ -26,10 +26,9 @@ export class ContractProcessor {
   async handleIncomingTx(resp: IncomingTransactionResp): Promise<unknown> {
     const executionContext = new ExecutionContext(resp, this.rpc)
 
+    Container.set(executionContext)
     const { args, actionMetadata } = this.paramsExtractor
       .extract(this.contract as ObjectConstructor, executionContext)
-
-    Container.set(executionContext)
 
     const c = this.contract as ObjectConstructor
     const contractInstance = new c()

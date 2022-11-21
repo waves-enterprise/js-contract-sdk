@@ -1,6 +1,6 @@
 import { ARGS_METADATA } from '../contants'
 import { TArgs } from '../meta'
-import { getExecutionContext } from './common'
+import { getExecutionContext, getPayments, getTx } from './common'
 
 function assignMetadata(args: TArgs, index: number, paramKeyOrGetter: string | (() => void)): TArgs {
   const key = `arg:${index}`
@@ -41,7 +41,7 @@ export function Payments(target: object, propertyKey: string | symbol, parameter
   const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
   Reflect.defineMetadata(
     ARGS_METADATA,
-    assignMetadata(args, parameterIndex, () => getExecutionContext().tx.payments),
+    assignMetadata(args, parameterIndex, getPayments),
     target.constructor,
     propertyKey,
   )
@@ -53,6 +53,16 @@ export function Ctx(target: object, propertyKey: string | symbol, parameterIndex
   Reflect.defineMetadata(
     ARGS_METADATA,
     assignMetadata(args, parameterIndex, getExecutionContext),
+    target.constructor,
+    propertyKey,
+  )
+}
+
+export function Tx(target: object, propertyKey: string | symbol, parameterIndex: number): void {
+  const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
+  Reflect.defineMetadata(
+    ARGS_METADATA,
+    assignMetadata(args, parameterIndex, getTx),
     target.constructor,
     propertyKey,
   )
