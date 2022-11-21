@@ -53,52 +53,40 @@ export function decorateProperty(target: Constructable<unknown>, propertyKey: st
     target.constructor,
   )
 
-  let _settled: object
-
   Object.defineProperty(target, propertyKey, {
     set: () => {
       throw new Error('cannot reassign typed property')
     },
     get: () => {
-      if (!_settled) {
-        if (isMapping) {
-          const mappingInstance = getState().getMapping(contractKey)
-
-          _settled = mappingInstance
-
-          return _settled
-        }
-
-        const res = new class extends PrimitiveType {
-          async get() {
-            const entries = getContractEntries(target)
-
-            let res
-            if (entries.has(contractKey)) {
-              res = entries.get(contractKey)
-            } else {
-              res = await getState().tryGet(contractKey)
-            }
-
-            this.settle(res)
-
-            return this.castToTargetType()
-          }
-
-          set(value: TVal) {
-            if (!config.mutable) {
-              throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
-            }
-
-            setContractEntry(target, contractKey, value as TVal)
-            getState().set(contractKey, value as TVal)
-          }
-        }()
-
-        _settled = res
+      if (isMapping) {
+        return getState().getMapping(contractKey)
       }
 
-      return _settled
+      return new class extends PrimitiveType {
+        async get() {
+          const entries = getContractEntries(target)
+
+          let res
+          if (entries.has(contractKey)) {
+            res = entries.get(contractKey)
+          } else {
+            res = await getState().tryGet(contractKey)
+          }
+
+          this.settle(res)
+
+          return this.castToTargetType()
+        }
+
+        set(value: TVal) {
+          if (!config.mutable) {
+            throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
+          }
+
+          setContractEntry(target, contractKey, value as TVal)
+          getState().set(contractKey, value as TVal)
+        }
+      }()
     },
   })
 }

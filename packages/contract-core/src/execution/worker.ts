@@ -3,7 +3,9 @@ import { isMainThread, parentPort, workerData } from 'node:worker_threads'
 import { ContractProcessor } from './contract-processor'
 import { envConfig, RPC } from '../grpc'
 import { IncomingTx, ProcessTransactionTask } from './types'
-import { CommonLogger } from '../api'
+import { CommonLogger, Logger } from '../api'
+
+Logger.workerIdx = workerData.index
 
 if (isMainThread) {
   throw new Error('Main thread error')
@@ -21,16 +23,18 @@ if (isMainThread) {
 
   const processor = new ContractProcessor(ContractClassConstructor, rpc)
 
-  parentPort!.on('message', async (incoming: ProcessTransactionTask) => {
+  parentPort.on('message', async (incoming: ProcessTransactionTask) => {
     const start = Date.now()
-    const idx = workerData.index
     const txId = (incoming.tx as IncomingTx).id
-    CommonLogger.verbose(`Worker#${idx} received tx ${txId}`)
+    CommonLogger.verbose(`Worker received tx ${txId}`)
     try {
       await processor.handleIncomingTx(incoming)
-      CommonLogger.info(`Worker#${idx} handled tx ${txId} in ${Date.now() - start}ms`)
+      CommonLogger.info(`Worker handled tx ${txId} in ${Date.now() - start}ms`)
     } catch (e) {
-      CommonLogger.error(`Uncaught error ${e.message} tx may not be committed`)
+      CommonLogger.error(
+        `Uncaught error "${e.message}" tx ${(incoming?.tx as IncomingTx)?.id} may not be committed`,
+        e.stack,
+      )
     } finally {
       parentPort!.postMessage('done')
     }

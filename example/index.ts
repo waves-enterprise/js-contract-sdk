@@ -2,4 +2,4 @@ import 'reflect-metadata'
 
 import { initContract } from '../packages/contract-core/src'
 
-initContract({ contractPath: './contract' })
+initContract({ contractPath: './contract', concurrencyLevel: 8 })

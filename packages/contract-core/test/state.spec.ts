@@ -362,7 +362,7 @@ describe('State', () => {
     it('should initialize mapping', async function () {
       @Contract()
       class TestingContract {
-        @Var() user: Mapping;
+        @Var() user: Mapping<string>;
 
         @Action()
         mappingTest() {
