@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/compare/create-we-contract@1.2.0...create-we-contract@1.2.1) (2022-11-22)
+
+
+### Bug Fixes
+
+* **create-we-contract:** fix dirname ([ae948e7](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/commit/ae948e7682231358bdb8d04dd7be2ff05aa65217))
+
+
+
+
+
 # [1.2.0](https://github.com/waves-enterprise/js-contract-sdk/compare/create-we-contract@1.1.0...create-we-contract@1.2.0) (2022-11-08)
 
 
