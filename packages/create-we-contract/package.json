@@ -26,7 +26,8 @@
     "url": "https://github.com/stfy"
   },
   "scripts": {
-    "build": "unbuild"
+    "build": "unbuild",
+    "prepublish": "npm run build"
   },
   "engines": {
     "node": ">=14.16"
