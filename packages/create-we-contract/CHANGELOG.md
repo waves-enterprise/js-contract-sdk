@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.2](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/compare/create-we-contract@1.2.1...create-we-contract@1.2.2) (2022-11-22)
+
+
+### Bug Fixes
+
+* **create-we-contract:** fix publish ([1d92350](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/commit/1d92350b142219f39160957c358f5a6b64505d95))
+* **create-we-contract:** fix templates folder missing ([d27193d](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/commit/d27193d7119b7ca785189b13805859c6fc7d1f8c))
+
+
+
+
+
 ## [1.2.1](https://gitlab.wvservices.com/waves-enterprise/js-contract-sdk/compare/create-we-contract@1.2.0...create-we-contract@1.2.1) (2022-11-22)
 
 
