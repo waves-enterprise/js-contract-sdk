@@ -11,9 +11,10 @@ import { pascalCase } from 'pascal-case'
 import { getInstallCmd } from './install-cmd'
 import { execa } from 'execa'
 import pkg from '../package.json'
+import { fileURLToPath } from 'url'
 
 const { realpath } = fs
-const prog = sade('we-create-contract [contractName]', true)
+const prog = sade('we-create-contract <contractName>', true)
 
 prog
   .version(pkg.version)
@@ -50,11 +51,14 @@ Try ${chalk.yellowBright('we-create-contract MyContract')}
     const relContractPath = `./src/${contractName}.ts`
     const contractPath = path.resolve(projectPath, relContractPath)
 
+    const __filename = fileURLToPath(import.meta.url)
+    const __dirname = path.dirname(__filename)
+
     try {
       bootSpinner.start('Copy template files ...')
 
       await fs.copy(
-        path.resolve(path.dirname('.'), './template'),
+        path.resolve(__dirname, '../template'),
         projectPath,
         {
           overwrite: true,
