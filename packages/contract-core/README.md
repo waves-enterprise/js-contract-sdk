@@ -13,19 +13,66 @@ npm i @wavesenterpise/contract-core
 Create `contract.ts` as follows
 
 ```ts 
-import {Action, Contract, ContractState, Param, State} from '@wavesenterpise/contract-core';
+import {
+  Action,
+  Contract,
+  ContractMapping,
+  ContractValue,
+  IncomingTx,
+  JsonVar,
+  logger,
+  Param,
+  Params,
+  Tx,
+  Var,
+} from '@wavesenterprise/contract-core'
+import BN from 'bn.js'
 
-@Contract
-class MyContract {
-    @State state: ContractState;
+@Contract()
+export default class #{contractName} {
 
-    @Action
-    greeting(@Param('name') name: string) {
-        this.state.set('greeting', `Hello, ${name}`);
+  log = logger(this)
+
+  @Var()
+  counter!: ContractValue<number>
+
+  @JsonVar()
+  participants!: ContractMapping<UserData>
+
+  @Action({ onInit: true })
+  init(@Params() params: Record<string, unknown>) {
+    this.counter.set(0)
+    this.log.info('all params', params)
+  }
+
+  @Action({ preload: ['counter'] })
+  async increment(@Tx tx: IncomingTx, @Param('by') by: BN) {
+    const { senderPublicKey, sender } = tx
+    const counter = await this.counter.get()
+    let participant = await this.participants.tryGet(senderPublicKey)
+    if (!participant) {
+      participant = {
+        publicKey: senderPublicKey,
+        address: sender,
+        amount: 0,
+      }
     }
+    participant.amount += by.toNumber()
+    this.counter.set(counter + by.toNumber())
+    this.participants.set(senderPublicKey, participant)
+  }
 }
 ```
 
+To initialize contract use:
+```ts
+import { initContract } from '@wavesenterprise/contract-core'
+
+initContract({
+  contractPath: __dirname + '/contract.js', // path to compiled contract
+  concurrencyLevel: 1,
+})
+```
 
 ## License
 

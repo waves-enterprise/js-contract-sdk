@@ -1,12 +1,13 @@
-import {Action, Contract, ContractState, Mapping, preload, State, TVar, Var} from '../src'
-import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
+import { Action, Contract, ContractMapping, ContractState, ContractValue, preload, State, Var } from '../src'
+import { ContractClient, RPC, RPCConnectionConfig } from '../src/grpc'
 import { mockRespTx } from './mocks/contract-transaction-response'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import {
   ContractKeyRequest,
   ContractKeysRequest,
   ContractKeysResponse,
-  ContractTransaction, ExecutionSuccessRequest,
+  ContractTransaction,
+  ExecutionSuccessRequest,
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { ContractProcessor } from '../src/execution/contract-processor'
 import { ParamsExtractor } from '../src/execution/params-extractor'
@@ -26,8 +27,8 @@ const stateMock = {
 }
 
 
-jest.mock('../src/grpc/clients/address-client');
-jest.mock('../src/grpc/clients/contract-client');
+jest.mock('../src/grpc/clients/address-client')
+jest.mock('../src/grpc/clients/contract-client')
 jest.spyOn(RPC.prototype, 'Contract', 'get')
   .mockReturnValue({
     setAuth() {
@@ -60,7 +61,6 @@ describe('State', () => {
   let extractor: ParamsExtractor
 
 
-
   beforeEach(() => {
     extractor = new ParamsExtractor()
   })
@@ -68,20 +68,19 @@ describe('State', () => {
   describe('ContractState', () => {
     it('should set string value', async () => {
       class TestContract {
-                @State state: ContractState
+        @State state: ContractState
 
-                @Action
-                test() {
-                  this.state.setString('strictString', 'str')
-                  this.state.set('castString', 'str1')
-                }
+        @Action
+        test() {
+          this.state.set('castString', 'str1')
+        }
       }
 
       const resp = mockRespTx('test')
 
       const processor = new ContractProcessor(
         TestContract,
-        rpc
+        rpc,
       )
 
       await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
@@ -90,10 +89,6 @@ describe('State', () => {
         {
           txId: 'some-tx-id',
           results: [
-            DataEntry.fromPartial({
-              stringValue: 'str',
-              key: 'strictString',
-            }),
             DataEntry.fromPartial({
               stringValue: 'str1',
               key: 'castString',
@@ -106,20 +101,19 @@ describe('State', () => {
 
     it('should set int value', async () => {
       class TestContract {
-                @State state: ContractState
+        @State state: ContractState
 
-                @Action
-                test() {
-                  this.state.setInt('strictInt', 100)
-                  this.state.set('castInt', 1001)
-                }
+        @Action
+        test() {
+          this.state.set('castInt', 1001)
+        }
       }
 
       const resp = mockRespTx('test')
 
       const processor = new ContractProcessor(
         TestContract,
-        rpc
+        rpc,
       )
 
       await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
@@ -128,11 +122,6 @@ describe('State', () => {
         {
           txId: 'some-tx-id',
           results: [
-            DataEntry.fromPartial({
-              intValue: 100,
-              key: 'strictInt',
-            }),
-
             DataEntry.fromPartial({
               intValue: 1001,
               key: 'castInt',
@@ -145,13 +134,12 @@ describe('State', () => {
 
     it('should set boolean value', async () => {
       class TestContract {
-                @State state: ContractState
+        @State state: ContractState
 
-                @Action
-                test() {
-                  this.state.setBool('strictBool', false)
-                  this.state.set('castBool', true)
-                }
+        @Action
+        test() {
+          this.state.set('castBool', true)
+        }
       }
 
       const resp = mockRespTx('test')
@@ -167,11 +155,6 @@ describe('State', () => {
         {
           txId: 'some-tx-id',
           results: [
-            DataEntry.fromPartial({
-              boolValue: false,
-              key: 'strictBool',
-            }),
-
             DataEntry.fromPartial({
               boolValue: true,
               key: 'castBool',
@@ -184,13 +167,12 @@ describe('State', () => {
 
     it('should set binary value', async () => {
       class TestContract {
-                @State state: ContractState
+        @State state: ContractState
 
-                @Action
-                test() {
-                  this.state.setBinary('strictBinary', new Uint8Array([22, 8, 322]))
-                  this.state.set('castBinary', new Uint8Array([21, 8, 322]))
-                }
+        @Action
+        test() {
+          this.state.set('castBinary', new Uint8Array([21, 8, 322]))
+        }
       }
 
       const resp = mockRespTx('test')
@@ -206,11 +188,6 @@ describe('State', () => {
         {
           txId: 'some-tx-id',
           results: [
-            DataEntry.fromPartial({
-              binaryValue: new Uint8Array([22, 8, 322]),
-              key: 'strictBinary',
-            }),
-
             DataEntry.fromPartial({
               binaryValue: new Uint8Array([21, 8, 322]),
               key: 'castBinary',
@@ -225,57 +202,36 @@ describe('State', () => {
   describe('Properties', () => {
     @Contract()
     class TestContract {
-            @Var() intVar: TVar<number>
-            @Var() decimalVar: TVar<number>
+      @Var() intVar: ContractValue<number>
+      @Var() decimalVar: ContractValue<number>
 
-            @Var() myVar: TVar<string>
-            @Var({ mutable: false }) immutable: TVar<string>
+      @Var() myVar: ContractValue<string>
 
-            @Action
-            test() {
-              this.myVar.set('test')
-            }
+      @Action
+      test() {
+        this.myVar.set('test')
+      }
 
-            @Action
-            async getterTest() {
-              await this.myVar.get()
-            }
+      @Action
+      async getterTest() {
+        await this.myVar.get()
+      }
 
-            @Action
-            async immutableTest() {
-              this.immutable.set('testValue')
-            }
+      @Action
+      async preloadInAction() {
+        await preload(this, ['myVar'])
+      }
 
-            @Action
-            async preloadInAction() {
-              await preload(this, ['myVar'])
-            }
+      @Action
+      async preloadInActionVars() {
+        await preload(this, ['intVar', 'decimalVar'])
 
-            @Action
-            async preloadInActionVars() {
-              await preload(this, ['intVar', 'decimalVar'])
+        await this.intVar.get()
+        await this.decimalVar.get()
 
-              await this.intVar.get()
-              await this.decimalVar.get()
-
-              this.decimalVar.set(100)
-            }
+        this.decimalVar.set(100)
+      }
     }
-
-    it('should throw error on try set immutable', async function () {
-      const resp = mockRespTx('immutableTest')
-
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
-
-
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-
-      expect(processor.tryCommitError).toBeCalled()
-    })
 
     it('should get value by propertyKey', async function () {
       const resp = mockRespTx('getterTest')
@@ -362,7 +318,7 @@ describe('State', () => {
     it('should initialize mapping', async function () {
       @Contract()
       class TestingContract {
-        @Var() user: Mapping<string>;
+        @Var() user: ContractMapping<string>
 
         @Action()
         mappingTest() {
@@ -388,13 +344,13 @@ describe('State', () => {
           results: [
             DataEntry.fromPartial({
               key: 'user_first',
-              stringValue: 'user1'
+              stringValue: 'user1',
             }),
             DataEntry.fromPartial({
               key: 'user_second',
-              stringValue: 'user2'
-            })
-          ]
+              stringValue: 'user2',
+            }),
+          ],
         }),
       )
     })

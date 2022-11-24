@@ -6,9 +6,10 @@
   "type": "commonjs",
   "scripts": {
     "bootstrap": "lerna bootstrap",
+    "typecheck": "lerna run typecheck --stream",
     "lint": "npx eslint . --ext .ts,.tsx",
     "lint:fix": "npx eslint . --ext .ts,.tsx --fix",
-    "test-ci": "npm run lint && npx tsc --noEmit &&  lerna run test --stream"
+    "test-ci": "npm run lint && npm run typecheck &&  lerna run test --stream"
   },
   "repository": {
     "url": "git@github.com:waves-enterprise/js-contract-sdk.git"

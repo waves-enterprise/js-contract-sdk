@@ -1,32 +1,48 @@
 import { TValue } from '../../../intefaces/contract'
-import { ContractState } from '../contract-state'
 import { Optional } from '../../../intefaces/helpers'
+import { ContractState } from '../contract-state'
+import { TVarConfig } from '../../decorators/var'
 
-const MAPPING_DELIMITER = '_'
+export class ContractMapping<Deserialized extends unknown> {
 
-export class Mapping<V extends TValue> {
-  prefix: string
-
-  constructor(private state: ContractState) {
+  constructor(
+    protected readonly state: ContractState,
+    protected readonly config: TVarConfig,
+  ) {
   }
 
-  setPrefix(prefix: string) {
-    this.prefix = prefix + MAPPING_DELIMITER
+  protected deserialize(value: TValue): Deserialized {
+    if (this.config.deserialize) {
+      return this.config.deserialize(value) as Deserialized
+    }
+    return value as unknown as Deserialized
   }
 
-  private key(el: string) {
-    return this.prefix + el
+  protected serialize(value: Deserialized): TValue {
+    if (this.config.serialize) {
+      return this.config.serialize(value) as TValue
+    }
+    return value as unknown as TValue
   }
 
-  tryGet<T extends TValue = V>(el: string): Promise<Optional<T>> {
-    return this.state.tryGet<T>(this.key(el))
+  protected composeKey(key: string) {
+    if (this.config.key) {
+      return `${this.config.key}_${key}`
+    }
+    return key
   }
 
-  get<T extends TValue = V>(el: string): Promise<T> {
-    return this.state.get<T>(this.key(el))
+  tryGet(key: string): Promise<Optional<Deserialized>> {
+    return this.state.tryGet(this.composeKey(key))
+      .then((value) => value === undefined ? value : this.deserialize(value))
   }
 
-  set<T extends TValue = V>(el: string, value: T) {
-    return this.state.set(this.key(el), value)
+  get(key: string): Promise<Deserialized> {
+    return this.state.get(this.composeKey(key))
+      .then((value) => this.deserialize(value))
+  }
+
+  set(key: string, value: Deserialized) {
+    this.state.set(this.composeKey(key), this.serialize(value))
   }
 }

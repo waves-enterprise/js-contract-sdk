@@ -1,141 +1,75 @@
-import { CommonLogger, logger } from '../'
+import { logger } from '../'
 import { ContractClient } from '../../grpc'
-import { TVal, TValue } from '../../intefaces/contract'
-import {
-  ContractKeysRequest,
-  ContractKeysResponse,
-} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
-import { _parseDataEntry, isString, parseDataEntry } from '../../utils'
-import { InternalContractState } from './internal-contract-state'
-import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
-
-type GetConfig = Omit<ContractKeysRequest, 'contractId'>
+import { TVal } from '../../intefaces/contract'
+import { _parseDataEntry } from '../../utils'
 
 export class Storage {
-  private internalState: InternalContractState
 
   log = logger(this)
+
+  private readonly cache = new Map<string, TVal>()
+
+  private readonly changedKeys = new Set<string>()
 
   constructor(
     private readonly contractId: string,
     private readonly client: ContractClient,
-    private readonly _cache: Map<string, TValue> = new Map(),
   ) {
-    this.internalState = new InternalContractState(_cache)
   }
 
-  read(key: string) {
-    const res = this.client.getContractKey({
-      contractId: this.contractId,
-      key,
-    })
-
-    return res.then(r => _parseDataEntry(r.entry!))
+  async read(key: string) {
+    if (!this.cache.has(key)) {
+      const res = await this.client.getContractKey({
+        contractId: this.contractId,
+        key,
+      })
+      this.cache.set(key, _parseDataEntry(res.entry!))
+    }
+    return this.cache.get(key)!
   }
 
-  async readBatch(keys: string[]): Promise<DataEntry[]> {
-    const res = await this.client.getContractKeys({
-      contractId: this.contractId,
-      keysFilter: {
-        keys,
-      },
-    })
+  async readBatch(keys: string[]): Promise<Record<string, TVal>> {
 
-    CommonLogger.info('Entries Preloaded', ContractKeysResponse.toJSON(res))
-
-    return res.entries
-  }
-
-  /**
-   * @deprecated use read/readBatch instead
-   */
-  get(config: GetConfig): Promise<TValue[]>
-  /**
-   * @deprecated use read/readBatch instead
-   */
-  get<T extends TValue>(key): Promise<T>
-  /**
-   * @deprecated use read/readBatch instead
-   */
-  get(keys: string[], config?: Omit<GetConfig, 'matches'>): Promise<TValue[]>
-  /**
-   * @deprecated use read/readBatch instead
-   */
-  async get(...args: any[]): Promise<unknown> {
-    if (isString(args[0])) {
-      const key = args[0]
-      const contractId = this.contractId
-
-      if (this.internalState.has(key)) {
-        return this.internalState.get(key)
+    const cached: Record<string, TVal> = {}
+    const missingKeys = keys.filter((key) => {
+      if (this.cache.has(key)) {
+        cached[key] = this.cache.get(key)!
+        return false
       }
+      return true
+    })
 
-      const resp = await this.client.getContractKey({ key, contractId })
-
-      const value = parseDataEntry(resp.entry as DataEntry)
-
-      this._cache.set(key, value)
-
-      return value
-    } else if (Array.isArray(args[0])) {
-      const request = args[1] || {}
-      const keys = args[0]
-
-      // TODO: get from internal state
-
-      const response = await this.client.getContractKeys({
-        ...request,
+    const loaded: Record<string, TVal> = {}
+    if (missingKeys.length > 0) {
+      const res = await this.client.getContractKeys({
+        contractId: this.contractId,
         keysFilter: {
-          keys,
+          keys: missingKeys,
         },
       })
-
-      const entries = response.entries.map((e) => {
-        return [e.key, parseDataEntry(e)] as [string, TValue]
+      res.entries.forEach((entry) => {
+        const parsedValue = _parseDataEntry(entry)
+        this.cache.set(entry.key, parsedValue)
+        loaded[entry.key] = parsedValue
       })
-
-      for (const [key, val] of entries) {
-        this._cache.set(key, val)
-      }
-      return entries.map(([, val]) => val)
     }
 
-    const response = await this.client.getContractKeys(args[0])
-
-    // TODO: cache request by config
-    const entries = response.entries.map((e) => {
-      return [e.key, parseDataEntry(e)] as [string, TValue]
-    })
-
-    for (const [key, val] of entries) {
-      this._cache.set(key, val)
+    return {
+      ...cached,
+      ...loaded,
     }
-
-    return entries.map(([, val]) => val)
-  }
-
-  async has(key: string): Promise<boolean> {
-    if (this.internalState.has(key)) {
-      return Promise.resolve(true)
-    }
-
-    const { entry } = await this.client.getContractKey({
-      contractId: this.contractId,
-      key,
-    })
-
-    return Boolean(entry?.stringValue !== undefined)
   }
 
   set(key: string, value: TVal): void {
-    this.internalState.write(key, value)
+    this.changedKeys.add(key)
+    this.cache.set(key, value)
   }
 
   delete(key: string) {
-    this.internalState.write(key, undefined as unknown as TValue)
+    this.cache.delete(key)
   }
 
-  getEntries(): DataEntry[] {
-    return this.internalState.getEntries()
+  getUpdates(): Record<string, TVal> {
+    return Object.fromEntries(Array.from(this.cache.entries()).filter(([key]) => this.changedKeys.has(key)))
   }
 }

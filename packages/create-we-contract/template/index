@@ -1,3 +1,5 @@
-import {start} from "@wavesenterprise/contract-core";
+import { initContract } from '@wavesenterprise/contract-core'
 
-start('./src/contract');
+initContract({
+  contractPath: __dirname + '/src/contract.js',
+})

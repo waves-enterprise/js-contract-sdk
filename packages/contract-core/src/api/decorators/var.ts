@@ -2,41 +2,60 @@ import { Constructable } from '../../intefaces/helpers'
 import { getState } from './common'
 import { ContractError } from '../../execution'
 import { CONTRACT_VARS } from '../contants'
-import { TContractVarsMeta, TVarMeta } from '../meta'
-import { getContractEntries, setContractEntry } from '../../execution/reflect'
-import { PrimitiveType } from '../state/types/primitives'
-import { TVal } from '../../intefaces/contract'
-import { Mapping } from '../state'
+import { TContractVarsMeta } from '../meta'
+import { TValue } from '../../intefaces/contract'
+import { ContractMapping } from '../state'
+import { ContractValue } from '../state/types/value'
 
-export type TVarConfig = Partial<TVarMeta>
-
-const DefaultConfig: TVarConfig = {
-  mutable: true,
-  eager: false,
+export type TVarConfig = {
+  key: string,
+  mutable?: boolean,
+  serialize?: (value: unknown) => TValue,
+  deserialize?: (value: TValue) => unknown,
 }
-
 
 export function Var(target: object, propertyName: string | symbol, descriptor): void
 export function Var(props?: TVarConfig): PropertyDecorator
 export function Var(...args: any[]) {
   if (args.length > 1) {
-    return decorateProperty.call(undefined, ...args, DefaultConfig) as void
+    decorateProperty.call(undefined, ...args, {
+      key: args[1],
+    })
+    return
   }
 
-  const config = {
-    ...DefaultConfig,
-    ...(args[0] || {}),
+  return (...args_: any[]): void => decorateProperty.call(undefined, ...args_, {
+    key: args_[1],
+    ...args[0],
+  }) as void
+}
+
+export function JsonVar(target: object, propertyName: string | symbol, descriptor): void
+export function JsonVar(props?: TVarConfig): PropertyDecorator
+export function JsonVar(...args: any[]) {
+  if (args.length > 1) {
+    decorateProperty.call(undefined, ...args, {
+      key: args[1],
+      serialize: JSON.stringify,
+      deserialize: JSON.parse,
+    })
+    return
   }
 
-  return (...args_: any[]): void => decorateProperty.call(undefined, ...args_, config) as void
+  return (...args_: any[]): void => decorateProperty.call(undefined, ...args_, {
+    key: args_[1],
+    serialize: JSON.stringify,
+    deserialize: JSON.parse,
+    ...args[0],
+  }) as void
 }
 
 export function decorateProperty(target: Constructable<unknown>, propertyKey: string, _, config: TVarConfig): void {
-  const contractKey = config.name || propertyKey
+  const contractKey = config.key
 
   const meta: TContractVarsMeta = Reflect.getMetadata(CONTRACT_VARS, target.constructor) || {}
   const designType = Reflect.getMetadata('design:type', target, propertyKey)
-  const isMapping = designType === Mapping
+  const isMapping = designType === ContractMapping
 
   if (!!meta[contractKey]) {
     throw new ContractError('Variable names need to be unique')
@@ -59,34 +78,9 @@ export function decorateProperty(target: Constructable<unknown>, propertyKey: st
     },
     get: () => {
       if (isMapping) {
-        return getState().getMapping(contractKey)
+        return new ContractMapping(getState(), config)
       }
-
-      return new class extends PrimitiveType {
-        async get() {
-          const entries = getContractEntries(target)
-
-          let res
-          if (entries.has(contractKey)) {
-            res = entries.get(contractKey)
-          } else {
-            res = await getState().tryGet(contractKey)
-          }
-
-          this.settle(res)
-
-          return this.castToTargetType()
-        }
-
-        set(value: TVal) {
-          if (!config.mutable) {
-            throw new ContractError(`Trying to set immutable variable "${contractKey}" in call transaction `)
-          }
-
-          setContractEntry(target, contractKey, value as TVal)
-          getState().set(contractKey, value as TVal)
-        }
-      }()
+      return new ContractValue(getState(), config)
     },
   })
 }

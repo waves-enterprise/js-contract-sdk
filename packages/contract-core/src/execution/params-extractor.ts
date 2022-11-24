@@ -78,7 +78,7 @@ export class ParamsExtractor {
 
         const paramValue = executionContext.params.get(argFromParams.paramKey!)
 
-        if (!paramValue) {
+        if (paramValue === null || paramValue === undefined) {
           throw new UnavailableContractParamException(argFromParams.paramKey || `#${paramIndex.toString()}`)
         }
 
