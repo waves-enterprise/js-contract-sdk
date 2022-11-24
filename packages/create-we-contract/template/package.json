@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.7.1",
-    "@wavesenterprise/contract-core": "^1.0.14",
+    "@wavesenterprise/contract-core": "^1.1.5",
     "@wavesenterprise/crypto-utils": "^1.0.0-rc.1"
   },
   "devDependencies": {

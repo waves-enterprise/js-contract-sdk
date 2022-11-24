@@ -101,7 +101,7 @@ const run = async () => {
   console.log('Create tx mined')
 
   const participants = await getParticipants()
-  await Promise.all(participants.slice(0, 1).map((p) => {
+  await Promise.all(participants.slice(0, 20).map((p) => {
     return broadcast(new CallContractTx({
       fee: 0,
       senderPublicKey: p.publicKey,

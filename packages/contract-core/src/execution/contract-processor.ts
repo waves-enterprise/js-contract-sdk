@@ -6,7 +6,7 @@ import { ExecutionContext } from './execution-context'
 import { RPC } from '../grpc'
 import { IncomingTransactionResp } from './types'
 import { ERROR_CODE } from './constants'
-import { Container, logger } from '../api'
+import { Container, logger, preload } from '../api'
 import { ParamsExtractor } from './params-extractor'
 import { setContractEntries } from './reflect'
 import { ContractError } from './exceptions'
@@ -18,7 +18,7 @@ export function clearPreloadedEntries(contract: object): void {
 export class ContractProcessor {
   logger = logger(this)
 
-  private paramsExtractor = new ParamsExtractor()
+  private readonly paramsExtractor = new ParamsExtractor()
 
   constructor(private contract: unknown, private rpc: RPC) {
   }
@@ -35,6 +35,9 @@ export class ContractProcessor {
     clearPreloadedEntries(contractInstance)
 
     try {
+      if (actionMetadata.preload) {
+        await preload(contractInstance, actionMetadata.preload as keyof object)
+      }
       await contractInstance[actionMetadata.propertyName](...args)
 
       return this.tryCommitSuccess(executionContext)
@@ -45,11 +48,12 @@ export class ContractProcessor {
   }
 
   async tryCommitSuccess(executionContext: ExecutionContext) {
+    const results = executionContext.state.getUpdatedEntries()
     try {
       await this.rpc.Contract.commitExecutionSuccess(
         ExecutionSuccessRequest.fromPartial({
           txId: executionContext.txId,
-          results: executionContext.state.getStateEntries(),
+          results,
           assetOperations: executionContext.assetOperations.operations,
         }),
       )

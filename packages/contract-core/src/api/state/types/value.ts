@@ -1,0 +1,35 @@
+import { ContractState } from '../contract-state'
+import { TVarConfig } from '../../decorators/var'
+import { TValue } from '../../../intefaces/contract'
+
+export class ContractValue<Deserialized extends unknown> {
+
+  constructor(
+    private readonly state: ContractState,
+    private readonly config: TVarConfig,
+  ) {
+  }
+
+  protected deserialize(value: TValue): Deserialized {
+    if (this.config.deserialize) {
+      return this.config.deserialize(value) as Deserialized
+    }
+    return value as unknown as Deserialized
+  }
+
+  protected serialize(value: Deserialized): TValue {
+    if (this.config.serialize) {
+      return this.config.serialize(value) as TValue
+    }
+    return value as unknown as TValue
+  }
+
+  get(): Promise<Deserialized> {
+    return this.state.get(this.config.key)
+      .then((value) => this.deserialize(value))
+  }
+
+  set(value: Deserialized) {
+    this.state.set(this.config.key, this.serialize(value))
+  }
+}

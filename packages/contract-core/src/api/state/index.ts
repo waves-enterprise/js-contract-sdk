@@ -1,5 +1,5 @@
 export { Storage } from './storage'
-export { ContractState, IState } from './contract-state'
-export { TVar } from './types/primitives'
-export { Mapping } from './types/mapping'
+export { ContractState } from './contract-state'
+export { ContractMapping } from './types/mapping'
+export { ContractValue } from './types/value'
 export { preload } from './preload'

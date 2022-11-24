@@ -1,17 +1,49 @@
-import {Action, Contract, Param} from "@wavesenterprise/contract-core";
+import {
+  Action,
+  Contract,
+  ContractMapping,
+  ContractValue,
+  IncomingTx,
+  JsonVar,
+  logger,
+  Param,
+  Params,
+  Tx,
+  Var,
+} from '@wavesenterprise/contract-core'
+import BN from 'bn.js'
 
 @Contract()
-export class #{contractName} {
-    @Action({onInit: true})
-    init() {
-    }
+export default class #{contractName} {
 
-    @Action
-    setValue(
-        @Param('first') param: string,
-        @Param('third') param2: string,
-    ) {
+  log = logger(this)
 
-        // Write your logic here
+  @Var()
+  counter!: ContractValue<number>
+
+  @JsonVar()
+  participants!: ContractMapping<UserData>
+
+  @Action({ onInit: true })
+  init(@Params() params: Record<string, unknown>) {
+    this.counter.set(0)
+    this.log.info('all params', params)
+  }
+
+  @Action({ preload: ['counter'] })
+  async increment(@Tx tx: IncomingTx, @Param('by') by: BN) {
+    const { senderPublicKey, sender } = tx
+    const counter = await this.counter.get()
+    let participant = await this.participants.tryGet(senderPublicKey)
+    if (!participant) {
+      participant = {
+        publicKey: senderPublicKey,
+        address: sender,
+        amount: 0,
+      }
     }
+    participant.amount += by.toNumber()
+    this.counter.set(counter + by.toNumber())
+    this.participants.set(senderPublicKey, participant)
+  }
 }

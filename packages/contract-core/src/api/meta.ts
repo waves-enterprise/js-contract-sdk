@@ -10,6 +10,7 @@ export type TContractActionMetadata = {
   name: string,
   propertyName: string,
   params: unknown[],
+  preload?: string[],
 }
 
 export type TContractActionsMetadata = {

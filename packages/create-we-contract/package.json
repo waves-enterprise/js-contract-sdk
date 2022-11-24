@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "unbuild",
+    "typecheck": "npx tsc --noEmit",
     "prepublish": "npm run build"
   },
   "engines": {

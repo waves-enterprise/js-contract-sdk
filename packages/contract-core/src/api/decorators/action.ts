@@ -4,6 +4,7 @@ import { TContractActionMetadata, TContractActionsMetadata } from '../meta'
 
 type TContractActionOptions = {
   name?: string,
+  preload?: string[],
   onInit?: boolean,
 }
 
@@ -45,6 +46,7 @@ const decorateMethod = (
     name: options?.name ? options.name : (propertyName as string),
     propertyName: propertyName as string,
     params: Reflect.getMetadata('design:paramtypes', target, propertyName as string),
+    preload: options.preload,
   }
 
   if (options.onInit) {
