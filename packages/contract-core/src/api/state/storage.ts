@@ -18,6 +18,7 @@ export class Storage {
   }
 
   async read(key: string) {
+    this.log.verbose(`Requested key ${key}, in cache`, this.cache.has(key))
     if (!this.cache.has(key)) {
       const res = await this.client.getContractKey({
         contractId: this.contractId,
@@ -29,7 +30,7 @@ export class Storage {
   }
 
   async readBatch(keys: string[]): Promise<Record<string, TVal>> {
-
+    this.log.verbose(`Requested keys ${JSON.stringify(keys)}`)
     const cached: Record<string, TVal> = {}
     const missingKeys = keys.filter((key) => {
       if (this.cache.has(key)) {
@@ -38,6 +39,7 @@ export class Storage {
       }
       return true
     })
+    this.log.verbose(`Cached keys ${JSON.stringify(Object.keys(cached))}`)
 
     const loaded: Record<string, TVal> = {}
     if (missingKeys.length > 0) {
@@ -52,6 +54,7 @@ export class Storage {
         this.cache.set(entry.key, parsedValue)
         loaded[entry.key] = parsedValue
       })
+      this.log.verbose(`Loaded keys ${JSON.stringify(Object.keys(loaded))}`)
     }
 
     return {
