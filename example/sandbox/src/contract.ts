@@ -8,6 +8,7 @@ import {
   logger,
   Param,
   Params,
+  preload,
   Tx,
   Var,
 } from '@wavesenterprise/contract-core'
@@ -24,13 +25,13 @@ export default class MyContract {
 
   log = logger(this)
 
-  @Var()
+  @Var({ key: 'COUNTER' })
   counter!: ContractValue<number>
 
-  @JsonVar()
+  @JsonVar({ key: 'PARTICIPANTS' })
   participants!: ContractMapping<UserData>
 
-  @JsonVar()
+  @JsonVar({ key: 'ARR' })
   arr!: ContractValue<number[]>
 
   @Action({ onInit: true })
@@ -40,9 +41,11 @@ export default class MyContract {
     this.log.info('all params', params)
   }
 
-  @Action({ preload: ['counter'] })
+  @Action()
   async increment(@Tx tx: IncomingTx, @Param('by') by: BN) {
     const { senderPublicKey, sender } = tx
+    // @ts-ignore
+    await preload(this, ['counter', ['participants', senderPublicKey]])
     const counter = await this.counter.get()
     let participant = await this.participants.tryGet(senderPublicKey)
     if (!participant) {
