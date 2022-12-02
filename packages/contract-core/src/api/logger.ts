@@ -2,7 +2,7 @@ import http from 'http'
 
 type LogLevel = 'verbose' | 'info' | 'error'
 
-const { DEBUG, HOST_NETWORK, HOSTNAME, VERBOSE_LOG } = process.env
+const { DEBUG, HOST_NETWORK, HOSTNAME, VERBOSE_LOG, REMOTE_LOG } = process.env
 
 const request = (url: string, data: unknown) => {
   const body = JSON.stringify(data, (key, value) => {
@@ -32,8 +32,10 @@ export const writeLog = (...message: [LogLevel, ...unknown[]]) => {
     const prefix = HOSTNAME ? `[${(new Date()).toISOString()}] Host: ${HOSTNAME}` : `[${(new Date()).toISOString()}]`
     // eslint-disable-next-line no-console
     console[type](prefix, ...data)
-    const loggerAddress = `http://${HOST_NETWORK}:5050`
-    request(loggerAddress, [type, prefix, ...data])
+    if (Number(REMOTE_LOG)) {
+      const loggerAddress = `http://${HOST_NETWORK}:5050`
+      request(loggerAddress, [type, prefix, ...data])
+    }
   }
 }
 

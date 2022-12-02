@@ -42,7 +42,8 @@ const run = async () => {
   await execute(`npm --prefix ${path.resolve(__dirname, '..', '..', 'packages', 'contract-core')} run build`)
   console.log(`Building docker image, debug=1, host_network=${ip}`)
   const buildCommand =
-    `docker build --build-arg DEBUG=1 --build-arg HOST_NETWORK=${ip} -t ${contractName} -f sandbox.Dockerfile ../../`
+    // eslint-disable-next-line max-len
+    `docker build --build-arg DEBUG=1 --build-arg REMOTE_LOG=1 --build-arg HOST_NETWORK=${ip} -t ${contractName} -f sandbox.Dockerfile ../../`
   console.log(buildCommand)
   await execute(buildCommand)
   console.log('Done building')
