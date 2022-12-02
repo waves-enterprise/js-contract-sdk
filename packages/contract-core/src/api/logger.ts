@@ -55,7 +55,7 @@ export class Logger {
 
   verbose(...args: unknown[]) {
     if (VERBOSE_LOG) {
-      this.printMessage('verbose', ...this.prefixes, ...args)
+      this.printMessage('info', ...this.prefixes, ...args)
     }
   }
 
