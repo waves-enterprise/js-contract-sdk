@@ -31,6 +31,9 @@ export class GrpcClient {
     this.contractPKIService = new ContractPKIService(this.props.nodeAddress)
     this.contractPrivacyService = new ContractPrivacyService(this.props.nodeAddress)
     this.contractTransactionService = new ContractTransactionService(this.props.nodeAddress)
+    this.setMetadata({
+      authorization: this.props.connectionToken,
+    })
   }
 
   setMetadata(metadata: Record<string, MetadataValue>) {
