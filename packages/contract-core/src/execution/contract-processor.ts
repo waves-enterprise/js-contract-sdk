@@ -51,6 +51,7 @@ export class ContractProcessor {
   async tryCommitSuccess(executionContext: ExecutionContext) {
     const results = executionContext.state.getUpdatedEntries()
     // const assetOperations = executionContext.assetOperations.operations
+    this.logger.verbose('Commiting success with params', results)
     try {
       await this.grpcClient.contractService.commitExecutionSuccess({
         txId: executionContext.txId,

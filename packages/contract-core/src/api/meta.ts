@@ -1,5 +1,7 @@
 export type TVarMeta = {
   name: string,
+
+  readonly?: boolean,
   contractId: string,
 }
 

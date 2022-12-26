@@ -85,8 +85,10 @@ export class Storage {
 
   getUpdates(): Record<string, TVal> {
     return Object.fromEntries(
-      Array.from(this.cache.entries())
-        .filter(([key]) => this.changedKeys.has(this.composeCacheKey(this.contractId, key))),
+      Array.from(this.changedKeys.values())
+        .map((changedKey) => {
+          return [changedKey, this.cache.get(this.composeCacheKey(this.contractId, changedKey))!]
+        }),
     )
   }
 }
