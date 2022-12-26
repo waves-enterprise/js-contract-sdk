@@ -13,13 +13,13 @@ function bindProcessHandlers() {
   })
 }
 
-export async function initContract(cfg: ContractConfig) {
+export function initContract(cfg: ContractConfig) {
   bindProcessHandlers()
 
   const contractService = new ContractService(cfg)
 
   try {
-    await contractService.start()
+    contractService.start()
   } catch (err) {
     console.error(err)
     process.exit(1)

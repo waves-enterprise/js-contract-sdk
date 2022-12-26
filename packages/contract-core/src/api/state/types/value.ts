@@ -1,6 +1,7 @@
 import { ContractState } from '../contract-state'
 import { TVarConfig } from '../../decorators/var'
 import { TValue } from '../../../intefaces/contract'
+import { ContractError } from '../../../execution'
 
 export class ContractValue<Deserialized extends unknown> {
 
@@ -25,11 +26,17 @@ export class ContractValue<Deserialized extends unknown> {
   }
 
   get(): Promise<Deserialized> {
-    return this.state.get(this.config.key)
+    return this.state.get(this.config.key, this.config.contractId)
       .then((value) => this.deserialize(value))
   }
 
   set(value: Deserialized) {
+    if (this.config.contractId) {
+      throw new ContractError(`Attempt to set external contract value of ${this.config.key}`)
+    }
+    if (this.config.readonly) {
+      throw new ContractError(`Attempt to set readonly value of key ${this.config.key}`)
+    }
     this.state.set(this.config.key, this.serialize(value))
   }
 }

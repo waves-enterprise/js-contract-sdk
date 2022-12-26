@@ -2,7 +2,7 @@ import { ExecutionContext } from './execution-context'
 import { getArgsMetadata, getContractMetadata } from './reflect'
 import { TArgs, TContractActionMetadata } from '../api/meta'
 import { isPrimitive, isWrappedType } from '../utils'
-import { Constructable } from '../@types/common'
+import { Constructable } from '../intefaces/helpers'
 import { ReservedParamNames, TxId } from './constants'
 import {
   ContractError,

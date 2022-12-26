@@ -1,7 +1,6 @@
 export type TVarMeta = {
   name: string,
-  mutable: boolean,
-  eager: boolean,
+  contractId: string,
 }
 
 export type TContractVarsMeta = Record<string, { propertyKey: string, meta: Partial<TVarMeta> }>

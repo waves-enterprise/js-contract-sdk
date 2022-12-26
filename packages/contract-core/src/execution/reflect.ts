@@ -1,6 +1,6 @@
 import { ACTION_METADATA, ARGS_METADATA } from './constants'
 import { TArgs, TContractActionsMetadata, TContractVarsMeta } from '../api/meta'
-import { Constructable, TContract } from '../@types/common'
+import { Constructable, TContract } from '../intefaces/helpers'
 import { CONTRACT_PRELOADED_ENTRIES, CONTRACT_VARS } from '../api/contants'
 import { TVal } from '../intefaces/contract'
 

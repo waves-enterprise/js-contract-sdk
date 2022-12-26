@@ -10,16 +10,16 @@ export class ContractState {
   readonly storage: Storage
 
   constructor(context: ExecutionContext) {
-    this.storage = new Storage(context.contractId, context.rpcConnection.Contract)
+    this.storage = new Storage(context.contractId, context.grpcClient.contractService)
   }
 
-  get<T extends TValue>(key: string): Promise<T> {
-    return this.storage.read(key) as Promise<T>
+  get<T extends TValue>(key: string, contractId?: string): Promise<T> {
+    return this.storage.read(key, contractId) as Promise<T>
   }
 
-  async tryGet<T extends TValue>(key: string): Promise<Optional<T>> {
+  async tryGet<T extends TValue>(key: string, contractId?: string): Promise<Optional<T>> {
     try {
-      return await this.get(key) as T
+      return await this.get(key, contractId) as T
     } catch (e) {
       if (e instanceof UnavailableStateKeyException) {
         return undefined

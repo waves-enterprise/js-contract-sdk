@@ -9,7 +9,8 @@ import { ContractValue } from '../state/types/value'
 
 export type TVarConfig = {
   key: string,
-  mutable?: boolean,
+  readonly?: boolean,
+  contractId?: string,
   serialize?: (value: unknown) => TValue,
   deserialize?: (value: TValue) => unknown,
 }
@@ -31,7 +32,7 @@ export function Var(...args: any[]) {
 }
 
 export function JsonVar(target: object, propertyName: string | symbol, descriptor): void
-export function JsonVar(props?: TVarConfig): PropertyDecorator
+export function JsonVar(props?: Omit<TVarConfig, 'serialize' | 'deserialize'>): PropertyDecorator
 export function JsonVar(...args: any[]) {
   if (args.length > 1) {
     decorateProperty.call(undefined, ...args, {

@@ -28,14 +28,3 @@ export type IncomingTx = {
   payments: TransferIn[],
   params: TParam[],
 }
-
-export type ProcessTransactionTask = {
-  authToken: string,
-  tx: unknown,
-}
-
-
-export type IncomingTransactionResp = {
-  authToken: string,
-  tx: unknown,
-}

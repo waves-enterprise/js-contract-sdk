@@ -1,7 +1,7 @@
 import { logger } from '../'
-import { ContractClient } from '../../grpc'
 import { TVal } from '../../intefaces/contract'
 import { _parseDataEntry } from '../../utils'
+import { ContractService } from '@wavesenterprise/we-node-grpc-api'
 
 export class Storage {
 
@@ -13,28 +13,37 @@ export class Storage {
 
   constructor(
     private readonly contractId: string,
-    private readonly client: ContractClient,
+    private readonly client: ContractService,
   ) {
   }
 
-  async read(key: string) {
-    this.log.verbose(`Requested key ${key}, in cache`, this.cache.has(key))
-    if (!this.cache.has(key)) {
-      const res = await this.client.getContractKey({
-        contractId: this.contractId,
-        key,
-      })
-      this.cache.set(key, _parseDataEntry(res.entry!))
-    }
-    return this.cache.get(key)!
+  private composeCacheKey = (contractId: string, key: string) => {
+    return `${contractId}:${key}`
   }
 
-  async readBatch(keys: string[]): Promise<Record<string, TVal>> {
-    this.log.verbose(`Requested keys ${JSON.stringify(keys)}`)
+  async read(key: string, contractId?: string) {
+    const actualContractId = contractId ?? this.contractId
+    const cacheKey = this.composeCacheKey(actualContractId, key)
+    this.log.verbose(`Requested key ${cacheKey}, in cache`, this.cache.has(cacheKey))
+    if (!this.cache.has(cacheKey)) {
+      const res = await this.client.getContractKey({
+        contractId: actualContractId,
+        key,
+      })
+      this.cache.set(cacheKey, _parseDataEntry(res))
+    }
+    return this.cache.get(cacheKey)!
+  }
+
+  async readBatch(keys: string[], contractId?: string): Promise<Record<string, TVal>> {
+    const actualContractId = contractId ?? this.contractId
+    const cacheKeys = keys.map((key) => this.composeCacheKey(actualContractId, key))
+    this.log.verbose(`Requested keys ${JSON.stringify(cacheKeys)}`)
     const cached: Record<string, TVal> = {}
     const missingKeys = keys.filter((key) => {
-      if (this.cache.has(key)) {
-        cached[key] = this.cache.get(key)!
+      const cacheKey = this.composeCacheKey(actualContractId, key)
+      if (this.cache.has(cacheKey)) {
+        cached[cacheKey] = this.cache.get(cacheKey)!
         return false
       }
       return true
@@ -44,14 +53,14 @@ export class Storage {
     const loaded: Record<string, TVal> = {}
     if (missingKeys.length > 0) {
       const res = await this.client.getContractKeys({
-        contractId: this.contractId,
+        contractId: actualContractId,
         keysFilter: {
           keys: missingKeys,
         },
       })
-      res.entries.forEach((entry) => {
+      res.forEach((entry) => {
         const parsedValue = _parseDataEntry(entry)
-        this.cache.set(entry.key, parsedValue)
+        this.cache.set(this.composeCacheKey(actualContractId, entry.key), parsedValue)
         loaded[entry.key] = parsedValue
       })
       this.log.verbose(`Loaded keys ${JSON.stringify(Object.keys(loaded))}`)
@@ -64,8 +73,9 @@ export class Storage {
   }
 
   set(key: string, value: TVal): void {
+    // modification of external contracts state is prohibited
     this.changedKeys.add(key)
-    this.cache.set(key, value)
+    this.cache.set(this.composeCacheKey(this.contractId, key), value)
   }
 
   delete(key: string) {
@@ -73,6 +83,9 @@ export class Storage {
   }
 
   getUpdates(): Record<string, TVal> {
-    return Object.fromEntries(Array.from(this.cache.entries()).filter(([key]) => this.changedKeys.has(key)))
+    return Object.fromEntries(
+      Array.from(this.cache.entries())
+        .filter(([key]) => this.changedKeys.has(this.composeCacheKey(this.contractId, key))),
+    )
   }
 }
