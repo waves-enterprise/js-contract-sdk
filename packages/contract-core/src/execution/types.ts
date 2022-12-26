@@ -1,5 +1,6 @@
 import { TVal } from '../intefaces/contract'
 import BN from 'bn.js'
+import Long from 'long'
 
 export type TParam = {
   key: string,
@@ -21,7 +22,7 @@ export type IncomingTx = {
   senderPublicKey: string,
   contractId: string,
   version: number,
-  fee: BN,
+  fee: Long,
   proofs: Uint8Array,
   timestamp: number,
   feeAssetId?: string,

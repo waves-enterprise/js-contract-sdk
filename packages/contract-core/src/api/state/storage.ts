@@ -51,6 +51,7 @@ export class Storage {
     this.log.verbose(`Cached keys ${JSON.stringify(Object.keys(cached))}`)
 
     const loaded: Record<string, TVal> = {}
+    this.log.verbose(`Missing keys are ${JSON.stringify(missingKeys)}`)
     if (missingKeys.length > 0) {
       const res = await this.client.getContractKeys({
         contractId: actualContractId,

@@ -4,6 +4,7 @@ import { ContractTransaction, DataEntry } from '@wavesenterprise/we-node-grpc-ap
 import { ContractTransferIn } from '@wavesenterprise/js-contract-grpc-client/contract_transfer_in'
 import { TVal } from '../intefaces/contract'
 import BN from 'bn.js'
+import { CommonLogger } from '../api'
 
 export class Param implements TParam {
   constructor(public key: string, public value: TVal) {
@@ -34,7 +35,7 @@ export function convertContractTransaction(tx: ContractTransaction): IncomingTx 
     senderPublicKey: tx.senderPublicKey,
     contractId: tx.contractId,
     version: tx.version,
-    fee: new BN(tx.fee.toString()),
+    fee: tx.fee,
     feeAssetId: tx.feeAssetId?.value,
     timestamp: tx.timestamp.toNumber(),
     proofs: tx.proofs,
