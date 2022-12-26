@@ -24,7 +24,7 @@ export class ContractProcessor {
 
   async handleIncomingTx(resp: ContractTransactionResponse): Promise<unknown> {
     this.grpcClient.setMetadata({
-      'authorization': resp.authToken,
+      authorization: resp.authToken,
     })
     const executionContext = new ExecutionContext(resp, this.grpcClient)
 

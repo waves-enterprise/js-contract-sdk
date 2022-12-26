@@ -32,6 +32,9 @@ export class ContractService {
   }
 
   start() {
+    this.grpcClient.setMetadata({
+      authorization: '',
+    })
     this.connection = this.grpcClient.contractService.connect({
       connectionId: CONNECTION_ID,
     })

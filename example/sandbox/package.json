@@ -29,6 +29,7 @@
     "@types/bn.js": "^5.1.1",
     "@wavesenterprise/js-contract-grpc-client": "1.10.0",
     "@wavesenterprise/sdk": "^1.0.3",
+    "@wavesenterprise/we-node-grpc-api": "^1.0.6",
     "bn.js": "^5.2.1",
     "google-protobuf": "^3.21.0",
     "reflect-metadata": "^0.1.13",
