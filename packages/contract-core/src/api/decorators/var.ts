@@ -7,6 +7,7 @@ import { TValue } from '../../intefaces/contract'
 import { ContractMapping } from '../state'
 import { ContractValue } from '../state/types/value'
 
+
 export type TVarConfig = {
   key: string,
   readonly?: boolean,

@@ -1,10 +1,7 @@
 import { IncomingTx, TParam, TransferIn } from './types'
 import { _parseDataEntry } from '../utils'
-import { ContractTransaction, DataEntry } from '@wavesenterprise/we-node-grpc-api'
-import { ContractTransferIn } from '@wavesenterprise/js-contract-grpc-client/contract_transfer_in'
+import { ContractTransaction, ContractTransferIn, DataEntry } from '@wavesenterprise/we-node-grpc-api'
 import { TVal } from '../intefaces/contract'
-import BN from 'bn.js'
-import { CommonLogger } from '../api'
 
 export class Param implements TParam {
   constructor(public key: string, public value: TVal) {
@@ -19,7 +16,7 @@ export class Param implements TParam {
 export function convertTransferIn(transferIn: ContractTransferIn): TransferIn {
   return {
     assetId: transferIn.assetId,
-    amount: new BN(transferIn.amount.toString()),
+    amount: transferIn.amount,
   }
 }
 

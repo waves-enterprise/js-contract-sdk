@@ -81,7 +81,6 @@ export class ParamsExtractor {
         if (paramValue === null || paramValue === undefined) {
           throw new UnavailableContractParamException(argFromParams.paramKey || `#${paramIndex.toString()}`)
         }
-
         if (isPrimitive(param)) {
           actionArgs[paramIndex] = paramValue
         } else if (isWrappedType(param)) {

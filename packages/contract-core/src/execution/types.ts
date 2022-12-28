@@ -1,5 +1,4 @@
 import { TVal } from '../intefaces/contract'
-import BN from 'bn.js'
 import Long from 'long'
 
 export type TParam = {
@@ -10,7 +9,7 @@ export type TParam = {
 
 export class TransferIn {
   assetId?: string
-  amount: BN
+  amount: Long
 }
 
 export type AttachedPayments = TransferIn[]

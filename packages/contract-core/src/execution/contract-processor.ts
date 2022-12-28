@@ -6,6 +6,8 @@ import { setContractEntries } from './reflect'
 import { ContractError } from './exceptions'
 import { GrpcClient } from '../grpc/grpc-client'
 import { ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
+import { CommitExecutionResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { ContractAssetOperation } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
 
 export function clearPreloadedEntries(contract: object): void {
   return setContractEntries(contract, new Map())
@@ -50,13 +52,13 @@ export class ContractProcessor {
 
   async tryCommitSuccess(executionContext: ExecutionContext) {
     const results = executionContext.state.getUpdatedEntries()
-    // const assetOperations = executionContext.assetOperations.operations
-    this.logger.verbose('Commiting success with params', results)
+    const assetOperations = executionContext.assets.getOperations()
+    this.logger.verbose('Commiting success with params', executionContext.txId, results, assetOperations)
     try {
       await this.grpcClient.contractService.commitExecutionSuccess({
         txId: executionContext.txId,
         results,
-        // assetOperations,
+        assetOperations: assetOperations.map(ContractAssetOperation.fromPartial),
       })
     } catch (e) {
       await this.tryCommitError(executionContext, e)

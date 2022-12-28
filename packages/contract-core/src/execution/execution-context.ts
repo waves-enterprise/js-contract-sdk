@@ -3,11 +3,12 @@ import { IncomingTx } from './types'
 import { ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
 import { convertContractTransaction } from './converter'
 import { GrpcClient } from '../grpc/grpc-client'
+import { AssetsStorage } from '../api/assets/assets-storage'
 
 export class ExecutionContext {
-  private nonce = 0
   readonly tx: IncomingTx
   readonly state: ContractState
+  readonly assets: AssetsStorage
 
   constructor(
     private incomingTxResp: ContractTransactionResponse,
@@ -16,12 +17,7 @@ export class ExecutionContext {
 
     this.tx = convertContractTransaction(incomingTxResp.transaction)
     this.state = new ContractState(this)
-  }
-
-  getNonce() {
-    this.nonce = this.nonce + 1
-
-    return this.nonce
+    this.assets = new AssetsStorage()
   }
 
   get txId(): string {

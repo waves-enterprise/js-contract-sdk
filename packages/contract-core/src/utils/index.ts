@@ -2,7 +2,6 @@ import * as os from 'os'
 import { DataEntry } from '@wavesenterprise/we-node-grpc-api'
 import { TVal, TValue } from '../intefaces/contract'
 import Long from 'long'
-import BN from 'bn.js'
 
 export const isUndefined = (v: unknown): v is undefined => {
   return v === undefined
@@ -90,7 +89,7 @@ export function isPrimitive(v: ObjectConstructor) {
 }
 
 export function isWrappedType(v: unknown) {
-  return BN === v
+  return Long === v
 }
 
 export const getCpusCount = () => os.cpus().length
