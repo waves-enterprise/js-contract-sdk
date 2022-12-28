@@ -111,7 +111,7 @@ export async function getContractDeveloper() {
     })
     console.log('Wait 20s contract role add tx', data.id)
   } catch (e) {
-    throw new Error(`failed to append contract developer role ${e.message}`)
+    throw new Error(`failed to append contract developer role ${(e as Error).message}`)
   }
 
   await sleep(20000)
@@ -146,7 +146,7 @@ export async function getParticipants() {
 }
 
 
-export const broadcast = async (tx, keys: KeyPair) => {
+export const broadcast = async (tx: any, keys: KeyPair) => {
   const nodeConfig = await getNodeConfig()
   const broadcaster = new TransactionBroadcaster({
     networkByte: nodeConfig.chainId.charCodeAt(0),

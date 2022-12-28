@@ -14,7 +14,6 @@ import {
   Tx,
   Var,
 } from '@wavesenterprise/contract-core'
-import BN from 'bn.js'
 import Long from 'long'
 
 type UserData = {
@@ -60,9 +59,7 @@ export default class MyContract {
 
   @Action()
   async increment(@Tx tx: IncomingTx, @Param('by') by: Long) {
-    this.log.info(by.constructor.name, by instanceof Long)
     const { senderPublicKey, sender } = tx
-    // @ts-ignore
     await preload(this, ['counter', ['participants', senderPublicKey], 'niceAssetId'])
     const counter = await this.counter.get()
     let participant = await this.participants.tryGet(senderPublicKey)

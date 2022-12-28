@@ -11,6 +11,7 @@ import {
   UnexpectedParamTypeException,
 } from './exceptions'
 import { ALL_PARAMS_KEY } from '../api/contants'
+import { CommonLogger } from '../api'
 
 function getArgKey(idx: number) {
   return `arg:${idx}`
@@ -57,13 +58,12 @@ export class ParamsExtractor {
     const actionArgs = new Array(paramTypes.length)
 
     for (const [paramIndex, param] of paramTypes.entries()) {
+
       const argFromParams = argsMetadata[getArgKey(paramIndex)]
 
       if (!argFromParams) {
         throw new ContractError(`Argument at index ${paramIndex} should be annotated with @Param decorator`)
       } else {
-
-
         if (argFromParams.getter) {
           actionArgs[paramIndex] = argFromParams.getter()
 
