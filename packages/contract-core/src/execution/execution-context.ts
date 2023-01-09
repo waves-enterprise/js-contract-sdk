@@ -1,49 +1,23 @@
-import { AssetOperationsRegistry, ContractState } from '../api'
-import { RPC } from '../grpc'
-import { IncomingTransactionResp, IncomingTx } from './types'
-import { Metadata } from '@grpc/grpc-js'
-import { ContractTransaction } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { ContractState } from '../api'
+import { IncomingTx } from './types'
+import { ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
 import { convertContractTransaction } from './converter'
-
-export class Auth {
-  constructor(private readonly _authToken: string) {
-  }
-
-  authToken() {
-    return this._authToken
-  }
-
-  metadata(): Metadata {
-    const metadata = new Metadata()
-
-    metadata.set('authorization', this._authToken)
-
-    return metadata
-  }
-}
+import { GrpcClient } from '../grpc/grpc-client'
+import { AssetsStorage } from '../api/assets/assets-storage'
 
 export class ExecutionContext {
-  private nonce = 0
-  tx: IncomingTx
-  state: ContractState
-  private auth: Auth
+  readonly tx: IncomingTx
+  readonly state: ContractState
+  readonly assets: AssetsStorage
 
   constructor(
-    private incomingTxResp: IncomingTransactionResp,
-    public rpcConnection: RPC,
-    public assetOperations: AssetOperationsRegistry = new AssetOperationsRegistry(),
+    private incomingTxResp: ContractTransactionResponse,
+    readonly grpcClient: GrpcClient,
   ) {
 
-    this.tx = convertContractTransaction(ContractTransaction.fromJSON(incomingTxResp.tx))
+    this.tx = convertContractTransaction(incomingTxResp.transaction)
     this.state = new ContractState(this)
-    this.auth = new Auth(incomingTxResp.authToken)
-    this.rpcConnection.setAuth(this.auth.metadata())
-  }
-
-  getNonce() {
-    this.nonce = this.nonce + 1
-
-    return this.nonce
+    this.assets = new AssetsStorage()
   }
 
   get txId(): string {

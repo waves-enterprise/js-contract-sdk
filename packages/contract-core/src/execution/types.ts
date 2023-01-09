@@ -1,5 +1,5 @@
 import { TVal } from '../intefaces/contract'
-import BN from 'bn.js'
+import Long from 'long'
 
 export type TParam = {
   key: string,
@@ -9,7 +9,7 @@ export type TParam = {
 
 export class TransferIn {
   assetId?: string
-  amount: BN
+  amount: Long
 }
 
 export type AttachedPayments = TransferIn[]
@@ -21,21 +21,10 @@ export type IncomingTx = {
   senderPublicKey: string,
   contractId: string,
   version: number,
-  fee: BN,
+  fee: Long,
   proofs: Uint8Array,
   timestamp: number,
   feeAssetId?: string,
   payments: TransferIn[],
   params: TParam[],
-}
-
-export type ProcessTransactionTask = {
-  authToken: string,
-  tx: unknown,
-}
-
-
-export type IncomingTransactionResp = {
-  authToken: string,
-  tx: unknown,
 }

@@ -30,9 +30,3 @@ export class UnavailableContractActionException extends ContractError {
     super(`Contract Action with name "${key}" not founded`)
   }
 }
-
-export class ConstraintValidationError extends ContractError {}
-
-export class UnavailableStateKeyException extends ContractError {}
-
-export class WrongStateKeyTypeException extends ContractError {}

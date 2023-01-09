@@ -1,8 +1,7 @@
 import * as os from 'os'
-import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
+import { DataEntry } from '@wavesenterprise/we-node-grpc-api'
 import { TVal, TValue } from '../intefaces/contract'
 import Long from 'long'
-import BN from 'bn.js'
 
 export const isUndefined = (v: unknown): v is undefined => {
   return v === undefined
@@ -24,7 +23,7 @@ export function nil() {
   return undefined
 }
 
-export function getValueStateKey(v: unknown): keyof Omit<DataEntry, 'key'> {
+export function getValueStateKey(v: unknown): 'boolValue' | 'intValue' | 'binaryValue' | 'stringValue' {
   if (isBool(v)) {
     return 'boolValue'
   }
@@ -41,19 +40,19 @@ export function getValueStateKey(v: unknown): keyof Omit<DataEntry, 'key'> {
 }
 
 export function _parseDataEntry(d: DataEntry): TVal {
-  if (!isUndefined(d.stringValue)) {
+  if ('stringValue' in d && !isUndefined(d.stringValue)) {
     return d.stringValue
   }
 
-  if (!isUndefined(d.intValue)) {
+  if ('intValue' in d && !isUndefined(d.intValue)) {
     return Number(d.intValue)
   }
 
-  if (!isUndefined(d.boolValue)) {
+  if ('boolValue' in d && !isUndefined(d.boolValue)) {
     return d.boolValue
   }
 
-  if (!isUndefined(d.binaryValue)) {
+  if ('binaryValue' in d && !isUndefined(d.binaryValue)) {
     return Buffer.from(d.binaryValue)
   }
 
@@ -61,19 +60,19 @@ export function _parseDataEntry(d: DataEntry): TVal {
 }
 
 export function parseDataEntry(d: DataEntry): TValue {
-  if (!isUndefined(d.stringValue)) {
+  if ('stringValue' in d && !isUndefined(d.stringValue)) {
     return d.stringValue
   }
 
-  if (!isUndefined(d.intValue)) {
+  if ('intValue' in d && !isUndefined(d.intValue)) {
     return Long.fromValue(d.intValue).toNumber()
   }
 
-  if (!isUndefined(d.boolValue)) {
+  if ('boolValue' in d && !isUndefined(d.boolValue)) {
     return d.boolValue
   }
 
-  if (!isUndefined(d.binaryValue)) {
+  if ('binaryValue' in d && !isUndefined(d.binaryValue)) {
     return Buffer.from(d.binaryValue)
   }
 
@@ -83,14 +82,14 @@ export function parseDataEntry(d: DataEntry): TValue {
 export function isPrimitive(v: ObjectConstructor) {
   return (
     v.prototype === String.prototype ||
-        v.prototype === Number.prototype ||
-        v.prototype === Boolean.prototype ||
-        v.prototype === Buffer.prototype
+    v.prototype === Number.prototype ||
+    v.prototype === Boolean.prototype ||
+    v.prototype === Buffer.prototype
   )
 }
 
 export function isWrappedType(v: unknown) {
-  return BN === v
+  return Long === v
 }
 
 export const getCpusCount = () => os.cpus().length

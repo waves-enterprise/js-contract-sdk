@@ -62,7 +62,7 @@ describe('Decorators', () => {
       class TestClass {
         @Action()
         test(
-        @Param('name') stringValue: string,
+          @Param('name') stringValue: string,
         ) {
         }
       }
@@ -77,7 +77,7 @@ describe('Decorators', () => {
       class TestClass {
         @Action()
         test(
-        @Param('numberParam') numberParam: number,
+          @Param('numberParam') numberParam: number,
         ) {
         }
       }

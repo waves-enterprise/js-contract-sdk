@@ -1,9 +1,13 @@
 import 'reflect-metadata'
 import { isMainThread, parentPort, workerData } from 'node:worker_threads'
 import { ContractProcessor } from './contract-processor'
-import { envConfig, RPC } from '../grpc'
-import { IncomingTx, ProcessTransactionTask } from './types'
 import { CommonLogger, Logger } from '../api'
+import { GrpcClient } from '../grpc/grpc-client'
+import { CONNECTION_TOKEN, NODE_ADDRESS } from '../grpc/config'
+import { ContractTransaction, ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
+import {
+  ContractTransaction as RawContractTransaction,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 
 Logger.workerIdx = workerData.index
 
@@ -18,21 +22,28 @@ if (isMainThread) {
   const ContractClassConstructor = await import(workerData.contractPath)
     .then(({ default: ContractClass }) => ContractClass as unknown)
 
-  const rpc = new RPC(envConfig())
-  rpc.Contract.connect()
+  const grpcClient = new GrpcClient({
+    nodeAddress: NODE_ADDRESS,
+    connectionToken: CONNECTION_TOKEN,
+  })
 
-  const processor = new ContractProcessor(ContractClassConstructor, rpc)
+  const processor = new ContractProcessor(ContractClassConstructor, grpcClient)
 
-  parentPort.on('message', async (incoming: ProcessTransactionTask) => {
+  parentPort.on('message', async (incoming: ContractTransactionResponse) => {
     const start = Date.now()
-    const txId = (incoming.tx as IncomingTx).id
+    const { authToken, transaction: serializedTx } = incoming
+    const transaction = RawContractTransaction.fromJSON(serializedTx) as ContractTransaction
+    const txId = transaction.id
     CommonLogger.verbose(`Worker received tx ${txId}`)
     try {
-      await processor.handleIncomingTx(incoming)
+      await processor.handleIncomingTx({
+        authToken,
+        transaction,
+      })
       CommonLogger.info(`Worker handled tx ${txId} in ${Date.now() - start}ms`)
     } catch (e) {
       CommonLogger.error(
-        `Uncaught error "${e.message}" tx ${(incoming?.tx as IncomingTx)?.id} may not be committed`,
+        `Uncaught error "${e.message}" tx ${transaction?.id} may not be committed`,
         e.stack,
       )
     } finally {

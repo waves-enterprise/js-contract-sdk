@@ -2,7 +2,7 @@ import { ExecutionContext } from './execution-context'
 import { getArgsMetadata, getContractMetadata } from './reflect'
 import { TArgs, TContractActionMetadata } from '../api/meta'
 import { isPrimitive, isWrappedType } from '../utils'
-import { Constructable } from '../@types/common'
+import { Constructable } from '../intefaces/helpers'
 import { ReservedParamNames, TxId } from './constants'
 import {
   ContractError,
@@ -57,13 +57,12 @@ export class ParamsExtractor {
     const actionArgs = new Array(paramTypes.length)
 
     for (const [paramIndex, param] of paramTypes.entries()) {
+
       const argFromParams = argsMetadata[getArgKey(paramIndex)]
 
       if (!argFromParams) {
         throw new ContractError(`Argument at index ${paramIndex} should be annotated with @Param decorator`)
       } else {
-
-
         if (argFromParams.getter) {
           actionArgs[paramIndex] = argFromParams.getter()
 
@@ -81,7 +80,6 @@ export class ParamsExtractor {
         if (paramValue === null || paramValue === undefined) {
           throw new UnavailableContractParamException(argFromParams.paramKey || `#${paramIndex.toString()}`)
         }
-
         if (isPrimitive(param)) {
           actionArgs[paramIndex] = paramValue
         } else if (isWrappedType(param)) {

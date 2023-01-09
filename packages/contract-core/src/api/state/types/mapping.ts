@@ -2,6 +2,7 @@ import { TValue } from '../../../intefaces/contract'
 import { Optional } from '../../../intefaces/helpers'
 import { ContractState } from '../contract-state'
 import { TVarConfig } from '../../decorators/var'
+import { ContractError } from '../../../execution'
 
 export class ContractMapping<Deserialized extends unknown> {
 
@@ -43,6 +44,13 @@ export class ContractMapping<Deserialized extends unknown> {
   }
 
   set(key: string, value: Deserialized) {
-    this.state.set(this.composeKey(key), this.serialize(value))
+    const composedKey = this.composeKey(key)
+    if (this.config.contractId) {
+      throw new ContractError(`Attempt to set external contract value of ${composedKey}`)
+    }
+    if (this.config.readonly) {
+      throw new ContractError(`Attempt to set readonly value of key ${composedKey}`)
+    }
+    this.state.set(composedKey, this.serialize(value))
   }
 }

@@ -1,2 +1,3 @@
-export { AssetOperationsRegistry } from './asset-operations-registry'
-export { Asset } from './asset'
+export * from './asset'
+export * from './assets-service'
+export * from './assets-storage'

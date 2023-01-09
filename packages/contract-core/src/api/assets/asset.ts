@@ -1,159 +1,93 @@
-import { ContractIssue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_issue'
-import { ContractReissue } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_reissue'
-import { ContractBurn } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_burn'
+import { AssetsStorage } from './assets-storage'
 import {
+  ContractAddressService,
+  ContractBurn,
+  ContractIssue,
+  ContractReissue,
+  ContractService,
   ContractTransferOut,
-} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation/contract_transfer_out'
-import { ContractAssetOperation } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
-import { getExecutionContext } from '../decorators/common'
-import { ContractBalanceResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+} from '@wavesenterprise/we-node-grpc-api'
+import { Base58 } from '../../utils/base58'
+import Long from 'long'
 
-export type TBalance = {
-  assetId: string | undefined,
-  amount: number,
+export type Balance = {
+  assetId: string,
+  amount: Long,
   decimals: number,
 }
 
-
-export function mapContractBalance(t: ContractBalanceResponse): TBalance {
-  return {
-    assetId: t.assetId,
-    amount: t.amount.toNumber(),
-    decimals: t.decimals,
-  }
+export type AssetConfig = {
+  assetId: string,
+  nonce?: number,
 }
 
+export type AssetIssue = Omit<ContractIssue, 'assetId' | 'nonce'>
+
+export type AssetReissue = Omit<ContractReissue, 'assetId'>
+
+export type AssetBurn = Omit<ContractBurn, 'assetId'>
+
+export type AssetTransfer = Omit<ContractTransferOut, 'assetId'>
+
 export class Asset {
-  static getRPCConnection() {
-    return getExecutionContext().rpcConnection
-  }
-
-  static getExecutionContext() {
-    return getExecutionContext()
-  }
-
   constructor(
-    private assetId?: string,
-    private nonce?: number,
+    private readonly config: AssetConfig,
+    private readonly storage: AssetsStorage,
+    private readonly addressService: ContractAddressService,
+    private readonly contractService: ContractService,
   ) {
   }
 
-  static from(assetId: string) {
-    return new Asset(assetId)
-  }
-
-  static system() {
-    return new Asset()
-  }
-
-  static async new(nonce?: number) {
-    const nonceAssetId = nonce || this.getExecutionContext().getNonce()
-
-    const assetId = await this.calculateAssetId(nonceAssetId)
-
-    return new Asset(assetId, nonceAssetId)
+  async getBalanceOf(address?: string): Promise<Balance> {
+    if (address) {
+      const balance = await this.addressService.getAssetBalance({
+        assetId: Base58.decode(this.config.assetId),
+        address: Base58.decode(address),
+      })
+      return {
+        ...balance,
+        assetId: Base58.encode(balance.assetId),
+      }
+    } else {
+      const [balance] = await this.contractService.getContractBalances({
+        assetsIds: [this.config.assetId],
+      })
+      return balance
+    }
   }
 
   getId() {
-    return this.assetId
+    return this.config.assetId
   }
 
-  getNonce() {
-    return this.nonce
-  }
-
-  issue(name: string, description: string, qty: number, decimals: number, isreissuable) {
-    const operation = ContractIssue.fromPartial({
-      nonce: this.nonce,
-      assetId: this.assetId,
-      decimals,
-      description,
-      name,
-      isReissuable: isreissuable,
-      quantity: qty,
+  issue(config: AssetIssue) {
+    this.storage.addIssue({
+      ...config,
+      assetId: this.config.assetId,
+      nonce: this.config.nonce!,
     })
-
-    Asset.getExecutionContext()
-      .assetOperations
-      .addOperation(ContractAssetOperation.fromPartial({
-        contractIssue: operation,
-      }))
   }
 
-  reissue(qty: number, isReissuable: boolean) {
-    const operation = ContractReissue.fromPartial({
-      assetId: this.assetId,
-      isReissuable,
-      quantity: qty,
+  reissue(config: AssetReissue) {
+    this.storage.addReissue({
+      ...config,
+      assetId: this.config.assetId,
     })
-
-    Asset.getExecutionContext()
-      .assetOperations
-      .addOperation(ContractAssetOperation.fromPartial({
-        contractReissue: operation,
-      }))
   }
 
-  burn(amount: number) {
-    const operation = ContractBurn.fromPartial({
-      amount,
-      assetId: this.assetId,
+  burn(config: AssetBurn) {
+    this.storage.addBurn({
+      ...config,
+      assetId: this.config.assetId,
     })
-
-    Asset.getExecutionContext()
-      .assetOperations
-      .addOperation(ContractAssetOperation.fromPartial({
-        contractBurn: operation,
-      }))
   }
 
-  transfer(recipient: string, amount: number) {
-    const operation = ContractTransferOut.fromPartial({
-      assetId: this.assetId,
-      recipient,
-      amount,
+  transfer(config: AssetTransfer) {
+    this.storage.addTransfer({
+      ...config,
+      assetId: this.config.assetId,
     })
-
-    Asset.getExecutionContext()
-      .assetOperations
-      .addOperation(ContractAssetOperation.fromPartial({
-        contractTransferOut: operation,
-      }))
   }
 
-  balanceOf(address: string): Promise<TBalance> {
-    return Asset.balanceOf(address, this.assetId)
-  }
 
-  static async calculateAssetId(nonce: number): Promise<string> {
-    const res = await Asset.getRPCConnection().Contract
-      .calculateAssetId({
-        nonce,
-      })
-
-    return res.value
-  }
-
-  static async contractBalancesOf(assetIds: string[]): Promise<TBalance[]> {
-    const res = await Asset.getRPCConnection().Contract
-      .getContractBalances({
-        assetsIds: assetIds,
-      })
-
-    return res.assetsBalances.map(mapContractBalance)
-  }
-
-  static async contractBalanceOf(assetId?: string): Promise<TBalance> {
-    const res = await Asset.getRPCConnection().Contract
-      .getContractBalances({
-        assetsIds: [assetId ?? ''],
-      })
-
-    return res.assetsBalances.map(mapContractBalance)[0]
-  }
-
-  static balanceOf(address: string, assetId?: string): Promise<TBalance> {
-    return this.getRPCConnection().Address.getAssetBalance(address, assetId)
-  }
 }
-
