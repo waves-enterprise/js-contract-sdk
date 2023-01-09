@@ -1,8 +1,8 @@
-import { ContractProcessor } from '../src/execution/contract-processor'
 import { mockAction } from './mocks/contract-transaction-response'
-import { Action, Assets, AssetsService, Contract, ExecutionContext } from '../src'
+import { Action, Assets, AssetsService, AttachedPayments, Contract, ExecutionContext, Payments } from '../src'
 import Long from 'long'
-import { createGrpcClient } from './mocks/grpc-client'
+import { createContractProcessor } from './mocks/contract-processor'
+import { ContractAddressService, ContractService } from '@wavesenterprise/we-node-grpc-api'
 
 
 describe('Asset Operations', () => {
@@ -40,23 +40,24 @@ describe('Asset Operations', () => {
     }
 
     @Action()
-    async transfers() {
+    async transfers(@Payments payments: AttachedPayments) {
 
+    }
+
+    @Action()
+    async balances() {
+      const TestAsset = this.assets.getAsset('test')
+      await TestAsset.getBalanceOf('me')
+      await TestAsset.getBalanceOf()
+      console.log('???')
     }
   }
 
   it('must perform asset manipulations', async () => {
     const tx = mockAction('operations')
-    const processor = new ContractProcessor(TestContract, createGrpcClient())
-    const success = jest.spyOn(processor, 'tryCommitSuccess')
-    const error = jest.spyOn(processor, 'tryCommitError')
+    const { processor, success } = createContractProcessor(TestContract)
     const assetId = '123'
     jest.spyOn(AssetsService.prototype, 'calculateAssetId').mockImplementation(() => Promise.resolve(assetId))
-    success.mockImplementation(() => Promise.resolve())
-    error.mockImplementation((...args) => {
-      console.log('error', args)
-      return Promise.resolve()
-    })
     await processor.handleIncomingTx(tx)
     const resultContext = success.mock.calls[0][0] as ExecutionContext
     expect(resultContext.assets.getOperations()).toEqual([
@@ -92,15 +93,37 @@ describe('Asset Operations', () => {
         },
       },
     ])
-    expect(error).not.toHaveBeenCalled()
   })
 
   it('must receive incoming transfers', async () => {
-
+    const tx = mockAction('transfers')
+    const { processor } = createContractProcessor(TestContract)
+    const action = jest.spyOn(TestContract.prototype, 'transfers')
+    await processor.handleIncomingTx(tx)
+    expect(action).toHaveBeenCalledWith([{
+      assetId: 'test',
+      amount: new Long(10000),
+    }])
   })
 
   it('must request balances', async () => {
-
+    const tx = mockAction('balances')
+    const { processor } = createContractProcessor(TestContract)
+    const addressService = jest.spyOn(ContractAddressService.prototype, 'getAssetBalance')
+      .mockImplementation(() => Promise.resolve({
+        assetId: new Uint8Array(),
+        amount: new Long(1000),
+        decimals: 8,
+      }))
+    const contractService = jest.spyOn(ContractService.prototype, 'getContractBalances')
+      .mockImplementation(() => Promise.resolve([{
+        assetId: '',
+        amount: new Long(1000),
+        decimals: 8,
+      }]))
+    await processor.handleIncomingTx(tx)
+    expect(contractService).toHaveBeenCalledTimes(1)
+    expect(addressService).toHaveBeenCalledTimes(1)
   })
 
 })

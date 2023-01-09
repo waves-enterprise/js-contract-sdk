@@ -30,14 +30,16 @@ export class ContractProcessor {
     const executionContext = new ExecutionContext(resp, this.grpcClient)
 
     Container.set(executionContext)
-    const { args, actionMetadata } = this.paramsExtractor
-      .extract(this.contract as ObjectConstructor, executionContext)
-
-    const c = this.contract as ObjectConstructor
-    const contractInstance = new c()
-    clearPreloadedEntries(contractInstance)
 
     try {
+
+      const { args, actionMetadata } = this.paramsExtractor
+        .extract(this.contract as ObjectConstructor, executionContext)
+
+      const c = this.contract as ObjectConstructor
+      const contractInstance = new c()
+      clearPreloadedEntries(contractInstance)
+
       if (actionMetadata.preload) {
         await preload(contractInstance, actionMetadata.preload as keyof object)
       }

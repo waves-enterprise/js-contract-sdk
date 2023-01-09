@@ -1,199 +1,68 @@
-import { Action, Contract, ContractMapping, ContractState, ContractValue, preload, State, Var } from '../src'
-import { mockAction } from './mocks/contract-transaction-response'
-import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import {
-  ContractKeyRequest,
-  ContractKeysRequest,
-  ContractKeysResponse,
-  ContractTransaction,
-  ExecutionSuccessRequest,
-} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
-import { ContractProcessor } from '../src/execution/contract-processor'
-import { ParamsExtractor } from '../src/execution/params-extractor'
+  Action,
+  Contract,
+  ContractMapping,
+  ContractState,
+  ContractValue,
+  ExecutionContext,
+  preload,
+  State,
+  Var,
+} from '../src'
+import { mockAction } from './mocks/contract-transaction-response'
+import { ContractKeysRequest } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { createContractProcessor } from './mocks/contract-processor'
+import Long from 'long'
+import { ContractService } from '@wavesenterprise/we-node-grpc-api'
 
-
-const mockEntry = (key: string, valueKey: string, value: unknown) => {
-  return DataEntry.fromPartial({
-    key,
-    [valueKey]: value,
-  })
-}
-
-const stateMock = {
-  'intVar': mockEntry('intVar', 'intValue', Long.fromValue(350677)),
-  'decimalVar': mockEntry('decimalVar', 'intValue', Long.fromString('350677121231')),
-}
-
-
-jest.mock('../src/grpc/clients/address-client')
-jest.mock('../src/grpc/clients/contract-client')
-jest.spyOn(RPC.prototype, 'Contract', 'get')
-  .mockReturnValue({
-    setAuth() {
-    },
-    commitExecutionSuccess: jest.fn((args) => {
-      // console.log(args)
-    }),
-    commitExecutionError: jest.fn((args) => {
-      // console.log(args)
-    }),
-    getContractKeys: jest.fn((req: ContractKeysRequest) => {
-
-
-      return ContractKeysResponse.fromPartial({
-        entries: req.keysFilter!.keys.map((key) => {
-          return stateMock[key]
-        }),
-      })
-    }),
-    getContractKey: jest.fn((args) => {
-      // console.log(args)
-    }),
-  } as unknown as ContractClient)
-
-
-jest.spyOn(ContractProcessor.prototype, 'tryCommitError')
 
 describe('State', () => {
-  const rpc = new RPC({} as unknown as RPCConnectionConfig)
-  let extractor: ParamsExtractor
-
 
   beforeEach(() => {
-    extractor = new ParamsExtractor()
+    jest.restoreAllMocks();
   })
 
   describe('ContractState', () => {
+
     it('should set string value', async () => {
       class TestContract {
         @State state: ContractState
 
         @Action
         test() {
-          this.state.set('castString', 'str1')
+          this.state.set('str', 'str1')
+          this.state.set('int', 100)
+          this.state.set('bool', false)
+          this.state.set('bin', new Uint8Array([0, 1, 2]))
         }
       }
 
       const resp = mockAction('test')
 
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
+      const { processor, success } = createContractProcessor(TestContract)
 
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
+      await processor.handleIncomingTx(resp)
 
-      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+      const context = success.mock.calls[0][0] as ExecutionContext
+
+      expect(context.state.getUpdatedEntries()).toEqual([
         {
-          txId: 'some-tx-id',
-          results: [
-            DataEntry.fromPartial({
-              stringValue: 'str1',
-              key: 'castString',
-            }),
-          ],
-          assetOperations: [],
+          key: 'str',
+          stringValue: 'str1',
         },
-      )
-    })
-
-    it('should set int value', async () => {
-      class TestContract {
-        @State state: ContractState
-
-        @Action
-        test() {
-          this.state.set('castInt', 1001)
-        }
-      }
-
-      const resp = mockAction('test')
-
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
-
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
-          txId: 'some-tx-id',
-          results: [
-            DataEntry.fromPartial({
-              intValue: 1001,
-              key: 'castInt',
-            }),
-          ],
-          assetOperations: [],
+          key: 'int',
+          intValue: new Long(100),
         },
-      )
-    })
-
-    it('should set boolean value', async () => {
-      class TestContract {
-        @State state: ContractState
-
-        @Action
-        test() {
-          this.state.set('castBool', true)
-        }
-      }
-
-      const resp = mockAction('test')
-
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
-
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
-          txId: 'some-tx-id',
-          results: [
-            DataEntry.fromPartial({
-              boolValue: true,
-              key: 'castBool',
-            }),
-          ],
-          assetOperations: [],
+          key: 'bool',
+          boolValue: false,
         },
-      )
-    })
-
-    it('should set binary value', async () => {
-      class TestContract {
-        @State state: ContractState
-
-        @Action
-        test() {
-          this.state.set('castBinary', new Uint8Array([21, 8, 322]))
-        }
-      }
-
-      const resp = mockAction('test')
-
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
-
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
         {
-          txId: 'some-tx-id',
-          results: [
-            DataEntry.fromPartial({
-              binaryValue: new Uint8Array([21, 8, 322]),
-              key: 'castBinary',
-            }),
-          ],
-          assetOperations: [],
+          key: 'bin',
+          binaryValue: new Uint8Array([0, 1, 2]),
         },
-      )
+      ])
     })
   })
 
@@ -202,155 +71,116 @@ describe('State', () => {
     class TestContract {
       @Var() intVar: ContractValue<number>
       @Var() decimalVar: ContractValue<number>
-
       @Var() myVar: ContractValue<string>
+      @Var() user: ContractMapping<string>
 
       @Action
       test() {
         this.myVar.set('test')
+        this.user.set('user1', 'value1')
       }
 
       @Action
       async getterTest() {
         await this.myVar.get()
-      }
-
-      @Action
-      async preloadInAction() {
-        await preload(this, ['myVar'])
+        await this.user.get('user1')
       }
 
       @Action
       async preloadInActionVars() {
-        await preload(this, ['intVar', 'decimalVar'])
+        await preload(this, ['intVar', 'decimalVar', ['user', 'user1']])
 
         await this.intVar.get()
         await this.decimalVar.get()
-
-        this.decimalVar.set(100)
+        await this.user.get('user1')
       }
     }
 
     it('should get value by propertyKey', async function () {
       const resp = mockAction('getterTest')
 
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
+      const { processor } = createContractProcessor(TestContract)
+      const getKey = jest.spyOn(ContractService.prototype, 'getContractKey')
+        .mockImplementationOnce(() => Promise.resolve({
+          key: 'myVar',
+          stringValue: 'test',
+        }))
+        .mockImplementationOnce(() => Promise.resolve({
+          key: 'user_user1',
+          stringValue: 'nice',
+        }))
+      await processor.handleIncomingTx(resp)
+      expect(getKey).toHaveBeenCalledTimes(2)
+      expect(getKey).toHaveBeenNthCalledWith(2,
+        {
+          contractId: 'test-contract',
+          key: 'user_user1',
+        },
       )
-
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-      expect(rpc.Contract.getContractKey).toBeCalledWith(
-        ContractKeyRequest.fromPartial({
+      expect(getKey).toHaveBeenNthCalledWith(1,
+        {
           contractId: 'test-contract',
           key: 'myVar',
-        }),
+        },
       )
     })
 
     it('should initialize proxy state value', async function () {
       const resp = mockAction('test')
 
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
+      const { processor, success } = createContractProcessor(TestContract)
 
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
+      await processor.handleIncomingTx(resp)
 
-      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
+      const context = success.mock.calls[0][0] as ExecutionContext
+
+      expect(context.state.getUpdatedEntries()).toEqual([
         {
-          txId: 'some-tx-id',
-          results: [
-            DataEntry.fromPartial({
-              stringValue: 'test',
-              key: 'myVar',
-            }),
-
-          ],
-          assetOperations: [],
-        },
-      )
-    })
-
-    it('should batch preload state keys', async function () {
-      const resp = mockAction('getterTest')
-
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
-
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-      expect(rpc.Contract.getContractKey).toBeCalledWith(
-        ContractKeyRequest.fromPartial({
-          contractId: 'test-contract',
           key: 'myVar',
-        }),
-      )
+          stringValue: 'test',
+        },
+        {
+          key: 'user_user1',
+          stringValue: 'value1',
+        },
+      ])
     })
 
     it('should preload keys in a batch request', async function () {
-      const resp = mockAction('preloadInAction')
+      const resp = mockAction('preloadInActionVars')
 
-      const processor = new ContractProcessor(
-        TestContract,
-        rpc,
-      )
+      const { processor } = createContractProcessor(TestContract)
+      const getKeys = jest.spyOn(ContractService.prototype, 'getContractKeys')
+        .mockImplementation(() => Promise.resolve([
+          {
+            key: 'intVar',
+            intValue: new Long(10),
+          },
+          {
+            key: 'decimalVar',
+            intValue: new Long(20),
+          },
+          {
+            key: 'user_user1',
+            stringValue: 'nice',
+          },
+        ]))
+      const getKey = jest.spyOn(ContractService.prototype, 'getContractKey')
+        .mockImplementation(() => Promise.resolve({
+          key: '',
+          intValue: new Long(0),
+        }))
+      await processor.handleIncomingTx(resp)
 
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-      expect(rpc.Contract.getContractKeys).toBeCalledWith(
+      expect(getKeys).toBeCalledWith(
         ContractKeysRequest.fromPartial({
           contractId: 'test-contract',
           keysFilter: {
-            keys: ['myVar'],
+            keys: ['intVar', 'decimalVar', 'user_user1'],
           },
         }),
       )
-    })
-
-
-    it('should initialize mapping', async function () {
-      @Contract()
-      class TestingContract {
-        @Var() user: ContractMapping<string>
-
-        @Action()
-        mappingTest() {
-
-          this.user.set('first', 'user1')
-          this.user.set('second', 'user2')
-        }
-      }
-
-      const resp = mockAction('mappingTest')
-
-      const processor = new ContractProcessor(
-        TestingContract,
-        rpc,
-      )
-
-      await processor.handleIncomingTx({ authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!) })
-
-      expect(rpc.Contract.commitExecutionSuccess).toBeCalledWith(
-        ExecutionSuccessRequest.fromPartial({
-          txId: 'some-tx-id',
-          assetOperations: [],
-          results: [
-            DataEntry.fromPartial({
-              key: 'user_first',
-              stringValue: 'user1',
-            }),
-            DataEntry.fromPartial({
-              key: 'user_second',
-              stringValue: 'user2',
-            }),
-          ],
-        }),
-      )
+      expect(getKey).not.toHaveBeenCalled()
     })
   })
 })

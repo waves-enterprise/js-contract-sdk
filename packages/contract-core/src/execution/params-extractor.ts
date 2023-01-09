@@ -11,7 +11,6 @@ import {
   UnexpectedParamTypeException,
 } from './exceptions'
 import { ALL_PARAMS_KEY } from '../api/contants'
-import { CommonLogger } from '../api'
 
 function getArgKey(idx: number) {
   return `arg:${idx}`

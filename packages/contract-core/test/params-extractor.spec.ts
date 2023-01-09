@@ -1,10 +1,9 @@
 import { ExecutionContext } from '../src/execution'
 import { mockAction } from './mocks/contract-transaction-response'
-import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import { Action, AttachedPayments, Container, Contract, Ctx, Param, Payments } from '../src'
 import { ParamsExtractor } from '../src/execution/params-extractor'
-import BN from 'bn.js'
-import { ContractTransaction } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import Long from 'long'
+import { createGrpcClient } from './mocks/grpc-client'
 
 
 describe('Param Extractors', () => {
@@ -26,13 +25,7 @@ describe('Param Extractors', () => {
       }
     }
 
-    const tx = mockAction('test').transaction!
-    const incomingTx = ContractTransaction.toJSON(tx)
-
-    const ec = new ExecutionContext({
-      authToken: '',
-      tx: incomingTx,
-    }, new RPC({} as unknown as RPCConnectionConfig))
+    const ec = new ExecutionContext(mockAction('test'), createGrpcClient())
 
     Container.set(ec)
 
@@ -55,13 +48,7 @@ describe('Param Extractors', () => {
       }
     }
 
-    const tx = mockAction('test').transaction!
-    const incomingTx = ContractTransaction.toJSON(tx)
-
-    const ec = new ExecutionContext({
-      authToken: '',
-      tx: incomingTx,
-    }, new RPC({} as unknown as RPCConnectionConfig))
+    const ec = new ExecutionContext(mockAction('test'), createGrpcClient())
 
     Container.set(ec)
 
@@ -75,40 +62,35 @@ describe('Param Extractors', () => {
       @Action
       test(
         @Param('key') value: string,
-        @Param('next') big: BN,
+        @Param('next') big: Long,
         @Param('binary') buf: Buffer,
       ) {
 
       }
     }
 
-    const tx = mockAction('test').transaction!
+    const tx = mockAction('test')
 
-    tx.params.push(
-      DataEntry.fromPartial({
+    tx.transaction.params.push(
+      {
         stringValue: 'testValue',
         key: 'key',
-      }),
-      DataEntry.fromPartial({
-        intValue: 2,
+      },
+      {
+        intValue: new Long(2),
         key: 'next',
-      }),
-      DataEntry.fromPartial({
+      },
+      {
         binaryValue: new Uint8Array([2, 3, 4, 1]),
         key: 'binary',
-      }),
+      },
     )
 
-    const incomingTx = ContractTransaction.toJSON(tx)
-
-    const ec = new ExecutionContext({
-      authToken: '',
-      tx: incomingTx,
-    }, new RPC({} as unknown as RPCConnectionConfig))
+    const ec = new ExecutionContext(tx, createGrpcClient())
 
     const { args } = extractor.extract(TestContract, ec)
 
     expect(args[0]).toEqual('testValue')
-    expect((args[1] as BN).toNumber()).toEqual(2)
+    expect((args[1] as Long).toNumber()).toEqual(2)
   })
 })
