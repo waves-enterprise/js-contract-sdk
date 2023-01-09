@@ -3,7 +3,6 @@ import {
   ContractTransaction,
   ContractTransactionResponse
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
-import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
 import { ContractProcessor } from '../src/execution/contract-processor'
 import {Action, Contract, Ctx, Payments, AttachedPayments} from '../src'
 import Long from 'long'
@@ -15,24 +14,6 @@ import {
   UnavailableContractActionException,
   UnavailableContractParamException,
 } from '../src/execution'
-
-
-jest.mock('../src/grpc/clients/address-client');
-jest.mock('../src/grpc/clients/contract-client');
-jest.spyOn(RPC.prototype, 'Contract', 'get')
-  .mockReturnValue({
-    setAuth() {
-    },
-    commitExecutionSuccess: jest.fn((args) => {
-      // console.log(args)
-    }),
-    commitExecutionError: jest.fn((args) => {
-      // console.log(args)
-    }),
-  } as unknown as ContractClient)
-
-
-
 
 @Contract()
 class ExampleContract {

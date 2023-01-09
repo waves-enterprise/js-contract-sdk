@@ -1,6 +1,5 @@
 import { Action, Contract, ContractMapping, ContractState, ContractValue, preload, State, Var } from '../src'
-import { ContractClient, RPC, RPCConnectionConfig } from '../src/grpc'
-import { mockRespTx } from './mocks/contract-transaction-response'
+import { mockAction } from './mocks/contract-transaction-response'
 import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
 import {
   ContractKeyRequest,
@@ -11,7 +10,6 @@ import {
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { ContractProcessor } from '../src/execution/contract-processor'
 import { ParamsExtractor } from '../src/execution/params-extractor'
-import * as Long from 'long'
 
 
 const mockEntry = (key: string, valueKey: string, value: unknown) => {
@@ -76,7 +74,7 @@ describe('State', () => {
         }
       }
 
-      const resp = mockRespTx('test')
+      const resp = mockAction('test')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -109,7 +107,7 @@ describe('State', () => {
         }
       }
 
-      const resp = mockRespTx('test')
+      const resp = mockAction('test')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -142,7 +140,7 @@ describe('State', () => {
         }
       }
 
-      const resp = mockRespTx('test')
+      const resp = mockAction('test')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -175,7 +173,7 @@ describe('State', () => {
         }
       }
 
-      const resp = mockRespTx('test')
+      const resp = mockAction('test')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -234,7 +232,7 @@ describe('State', () => {
     }
 
     it('should get value by propertyKey', async function () {
-      const resp = mockRespTx('getterTest')
+      const resp = mockAction('getterTest')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -252,7 +250,7 @@ describe('State', () => {
     })
 
     it('should initialize proxy state value', async function () {
-      const resp = mockRespTx('test')
+      const resp = mockAction('test')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -277,7 +275,7 @@ describe('State', () => {
     })
 
     it('should batch preload state keys', async function () {
-      const resp = mockRespTx('getterTest')
+      const resp = mockAction('getterTest')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -295,7 +293,7 @@ describe('State', () => {
     })
 
     it('should preload keys in a batch request', async function () {
-      const resp = mockRespTx('preloadInAction')
+      const resp = mockAction('preloadInAction')
 
       const processor = new ContractProcessor(
         TestContract,
@@ -328,7 +326,7 @@ describe('State', () => {
         }
       }
 
-      const resp = mockRespTx('mappingTest')
+      const resp = mockAction('mappingTest')
 
       const processor = new ContractProcessor(
         TestingContract,

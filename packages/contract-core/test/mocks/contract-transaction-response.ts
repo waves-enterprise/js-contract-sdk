@@ -1,8 +1,11 @@
-import { ContractTransactionResponse } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import {
+  ContractTransactionResponse as ContractTransactionResponseRaw,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import { ContractTransferIn } from '@wavesenterprise/js-contract-grpc-client/contract_transfer_in'
+import { ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
 
-export function mockRespTx(name: string) {
-  return ContractTransactionResponse.fromPartial({
+export function mockAction(action: string) {
+  return ContractTransactionResponseRaw.fromPartial({
     authToken: 'test-token',
     transaction: {
       id: 'some-tx-id',
@@ -12,7 +15,7 @@ export function mockRespTx(name: string) {
       contractId: 'test-contract',
       params: [
         {
-          stringValue: name,
+          stringValue: action,
           key: 'action',
         },
       ],
@@ -26,5 +29,5 @@ export function mockRespTx(name: string) {
       proofs: new Uint8Array(),
       timestamp: new Date().getTime(),
     },
-  })
+  }) as ContractTransactionResponse
 }

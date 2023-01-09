@@ -1,27 +1,10 @@
-import {ExecutionContext} from '../src/execution'
-import {ContractClient, RPC, RPCConnectionConfig} from '../src/grpc'
-import {mockRespTx} from './mocks/contract-transaction-response'
-import {DataEntry} from '@wavesenterprise/js-contract-grpc-client/data_entry'
-import {Action, AttachedPayments, Contract, Param, Payments, Container, Ctx} from '../src'
-import {ParamsExtractor} from '../src/execution/params-extractor'
+import { ExecutionContext } from '../src/execution'
+import { mockAction } from './mocks/contract-transaction-response'
+import { DataEntry } from '@wavesenterprise/js-contract-grpc-client/data_entry'
+import { Action, AttachedPayments, Container, Contract, Ctx, Param, Payments } from '../src'
+import { ParamsExtractor } from '../src/execution/params-extractor'
 import BN from 'bn.js'
-import {ContractTransaction} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-
-
-jest.mock('../src/grpc/clients/address-client');
-jest.mock('../src/grpc/clients/contract-client');
-jest.spyOn(RPC.prototype, 'Contract', 'get')
-  .mockReturnValue({
-    setAuth() {
-    },
-    commitExecutionSuccess: jest.fn((args) => {
-      // console.log(args)
-    }),
-    commitExecutionError: jest.fn((args) => {
-      // console.log(args)
-    }),
-  } as unknown as ContractClient)
-
+import { ContractTransaction } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 
 
 describe('Param Extractors', () => {
@@ -43,7 +26,7 @@ describe('Param Extractors', () => {
       }
     }
 
-    const tx = mockRespTx('test').transaction!
+    const tx = mockAction('test').transaction!
     const incomingTx = ContractTransaction.toJSON(tx)
 
     const ec = new ExecutionContext({
@@ -53,13 +36,12 @@ describe('Param Extractors', () => {
 
     Container.set(ec)
 
-    const {args} = extractor.extract(TestContract, ec);
-
+    const { args } = extractor.extract(TestContract, ec)
 
 
     expect((args[0] as AttachedPayments)[0].assetId).toEqual('test')
     expect((args[0] as AttachedPayments)[0].amount.toNumber()).toEqual(10000)
-  });
+  })
 
   it('should apply @Ctx decorator to action', function () {
     @Contract()
@@ -67,13 +49,13 @@ describe('Param Extractors', () => {
       @Action
       test(
         @Ctx ctx: ExecutionContext,
-        @Payments payments: AttachedPayments
+        @Payments payments: AttachedPayments,
       ) {
-        console.log(ctx,payments)
+        console.log(ctx, payments)
       }
     }
 
-    const tx = mockRespTx('test').transaction!
+    const tx = mockAction('test').transaction!
     const incomingTx = ContractTransaction.toJSON(tx)
 
     const ec = new ExecutionContext({
@@ -83,9 +65,9 @@ describe('Param Extractors', () => {
 
     Container.set(ec)
 
-    const {args} = extractor.extract(TestContract, ec);
+    const { args } = extractor.extract(TestContract, ec)
     expect(args[0]).toEqual(ec)
-  });
+  })
 
   it('should apply @Param decorator to action ', () => {
     @Contract()
@@ -100,7 +82,7 @@ describe('Param Extractors', () => {
       }
     }
 
-    const tx = mockRespTx('test').transaction!
+    const tx = mockAction('test').transaction!
 
     tx.params.push(
       DataEntry.fromPartial({
@@ -124,7 +106,7 @@ describe('Param Extractors', () => {
       tx: incomingTx,
     }, new RPC({} as unknown as RPCConnectionConfig))
 
-    const {args} = extractor.extract(TestContract, ec)
+    const { args } = extractor.extract(TestContract, ec)
 
     expect(args[0]).toEqual('testValue')
     expect((args[1] as BN).toNumber()).toEqual(2)

@@ -1,110 +1,106 @@
-import {ContractClient, RPC, RPCConnectionConfig} from "../src/grpc";
-import {
-  AssetId,
-  CalculateAssetIdRequest, ContractBalanceResponse, ContractBalancesRequest, ContractBalancesResponse,
-  ContractKeysRequest,
-  ContractTransaction
-} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {ContractProcessor} from "../src/execution/contract-processor";
-import {mockRespTx} from "./mocks/contract-transaction-response";
-import {Action, Contract,Asset} from "../src";
-
-jest.mock('../src/grpc/clients/address-client');
-jest.mock('../src/grpc/clients/contract-client');
-jest.spyOn(RPC.prototype, 'Contract', 'get')
-  .mockReturnValue({
-    setAuth() {
-    },
-    commitExecutionSuccess: jest.fn((args) => {
-      // console.log(args)
-    }),
-    commitExecutionError: jest.fn((args) => {
-      // console.log(args)
-    }),
-    getContractKeys: jest.fn((req: ContractKeysRequest) => {
-
-    }),
-    getContractKey: jest.fn((args) => {
-      // console.log(args)
-    }),
-
-    getContractBalances(req: ContractBalancesRequest): Promise<ContractBalancesResponse> {
-      return  Promise.resolve(ContractBalancesResponse.fromPartial({
-        assetsBalances: [
-          ContractBalanceResponse.fromPartial({
-            assetId: 'mockAssetId',
-            amount: 10000000,
-          })
-        ]
-      }))
-    },
-
-    calculateAssetId: jest.fn((args) => {
-      console.log(args)
+import { ContractProcessor } from '../src/execution/contract-processor'
+import { mockAction } from './mocks/contract-transaction-response'
+import { Action, Assets, AssetsService, Contract, ExecutionContext } from '../src'
+import Long from 'long'
+import { createGrpcClient } from './mocks/grpc-client'
 
 
-      return AssetId.fromPartial({
-        value: 'test-x'
-      })
-    })
-  } as unknown as ContractClient)
-
-
-jest.spyOn(ContractProcessor.prototype, 'tryCommitError')
-
-
-describe("Asset Operations", () => {
-  const rpc = new RPC({} as unknown as RPCConnectionConfig)
+describe('Asset Operations', () => {
 
   @Contract()
   class TestContract {
-    @Action
-    async test() {
-      const TestAsset = await Asset.new()
 
-      TestAsset.issue(
-        'Habr/Rbah-LP',
-        'HabrAMM Habr/Rbah LP Shares',
-        1000000,
-        8,
-        true
-      )
+    @Assets()
+    assets!: AssetsService
 
-      TestAsset.transfer('me', 1000)
+    @Action()
+    async operations() {
+
+      const TestAsset = await this.assets.issueAsset({
+        name: 'Habr/Rbah-LP',
+        description: 'HabrAMM Habr/Rbah LP Shares',
+        decimals: 8,
+        quantity: new Long(1000000),
+        isReissuable: true,
+      })
+
+      TestAsset.transfer({
+        amount: new Long(1000),
+        recipient: 'me',
+      })
+
+      TestAsset.burn({
+        amount: new Long(2000),
+      })
+
+      TestAsset.reissue({
+        isReissuable: true,
+        quantity: new Long(3000),
+      })
+    }
+
+    @Action()
+    async transfers() {
+
     }
   }
 
-
-  it('should preload keys in a batch request', async function () {
-    const resp = mockRespTx('test')
-
-    const processor = new ContractProcessor(
-      TestContract,
-      rpc,
-    )
-
-    await processor.handleIncomingTx({authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!)})
+  it('must perform asset manipulations', async () => {
+    const tx = mockAction('operations')
+    const processor = new ContractProcessor(TestContract, createGrpcClient())
+    const success = jest.spyOn(processor, 'tryCommitSuccess')
+    const error = jest.spyOn(processor, 'tryCommitError')
+    const assetId = '123'
+    jest.spyOn(AssetsService.prototype, 'calculateAssetId').mockImplementation(() => Promise.resolve(assetId))
+    success.mockImplementation(() => Promise.resolve())
+    error.mockImplementation((...args) => {
+      console.log('error', args)
+      return Promise.resolve()
+    })
+    await processor.handleIncomingTx(tx)
+    const resultContext = success.mock.calls[0][0] as ExecutionContext
+    expect(resultContext.assets.getOperations()).toEqual([
+      {
+        contractIssue: {
+          assetId,
+          nonce: 1,
+          name: 'Habr/Rbah-LP',
+          description: 'HabrAMM Habr/Rbah LP Shares',
+          decimals: 8,
+          quantity: new Long(1000000),
+          isReissuable: true,
+        },
+      },
+      {
+        contractTransferOut: {
+          assetId,
+          recipient: 'me',
+          amount: new Long(1000),
+        },
+      },
+      {
+        contractBurn: {
+          assetId,
+          amount: new Long(2000),
+        },
+      },
+      {
+        contractReissue: {
+          assetId,
+          isReissuable: true,
+          quantity: new Long(3000),
+        },
+      },
+    ])
+    expect(error).not.toHaveBeenCalled()
   })
 
+  it('must receive incoming transfers', async () => {
 
-  it('should call getBalances contract rpc', async function () {
-    @Contract()
-    class TestingContract {
+  })
 
-      @Action()
-      async assetBalance() {
-        const resp =  await Asset.balanceOf('mockAddress');
-      }
-    }
+  it('must request balances', async () => {
 
-    const resp = mockRespTx('assetBalance')
-
-    const processor = new ContractProcessor(
-      TestingContract,
-      rpc,
-    )
-
-    await processor.handleIncomingTx({authToken: 'test', tx: ContractTransaction.toJSON(resp.transaction!)})
   })
 
 })

@@ -1,7 +1,6 @@
 import { ALL_PARAMS_KEY, ARGS_METADATA } from '../contants'
 import { TArgs } from '../meta'
 import { getExecutionContext, getPayments, getTx } from './common'
-import { CommonLogger } from '../logger'
 
 function assignMetadata(args: TArgs, index: number, paramKeyOrGetter: string | (() => void)): TArgs {
   const key = `arg:${index}`
