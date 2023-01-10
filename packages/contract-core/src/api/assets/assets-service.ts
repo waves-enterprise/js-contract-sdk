@@ -23,7 +23,7 @@ export class AssetsService {
     )
   }
 
-  getAsset(assetId: string) {
+  getAsset(assetId: string | undefined) {
     return this.makeAsset({
       assetId,
     })
@@ -37,19 +37,19 @@ export class AssetsService {
     return asset
   }
 
-  reissueAsset(assetId: string, config: AssetReissue) {
+  reissueAsset(assetId: string | undefined, config: AssetReissue) {
     return this.getAsset(assetId).reissue(config)
   }
 
-  burnAsset(assetId: string, config: AssetBurn) {
+  burnAsset(assetId: string | undefined, config: AssetBurn) {
     return this.getAsset(assetId).burn(config)
   }
 
-  transferAsset(assetId: string, config: AssetTransfer) {
+  transferAsset(assetId: string | undefined, config: AssetTransfer) {
     return this.getAsset(assetId).transfer(config)
   }
 
-  getAssetBalance(assetId: string, address?: string) {
+  getAssetBalance(assetId: string | undefined, address?: string) {
     return this.getAsset(assetId).getBalanceOf(address)
   }
 

@@ -29,7 +29,7 @@
     "@grpc/grpc-js": "^1.6.2",
     "@wavesenterprise/js-contract-grpc-client": "1.10.1",
     "@wavesenterprise/sdk": "^1.0.3",
-    "@wavesenterprise/we-node-grpc-api": "^1.0.6",
+    "@wavesenterprise/we-node-grpc-api": "^1.0.7",
     "bn.js": "^5.2.1",
     "google-protobuf": "^3.21.0",
     "long": "^5.2.1",

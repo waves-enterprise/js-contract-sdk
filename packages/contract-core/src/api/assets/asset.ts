@@ -17,7 +17,7 @@ export type Balance = {
 }
 
 export type AssetConfig = {
-  assetId: string,
+  assetId: string | undefined,
   nonce?: number,
 }
 
@@ -50,7 +50,7 @@ export class Asset {
       }
     } else {
       const [balance] = await this.contractService.getContractBalances({
-        assetsIds: [this.config.assetId],
+        assetsIds: this.config.assetId ? [this.config.assetId] : undefined,
       })
       return balance
     }
