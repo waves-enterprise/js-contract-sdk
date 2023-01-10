@@ -7,9 +7,9 @@ export type TParam = {
   type: string,
 }
 
-export class TransferIn {
-  assetId?: string
-  amount: Long
+export type TransferIn = {
+  assetId?: string,
+  amount: Long,
 }
 
 export type AttachedPayments = TransferIn[]
