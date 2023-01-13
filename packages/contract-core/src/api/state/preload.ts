@@ -37,9 +37,7 @@ export async function preload<T extends object>(contract: T, keys: Array<keyof T
       contractGroups.get(contractId)!.push(contractKey)
     }
     await Promise.all(Array.from(contractGroups.entries()).map(async ([contractId, keys]) => {
-      await getState()
-        .storage
-        .readBatch(keys, contractId)
+      await getState().getBatch(keys, contractId)
     }))
   }
 }

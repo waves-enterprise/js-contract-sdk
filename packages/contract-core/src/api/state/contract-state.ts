@@ -34,6 +34,10 @@ export class ContractState {
     }
   }
 
+  getBatch(keys: string[], contractId?: string) {
+    return this.storage.readBatch(keys, contractId)
+  }
+
   set(key: string, value: TVal) {
     this.storage.set(key, value)
   }
