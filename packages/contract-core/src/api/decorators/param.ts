@@ -1,6 +1,6 @@
 import { ALL_PARAMS_KEY, ARGS_METADATA } from '../contants'
 import { TArgs } from '../meta'
-import { getExecutionContext, getPayments, getTx } from './common'
+import { getBlock, getExecutionContext, getPayments, getSender, getTime, getTx } from './common'
 
 function assignMetadata(args: TArgs, index: number, paramKeyOrGetter: string | (() => void)): TArgs {
   const key = `arg:${index}`
@@ -21,12 +21,12 @@ function assignMetadata(args: TArgs, index: number, paramKeyOrGetter: string | (
 }
 
 const createParamsDecorator =
-  (paramKey: string): ParameterDecorator =>
+  (paramKeyOrGetter: string | (() => void)): ParameterDecorator =>
     (target, propertyKey, parameterIndex) => {
       const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
       Reflect.defineMetadata(
         ARGS_METADATA,
-        assignMetadata(args, parameterIndex, paramKey),
+        assignMetadata(args, parameterIndex, paramKeyOrGetter),
         target.constructor,
         propertyKey,
       )
@@ -40,33 +40,26 @@ export function Params() {
   return createParamsDecorator(ALL_PARAMS_KEY)
 }
 
-export function Payments(target: object, propertyKey: string | symbol, parameterIndex: number): void {
-  const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
-  Reflect.defineMetadata(
-    ARGS_METADATA,
-    assignMetadata(args, parameterIndex, getPayments),
-    target.constructor,
-    propertyKey,
-  )
+export function Payments() {
+  return createParamsDecorator(getPayments)
 }
 
-
-export function Ctx(target: object, propertyKey: string | symbol, parameterIndex: number): void {
-  const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
-  Reflect.defineMetadata(
-    ARGS_METADATA,
-    assignMetadata(args, parameterIndex, getExecutionContext),
-    target.constructor,
-    propertyKey,
-  )
+export function Ctx() {
+  return createParamsDecorator(getExecutionContext)
 }
 
-export function Tx(target: object, propertyKey: string | symbol, parameterIndex: number): void {
-  const args: TArgs = Reflect.getMetadata(ARGS_METADATA, target.constructor, propertyKey) || {}
-  Reflect.defineMetadata(
-    ARGS_METADATA,
-    assignMetadata(args, parameterIndex, getTx),
-    target.constructor,
-    propertyKey,
-  )
+export function Tx() {
+  return createParamsDecorator(getTx)
+}
+
+export function Sender() {
+  return createParamsDecorator(getSender)
+}
+
+export function Block() {
+  return createParamsDecorator(getBlock)
+}
+
+export function Time() {
+  return createParamsDecorator(getTime)
 }

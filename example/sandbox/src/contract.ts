@@ -54,11 +54,11 @@ export default class MyContract {
       decimals: 6,
       isReissuable: true,
     })
-    this.niceAssetId.set(asset.getId())
+    this.niceAssetId.set(asset.getId()!)
   }
 
   @Action()
-  async increment(@Tx tx: IncomingTx, @Param('by') by: Long) {
+  async increment(@Tx() tx: IncomingTx, @Param('by') by: Long) {
     const { senderPublicKey, sender } = tx
     await preload(this, ['counter', ['participants', senderPublicKey], 'niceAssetId'])
     const counter = await this.counter.get()

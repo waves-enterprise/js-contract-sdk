@@ -1,7 +1,7 @@
 import { ContractState } from '../api'
-import { IncomingTx } from './types'
+import { BlockInfo, IncomingTx } from './types'
 import { ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
-import { convertContractTransaction } from './converter'
+import { convertBlockInfo, convertContractTransaction } from './converter'
 import { GrpcClient } from '../grpc/grpc-client'
 import { AssetsStorage } from '../api/assets/assets-storage'
 
@@ -9,6 +9,7 @@ export class ExecutionContext {
   readonly tx: IncomingTx
   readonly state: ContractState
   readonly assets: AssetsStorage
+  readonly blockInfo: BlockInfo
 
   constructor(
     private incomingTxResp: ContractTransactionResponse,
@@ -16,6 +17,7 @@ export class ExecutionContext {
   ) {
 
     this.tx = convertContractTransaction(incomingTxResp.transaction)
+    this.blockInfo = convertBlockInfo(incomingTxResp.currentBlockInfo)
     this.state = new ContractState(this)
     this.assets = new AssetsStorage()
   }

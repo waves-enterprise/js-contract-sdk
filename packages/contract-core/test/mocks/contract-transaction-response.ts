@@ -29,5 +29,11 @@ export function mockAction(action: string) {
       proofs: new Uint8Array(),
       timestamp: new Date().getTime(),
     },
+    currentBlockInfo: {
+      height: 1,
+      timestamp: Date.now(),
+      minerAddress: '',
+      reference: '',
+    },
   }) as ContractTransactionResponse
 }

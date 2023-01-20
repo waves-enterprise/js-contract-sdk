@@ -25,8 +25,11 @@ import {
   Params,
   Tx,
   Var,
+  Block,
+  Sender,
+  BlockInfo,
 } from '@wavesenterprise/contract-core'
-import BN from 'bn.js'
+import Long from 'long'
 
 @Contract()
 export default class #{contractName} {
@@ -46,7 +49,7 @@ export default class #{contractName} {
   }
 
   @Action({ preload: ['counter'] })
-  async increment(@Tx tx: IncomingTx, @Param('by') by: BN) {
+  async increment(@Tx() tx: IncomingTx, @Param('by') by: Long) {
     const { senderPublicKey, sender } = tx
     const counter = await this.counter.get()
     let participant = await this.participants.tryGet(senderPublicKey)
@@ -60,6 +63,10 @@ export default class #{contractName} {
     participant.amount += by.toNumber()
     this.counter.set(counter + by.toNumber())
     this.participants.set(senderPublicKey, participant)
+  }
+  
+  async saveInfo(@Sender() sender: string, @Block() currentBlock: BlockInfo) {
+    // 
   }
 }
 ```

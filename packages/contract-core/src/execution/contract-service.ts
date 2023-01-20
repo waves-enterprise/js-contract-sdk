@@ -5,8 +5,11 @@ import { getCpusCount } from '../utils'
 import { GrpcClient } from '../grpc/grpc-client'
 import { CONNECTION_ID, CONNECTION_TOKEN, NODE_ADDRESS } from '../grpc/config'
 import { ClientReadableStream } from '@grpc/grpc-js'
-import { ContractTransaction, ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
-import { ContractTransaction as RawContractTransaction } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { ContractTransaction, ContractTransactionResponse, CurrentBlockInfo } from '@wavesenterprise/we-node-grpc-api'
+import {
+  BlockInfo as RawBlockInfo,
+  ContractTransaction as RawContractTransaction,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 
 export type ContractConfig = {
   contractPath: string,
@@ -72,6 +75,7 @@ export class ContractService {
       await this.workerPool.execute({
         authToken: resp.authToken,
         transaction: RawContractTransaction.toJSON(resp.transaction as RawContractTransaction) as ContractTransaction,
+        currentBlockInfo: RawBlockInfo.toJSON(resp.currentBlockInfo as RawBlockInfo) as CurrentBlockInfo,
       })
       this.log.verbose('Worker processed task', resp.transaction.id)
     } catch (e) {

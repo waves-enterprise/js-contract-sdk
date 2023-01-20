@@ -40,7 +40,7 @@ describe('Asset Operations', () => {
     }
 
     @Action()
-    async transfers(@Payments payments: AttachedPayments) {
+    async transfers(@Payments() payments: AttachedPayments) {
 
     }
 
@@ -49,7 +49,6 @@ describe('Asset Operations', () => {
       const TestAsset = this.assets.getAsset('test')
       await TestAsset.getBalanceOf('me')
       await TestAsset.getBalanceOf()
-      console.log('???')
     }
   }
 
