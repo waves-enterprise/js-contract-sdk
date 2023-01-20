@@ -1,6 +1,6 @@
-import { IncomingTx, TParam, TransferIn } from './types'
+import { BlockInfo, IncomingTx, TParam, TransferIn } from './types'
 import { _parseDataEntry } from '../utils'
-import { ContractTransaction, ContractTransferIn, DataEntry } from '@wavesenterprise/we-node-grpc-api'
+import { ContractTransaction, ContractTransferIn, CurrentBlockInfo, DataEntry } from '@wavesenterprise/we-node-grpc-api'
 import { TVal } from '../intefaces/contract'
 
 export class Param implements TParam {
@@ -38,5 +38,14 @@ export function convertContractTransaction(tx: ContractTransaction): IncomingTx 
     proofs: tx.proofs,
     payments: tx.payments.map(convertTransferIn),
     params: tx.params.map(convertDataEntryToParam),
+  }
+}
+
+export function convertBlockInfo(block: CurrentBlockInfo): BlockInfo {
+  return {
+    height: block.height.toNumber(),
+    timestamp: block.timestamp.toNumber(),
+    minerAddress: block.minerAddress,
+    reference: block.reference,
   }
 }

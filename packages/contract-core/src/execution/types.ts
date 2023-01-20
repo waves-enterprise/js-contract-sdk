@@ -28,3 +28,10 @@ export type IncomingTx = {
   payments: TransferIn[],
   params: TParam[],
 }
+
+export type BlockInfo = {
+  height: number,
+  timestamp: number,
+  minerAddress: string,
+  reference: string,
+}

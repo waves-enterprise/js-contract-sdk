@@ -32,8 +32,8 @@ class TestContract {
 
   @Action()
   params(
-    @Payments payments: AttachedPayments,
-    @Ctx ctx: ExecutionContext,
+    @Payments() payments: AttachedPayments,
+    @Ctx() ctx: ExecutionContext,
   ) {
 
     console.log(ctx, payments)

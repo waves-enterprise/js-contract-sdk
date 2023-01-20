@@ -4,9 +4,10 @@ import { ContractProcessor } from './contract-processor'
 import { CommonLogger, Logger } from '../api'
 import { GrpcClient } from '../grpc/grpc-client'
 import { CONNECTION_TOKEN, NODE_ADDRESS } from '../grpc/config'
-import { ContractTransaction, ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
+import { ContractTransaction, ContractTransactionResponse, CurrentBlockInfo } from '@wavesenterprise/we-node-grpc-api'
 import {
   ContractTransaction as RawContractTransaction,
+  BlockInfo as RawBlockInfo,
 } from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 
 Logger.workerIdx = workerData.index
@@ -31,14 +32,16 @@ if (isMainThread) {
 
   parentPort.on('message', async (incoming: ContractTransactionResponse) => {
     const start = Date.now()
-    const { authToken, transaction: serializedTx } = incoming
+    const { authToken, transaction: serializedTx, currentBlockInfo: serializedBlockInfo } = incoming
     const transaction = RawContractTransaction.fromJSON(serializedTx) as ContractTransaction
+    const currentBlockInfo = RawBlockInfo.fromJSON(serializedBlockInfo) as CurrentBlockInfo
     const txId = transaction.id
     CommonLogger.verbose(`Worker received tx ${txId}`)
     try {
       await processor.handleIncomingTx({
         authToken,
         transaction,
+        currentBlockInfo,
       })
       CommonLogger.info(`Worker handled tx ${txId} in ${Date.now() - start}ms`)
     } catch (e) {

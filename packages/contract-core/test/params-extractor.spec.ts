@@ -19,7 +19,7 @@ describe('Param Extractors', () => {
     class TestContract {
       @Action
       test(
-        @Payments attachedPayments: AttachedPayments,
+        @Payments() attachedPayments: AttachedPayments,
       ) {
         console.log(attachedPayments)
       }
@@ -41,8 +41,8 @@ describe('Param Extractors', () => {
     class TestContract {
       @Action
       test(
-        @Ctx ctx: ExecutionContext,
-        @Payments payments: AttachedPayments,
+        @Ctx() ctx: ExecutionContext,
+        @Payments() payments: AttachedPayments,
       ) {
         console.log(ctx, payments)
       }
