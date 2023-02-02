@@ -34,6 +34,10 @@ export class ContractState {
     }
   }
 
+  getAll(contractId?: string) {
+    return this.storage.readAll(contractId)
+  }
+
   getBatch(keys: string[], contractId?: string) {
     return this.storage.readBatch(keys, contractId)
   }
