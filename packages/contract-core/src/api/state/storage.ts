@@ -35,6 +35,19 @@ export class Storage {
     return this.cache.get(cacheKey)!
   }
 
+  async readAll(contractId?: string): Promise<Record<string, TVal>> {
+    const actualContractId = contractId ?? this.contractId
+    const res = await this.client.getContractKeys({
+      contractId: actualContractId,
+    })
+    const loaded: Record<string, TVal> = {}
+    res.forEach((entry) => {
+      const parsedValue = _parseDataEntry(entry)
+      loaded[entry.key] = parsedValue
+    })
+    return loaded
+  }
+
   async readBatch(keys: string[], contractId?: string): Promise<Record<string, TVal>> {
     const actualContractId = contractId ?? this.contractId
     const cacheKeys = keys.map((key) => this.composeCacheKey(actualContractId, key))
