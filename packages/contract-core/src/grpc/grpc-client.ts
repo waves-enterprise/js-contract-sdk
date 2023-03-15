@@ -1,14 +1,70 @@
-import { ContractAddressService, ContractService } from '@wavesenterprise/we-node-grpc-api'
-import { MetadataValue } from '@grpc/grpc-js'
+import {ContractAddressService, ContractService} from '@wavesenterprise/we-node-grpc-api'
+import {ClientReadableStream, MetadataValue} from '@grpc/grpc-js'
+import {
+  CalculateAssetIdRequest,
+  ConnectionRequest,
+  ContractBalancesRequest,
+  ContractKeyRequest,
+  ContractKeysRequest,
+  ExecutionErrorRequest,
+  ExecutionSuccessRequest
+} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
+import {
+  AssetBalanceResponse,
+  ContractBalanceResponse,
+  ContractTransactionResponse,
+  DataEntry
+} from "@wavesenterprise/we-node-grpc-api/src/types";
+import {
+  AddressDataRequest,
+  AssetBalanceRequest
+} from "@wavesenterprise/js-contract-grpc-client/contract/contract_address_service";
 
 export type GrpcClientProps = {
   connectionToken: string,
   nodeAddress: string,
 }
 
-export class GrpcClient {
-  readonly contractService: ContractService
-  readonly contractAddressService: ContractAddressService
+
+export interface IContractService {
+  connect(request: ConnectionRequest): ClientReadableStream<ContractTransactionResponse>
+
+  commitExecutionSuccess(request: ExecutionSuccessRequest): Promise<void>
+
+  commitExecutionError(request: ExecutionErrorRequest): Promise<void>
+
+  getContractKeys(request: ContractKeysRequest): Promise<DataEntry[]>
+
+  getContractKey(request: ContractKeyRequest): Promise<DataEntry>
+
+  getContractBalances(request: ContractBalancesRequest): Promise<ContractBalanceResponse[]>
+
+  calculateAssetId(request: CalculateAssetIdRequest): Promise<string>
+
+  setMetadata(metadata: Record<string, MetadataValue>)
+}
+
+export interface IAddressService {
+  getAddresses(): Promise<string[]>
+
+  getAddressData(request: AddressDataRequest): Promise<DataEntry[]>
+
+  getAssetBalance(request: AssetBalanceRequest): Promise<AssetBalanceResponse>
+
+  setMetadata(metadata: Record<string, MetadataValue>)
+}
+
+export interface IGrpcClient {
+  contractService: IContractService
+  contractAddressService: IAddressService
+
+  setMetadata(metadata: Record<string, MetadataValue>): void
+}
+
+
+export class GrpcClient implements IGrpcClient {
+  readonly contractService: IContractService
+  readonly contractAddressService: IAddressService
   // readonly contractUtilService: ContractUtilService
   // readonly contractPermissionService: ContractPermissionService
   // readonly contractPKIService: ContractPKIService

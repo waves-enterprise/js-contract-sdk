@@ -23,7 +23,7 @@ export class AssetsService {
     )
   }
 
-  getAsset(assetId: string | undefined) {
+  getAsset(assetId?: string | undefined) {
     return this.makeAsset({
       assetId,
     })

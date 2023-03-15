@@ -1,14 +1,8 @@
 import { AssetsStorage } from './assets-storage'
-import {
-  ContractAddressService,
-  ContractBurn,
-  ContractIssue,
-  ContractReissue,
-  ContractService,
-  ContractTransferOut,
-} from '@wavesenterprise/we-node-grpc-api'
+import { ContractBurn, ContractIssue, ContractReissue, ContractTransferOut, } from '@wavesenterprise/we-node-grpc-api'
 import { Base58 } from '../../utils/base58'
 import Long from 'long'
+import { IAddressService, IContractService } from "../../grpc/grpc-client";
 
 export type Balance = {
   assetId: string,
@@ -33,8 +27,8 @@ export class Asset {
   constructor(
     private readonly config: AssetConfig,
     private readonly storage: AssetsStorage,
-    private readonly addressService: ContractAddressService,
-    private readonly contractService: ContractService,
+    private readonly addressService: IAddressService,
+    private readonly contractService: IContractService,
   ) {
   }
 
@@ -88,6 +82,4 @@ export class Asset {
       assetId: this.config.assetId,
     })
   }
-
-
 }
