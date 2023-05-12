@@ -13,6 +13,9 @@ stages:
 
 run-test-ci:
   stage: test
+  before_script:
+    - mkdir -p $HOME/.docker
+    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json 
   script:
     # - docker login -u "${REGISTRY_USER}" -p "${REGISTRY_PASSWORD}" "${REGISTRY}"
     - cat Dockerfile.test | sed "s/\${REGISTRY}/${REGISTRY}/g" | docker build --no-cache --tag test-image -f - .
