@@ -1,5 +1,12 @@
 import { AssetsStorage } from './assets-storage'
-import { ContractBurn, ContractIssue, ContractReissue, ContractTransferOut, } from '@wavesenterprise/we-node-grpc-api'
+import {
+  ContractBurn,
+  ContractCancelLease,
+  ContractIssue,
+  ContractLease,
+  ContractReissue,
+  ContractTransferOut,
+} from '@wavesenterprise/we-node-grpc-api'
 import { Base58 } from '../../utils/base58'
 import Long from 'long'
 import { IAddressService, IContractService } from "../../grpc/grpc-client";
@@ -16,12 +23,11 @@ export type AssetConfig = {
 }
 
 export type AssetIssue = Omit<ContractIssue, 'assetId' | 'nonce'>
-
 export type AssetReissue = Omit<ContractReissue, 'assetId'>
-
 export type AssetBurn = Omit<ContractBurn, 'assetId'>
-
 export type AssetTransfer = Omit<ContractTransferOut, 'assetId'>
+export type Lease = Omit<ContractLease, 'leaseId' | 'nonce'>
+export type CancelLease = ContractCancelLease
 
 export class Asset {
   constructor(

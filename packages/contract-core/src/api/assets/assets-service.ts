@@ -1,17 +1,39 @@
 import { ExecutionContext } from '../../execution'
-import { Asset, AssetBurn, AssetConfig, AssetIssue, AssetReissue, AssetTransfer, Balance } from './asset'
+import {
+  Asset,
+  AssetBurn,
+  AssetConfig,
+  AssetIssue,
+  AssetReissue,
+  AssetTransfer,
+  Balance,
+  CancelLease,
+  Lease
+} from './asset'
+import { ContractCancelLease } from "@wavesenterprise/we-node-grpc-api";
 
 export class AssetsService {
-
-  private nonce = 1
+  private leaseNonce = 1;
+  private issueNonce = 1;
 
   constructor(private readonly context: ExecutionContext) {
   }
 
   calculateAssetId() {
     return this.context.grpcClient.contractService.calculateAssetId({
-      nonce: this.nonce,
+      nonce: this.issueNonce,
     })
+  }
+
+  async calculateLeaseId(): Promise<{ leaseId: string, nonce: number }> {
+    const leaseId = await this.context.grpcClient.contractService.calculateAssetId({
+      nonce: this.leaseNonce,
+    })
+
+    const nonce = this.leaseNonce;
+    this.leaseNonce++
+
+    return { leaseId, nonce };
   }
 
   private makeAsset(config: AssetConfig) {
@@ -31,8 +53,8 @@ export class AssetsService {
 
   async issueAsset(config: AssetIssue) {
     const assetId = await this.calculateAssetId()
-    const asset = this.makeAsset({ assetId, nonce: this.nonce })
-    this.nonce++
+    const asset = this.makeAsset({ assetId, nonce: this.issueNonce })
+    this.issueNonce++
     asset.issue(config)
     return asset
   }
@@ -59,4 +81,15 @@ export class AssetsService {
     })
   }
 
+  async lease(lease: Lease): Promise<string> {
+    const { leaseId, nonce } = await this.calculateLeaseId();
+
+    this.context.assets.addLease({ leaseId, nonce, ...lease })
+
+    return leaseId;
+  }
+
+  leaseCancel(lease: CancelLease) {
+    return this.context.assets.addCancelLease(lease)
+  }
 }

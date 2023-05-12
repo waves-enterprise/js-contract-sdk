@@ -79,4 +79,10 @@ export default class MyContract {
     })
     this.log.info(`Transfer to ${sender}`)
   }
+
+
+  @Action()
+  async leaseUnlease() {
+    this.assets.
+  }
 }

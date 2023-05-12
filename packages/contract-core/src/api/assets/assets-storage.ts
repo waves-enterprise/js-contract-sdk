@@ -1,7 +1,9 @@
 import {
   ContractAssetOperation,
   ContractBurn,
+  ContractCancelLease,
   ContractIssue,
+  ContractLease,
   ContractReissue,
   ContractTransferOut,
 } from '@wavesenterprise/we-node-grpc-api'
@@ -31,6 +33,18 @@ export class AssetsStorage {
   addTransfer(operation: ContractTransferOut) {
     this.operations.push({
       contractTransferOut: operation,
+    })
+  }
+
+  addLease(operation: ContractLease) {
+    this.operations.push({
+      contractLease: operation,
+    })
+  }
+
+  addCancelLease(operation: ContractCancelLease) {
+    this.operations.push({
+      contractCancelLease: operation,
     })
   }
 
