@@ -1,6 +1,6 @@
 import * as os from 'os'
-import { DataEntry } from '@wavesenterprise/we-node-grpc-api'
-import { TVal, TValue } from '../intefaces/contract'
+import {DataEntry} from '@wavesenterprise/we-node-grpc-api'
+import {TVal} from '../intefaces/contract'
 import Long from 'long'
 
 export const isUndefined = (v: unknown): v is undefined => {
@@ -55,29 +55,8 @@ export function _parseDataEntry(d: DataEntry): TVal {
   if ('binaryValue' in d && !isUndefined(d.binaryValue)) {
     return Buffer.from(d.binaryValue)
   }
-
-  throw new Error('Data entry parse error')
 }
 
-export function parseDataEntry(d: DataEntry): TValue {
-  if ('stringValue' in d && !isUndefined(d.stringValue)) {
-    return d.stringValue
-  }
-
-  if ('intValue' in d && !isUndefined(d.intValue)) {
-    return Long.fromValue(d.intValue).toNumber()
-  }
-
-  if ('boolValue' in d && !isUndefined(d.boolValue)) {
-    return d.boolValue
-  }
-
-  if ('binaryValue' in d && !isUndefined(d.binaryValue)) {
-    return Buffer.from(d.binaryValue)
-  }
-
-  throw new Error('Data entry parse error')
-}
 
 export function isPrimitive(v: ObjectConstructor) {
   return (

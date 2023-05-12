@@ -2,6 +2,7 @@ import { logger } from '../'
 import { TVal } from '../../intefaces/contract'
 import { _parseDataEntry } from '../../utils'
 import { ContractService } from '@wavesenterprise/we-node-grpc-api'
+import {IContractService} from "../../grpc/grpc-client";
 
 export class Storage {
 
@@ -13,7 +14,7 @@ export class Storage {
 
   constructor(
     private readonly contractId: string,
-    private readonly client: ContractService,
+    private readonly client: IContractService,
   ) {
   }
 
