@@ -14,7 +14,7 @@ stages:
 run-test-ci:
   stage: test
   script:
-    - docker login -u "${REGISTRY_USER}" -p "${REGISTRY_PASSWORD}" "${REGISTRY}"
+    # - docker login -u "${REGISTRY_USER}" -p "${REGISTRY_PASSWORD}" "${REGISTRY}"
     - cat Dockerfile.test | sed "s/\${REGISTRY}/${REGISTRY}/g" | docker build --no-cache --tag test-image -f - .
     - docker run --hostname test-0 --rm --name test-container-0 test-image
   tags:
