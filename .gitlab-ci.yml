@@ -1,7 +1,25 @@
-# include job templates
+image: ${REGISTRY}/it/docker:19.03.1
 
-include:
-  - project: 'development/we/gitlab-ci-jobs'
-    ref: master
-    file: 'pipelines/platform.gitlab-ci.yml'
+services:
+  - name: ${REGISTRY}/it/docker:19.03.1-dind
+    alias: docker
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
+stages:
+  - test
+
+run-test-ci:
+  stage: test
+  before_script:
+    - mkdir -p $HOME/.docker
+    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json 
+  script:
+    # - docker login -u "${REGISTRY_USER}" -p "${REGISTRY_PASSWORD}" "${REGISTRY}"
+    - cat Dockerfile.test | sed "s/\${REGISTRY}/${REGISTRY}/g" | docker build --no-cache --tag test-image -f - .
+    - docker run --hostname test-0 --rm --name test-container-0 test-image
+  tags:
+    - voting
 
