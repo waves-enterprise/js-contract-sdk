@@ -41,7 +41,7 @@ export class LocalContractService implements IContractService {
   constructor(private client: LocalGrpcClient) {
   }
 
-  getContractBalances(request: ContractBalancesRequest): Promise<ContractBalanceResponse[]> {
+  getContractBalances(_: ContractBalancesRequest): Promise<ContractBalanceResponse[]> {
     throw new Error('not implemented')
   }
 
@@ -69,7 +69,7 @@ export class LocalContractService implements IContractService {
     ))
   }
 
-  connect(request: ConnectionRequest): ClientReadableStream<ContractTransactionResponse> {
+  connect(_: ConnectionRequest): ClientReadableStream<ContractTransactionResponse> {
     throw new Error('not implemented')
   }
 
@@ -110,7 +110,7 @@ export class LocalContractService implements IContractService {
     return Promise.reject(request.message)
   }
 
-  calculateAssetId(request: CalculateAssetIdRequest): Promise<string> {
+  calculateAssetId(_: CalculateAssetIdRequest): Promise<string> {
     return Promise.resolve(makeid(32))
   }
 
@@ -129,11 +129,11 @@ export class LocalAddressService implements IAddressService {
     throw new Error('not implemented')
   }
 
-  getAssetBalance(request: AssetBalanceRequest): Promise<AssetBalanceResponse> {
+  getAssetBalance(_: AssetBalanceRequest): Promise<AssetBalanceResponse> {
     throw new Error('not implemented')
   }
 
-  getAddressData(request: AddressDataRequest): Promise<DataEntry[]> {
+  getAddressData(_: AddressDataRequest): Promise<DataEntry[]> {
     throw new Error('not implemented')
   }
 

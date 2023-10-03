@@ -4,7 +4,6 @@ import { ContractExecutable } from './types'
 import { Keypair } from '@wavesenterprise/signer'
 import * as marshal from '../utils/marshal'
 
-
 export class Executor {
   processor: ContractProcessor
   sender: Keypair

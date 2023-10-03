@@ -10,7 +10,6 @@ import {
   CancelLease,
   Lease,
 } from './asset'
-import { ContractCancelLease } from '@wavesenterprise/we-node-grpc-api'
 
 export class AssetsService {
   private leaseNonce = 1
