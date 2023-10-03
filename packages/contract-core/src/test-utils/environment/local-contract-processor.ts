@@ -1,44 +1,31 @@
-import {ContractProcessor} from "../../execution/contract-processor";
-import {ContractTransactionResponse} from "@wavesenterprise/we-node-grpc-api/src/types";
-import {LocalGrpcClient} from "./local";
+import { ContractProcessor } from '../../execution/contract-processor'
+import { ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api/src/types'
+import { LocalGrpcClient } from './local'
 
 export class LocalContractProcessor extends ContractProcessor {
-  async handleIncomingTx(resp: ContractTransactionResponse): Promise<unknown> {
-    this.prevalidatePayments(resp);
-    this.assignContractBalance(resp)
-
-    return super.handleIncomingTx(resp);
+  get client() {
+    return this.grpcClient as LocalGrpcClient
   }
 
-  prevalidatePayments(resp: ContractTransactionResponse) {
+  handleIncomingTx(resp: ContractTransactionResponse): Promise<unknown> {
+    this.validateBalances(resp)
+
+    return super.handleIncomingTx(resp)
+  }
+
+  validateBalances(resp: ContractTransactionResponse) {
     if (resp.transaction.payments.length === 0) {
       return
     }
 
-    const assetsStore = (this.grpcClient as LocalGrpcClient).assets
-
     for (const r of resp.transaction.payments) {
-      const isValid = assetsStore.canTransfer(resp.transaction.sender, r.amount)
+      const isValid = this.client.assets.canTransfer(resp.transaction.sender, r.amount)
 
       if (!isValid) {
-
         throw new Error('not valid payment attached')
       }
+
+      this.client.assets.transfer(resp.transaction.sender, resp.transaction.contractId, r.amount)
     }
   }
-
-
-  assignContractBalance(resp: ContractTransactionResponse) {
-    if (resp.transaction.payments.length === 0) {
-      return
-    }
-
-    const assetsStore = (this.grpcClient as LocalGrpcClient).assets
-
-    for (const r of resp.transaction.payments) {
-
-      assetsStore.transfer(resp.transaction.sender, resp.transaction.contractId, r.amount)
-    }
-  }
-
 }

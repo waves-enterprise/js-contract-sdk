@@ -9,7 +9,7 @@ import {
 } from '@wavesenterprise/we-node-grpc-api'
 import { Base58 } from '../../utils/base58'
 import Long from 'long'
-import { IAddressService, IContractService } from "../../grpc/grpc-client";
+import { IAddressService, IContractService } from '../../grpc/grpc-client'
 
 export type Balance = {
   assetId: string,

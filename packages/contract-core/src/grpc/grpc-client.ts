@@ -1,5 +1,5 @@
-import {ContractAddressService, ContractService} from '@wavesenterprise/we-node-grpc-api'
-import {ClientReadableStream, MetadataValue} from '@grpc/grpc-js'
+import { ContractAddressService, ContractService } from '@wavesenterprise/we-node-grpc-api'
+import { ClientReadableStream, MetadataValue } from '@grpc/grpc-js'
 import {
   CalculateAssetIdRequest,
   ConnectionRequest,
@@ -7,18 +7,18 @@ import {
   ContractKeyRequest,
   ContractKeysRequest,
   ExecutionErrorRequest,
-  ExecutionSuccessRequest
-} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
+  ExecutionSuccessRequest,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
 import {
   AssetBalanceResponse,
   ContractBalanceResponse,
   ContractTransactionResponse,
-  DataEntry
-} from "@wavesenterprise/we-node-grpc-api/src/types";
+  DataEntry,
+} from '@wavesenterprise/we-node-grpc-api/src/types'
 import {
   AddressDataRequest,
-  AssetBalanceRequest
-} from "@wavesenterprise/js-contract-grpc-client/contract/contract_address_service";
+  AssetBalanceRequest,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_address_service'
 
 export type GrpcClientProps = {
   connectionToken: string,
@@ -26,39 +26,39 @@ export type GrpcClientProps = {
 }
 
 
-export interface IContractService {
-  connect(request: ConnectionRequest): ClientReadableStream<ContractTransactionResponse>
+export type IContractService = {
+  connect(request: ConnectionRequest): ClientReadableStream<ContractTransactionResponse>,
 
-  commitExecutionSuccess(request: ExecutionSuccessRequest): Promise<void>
+  commitExecutionSuccess(request: ExecutionSuccessRequest): Promise<void>,
 
-  commitExecutionError(request: ExecutionErrorRequest): Promise<void>
+  commitExecutionError(request: ExecutionErrorRequest): Promise<void>,
 
-  getContractKeys(request: ContractKeysRequest): Promise<DataEntry[]>
+  getContractKeys(request: ContractKeysRequest): Promise<DataEntry[]>,
 
-  getContractKey(request: ContractKeyRequest): Promise<DataEntry>
+  getContractKey(request: ContractKeyRequest): Promise<DataEntry>,
 
-  getContractBalances(request: ContractBalancesRequest): Promise<ContractBalanceResponse[]>
+  getContractBalances(request: ContractBalancesRequest): Promise<ContractBalanceResponse[]>,
 
-  calculateAssetId(request: CalculateAssetIdRequest): Promise<string>
+  calculateAssetId(request: CalculateAssetIdRequest): Promise<string>,
 
-  setMetadata(metadata: Record<string, MetadataValue>)
+  setMetadata(metadata: Record<string, MetadataValue>),
 }
 
-export interface IAddressService {
-  getAddresses(): Promise<string[]>
+export type IAddressService = {
+  getAddresses(): Promise<string[]>,
 
-  getAddressData(request: AddressDataRequest): Promise<DataEntry[]>
+  getAddressData(request: AddressDataRequest): Promise<DataEntry[]>,
 
-  getAssetBalance(request: AssetBalanceRequest): Promise<AssetBalanceResponse>
+  getAssetBalance(request: AssetBalanceRequest): Promise<AssetBalanceResponse>,
 
-  setMetadata(metadata: Record<string, MetadataValue>)
+  setMetadata(metadata: Record<string, MetadataValue>),
 }
 
-export interface IGrpcClient {
-  contractService: IContractService
-  contractAddressService: IAddressService
+export type IGrpcClient = {
+  contractService: IContractService,
+  contractAddressService: IAddressService,
 
-  setMetadata(metadata: Record<string, MetadataValue>): void
+  setMetadata(metadata: Record<string, MetadataValue>): void,
 }
 
 

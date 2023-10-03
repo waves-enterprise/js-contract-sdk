@@ -1,10 +1,10 @@
-import {IAddressService, IContractService, IGrpcClient} from "../../grpc/grpc-client";
+import { IAddressService, IContractService, IGrpcClient } from '../../grpc/grpc-client'
 import {
   AssetBalanceResponse,
   ContractBalanceResponse,
   ContractTransactionResponse,
-  DataEntry
-} from "@wavesenterprise/we-node-grpc-api/src/types";
+  DataEntry,
+} from '@wavesenterprise/we-node-grpc-api/src/types'
 import {
   CalculateAssetIdRequest,
   ConnectionRequest,
@@ -12,29 +12,27 @@ import {
   ContractKeyRequest,
   ContractKeysRequest,
   ExecutionErrorRequest,
-  ExecutionSuccessRequest
-} from "@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service";
-import {ClientReadableStream, MetadataValue} from "@grpc/grpc-js";
-import {AddressDataRequest} from "@wavesenterprise/js-contract-grpc-client/address/address_public_service";
-import {AssetBalanceRequest} from "@wavesenterprise/js-contract-grpc-client/contract/contract_address_service";
-import {IBlockchainState, LocalAssets} from "./local-contract-state";
-import {_parseDataEntry, getValueStateKey, isUndefined} from "../../utils";
-import {TVal} from "../../intefaces/contract";
-import Long from "long";
-import {ContractIssue} from "@wavesenterprise/we-node-grpc-api";
-
-const nonces = new Map<number, string>()
+  ExecutionSuccessRequest,
+} from '@wavesenterprise/js-contract-grpc-client/contract/contract_contract_service'
+import { ClientReadableStream, MetadataValue } from '@grpc/grpc-js'
+import { AddressDataRequest } from '@wavesenterprise/js-contract-grpc-client/address/address_public_service'
+import { AssetBalanceRequest } from '@wavesenterprise/js-contract-grpc-client/contract/contract_address_service'
+import { IBlockchainState, LocalAssets } from './local-contract-state'
+import { _parseDataEntry, getValueStateKey, isUndefined } from '../../utils'
+import { TVal } from '../../intefaces/contract'
+import Long from 'long'
+import { ContractIssue } from '@wavesenterprise/we-node-grpc-api'
 
 function makeid(length) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  let counter = 0;
+  let result = ''
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const charactersLength = characters.length
+  let counter = 0
   while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    counter += 1
   }
-  return result;
+  return result
 }
 
 export class LocalContractService implements IContractService {
@@ -43,13 +41,13 @@ export class LocalContractService implements IContractService {
   constructor(private client: LocalGrpcClient) {
   }
 
-  getContractBalances(request: ContractBalancesRequest): Promise<ContractBalanceResponse[]> {
+  getContractBalances(_: ContractBalancesRequest): Promise<ContractBalanceResponse[]> {
     throw new Error('not implemented')
   }
 
   getContractKey(request: ContractKeyRequest): Promise<DataEntry> {
     const resp = this.client.state.getKeys([request.key as string])
-    const value = resp[0];
+    const value = resp[0]
 
     if (isUndefined(value)) {
       return Promise.resolve(undefined as any as DataEntry)
@@ -60,18 +58,18 @@ export class LocalContractService implements IContractService {
     return Promise.resolve(
       {
         key: request.key as string,
-        [valueKey]: value
-      } as DataEntry
+        [valueKey]: value,
+      } as DataEntry,
     )
   }
 
   getContractKeys(request: ContractKeysRequest): Promise<DataEntry[]> {
     return Promise.all(request.keysFilter!.keys!.map(
-      (k) => this.getContractKey({key: k as string})
-    ));
+      (k) => this.getContractKey({ key: k as string }),
+    ))
   }
 
-  connect(request: ConnectionRequest): ClientReadableStream<ContractTransactionResponse> {
+  connect(_: ConnectionRequest): ClientReadableStream<ContractTransactionResponse> {
     throw new Error('not implemented')
   }
 
@@ -88,7 +86,12 @@ export class LocalContractService implements IContractService {
 
     for (const res of request.assetOperations) {
       if (res.contractTransferOut) {
-        this.client.assets.transfer(this.client.contractId, res.contractTransferOut.recipient!, res.contractTransferOut.amount as Long)
+        this.client.assets.transfer(
+          this.client.contractId,
+          res.contractTransferOut.recipient!,
+          res.contractTransferOut.amount as Long,
+          res.contractTransferOut.assetId,
+        )
       }
       if (res.contractIssue) {
         this.client.assets.issue(res.contractIssue as ContractIssue, this.client.contractId)
@@ -103,12 +106,11 @@ export class LocalContractService implements IContractService {
 
 
   commitExecutionError(request: ExecutionErrorRequest): Promise<void> {
-    console.log(request)
 
-    return Promise.reject(request.message);
+    return Promise.reject(request.message)
   }
 
-  calculateAssetId(request: CalculateAssetIdRequest): Promise<string> {
+  calculateAssetId(_: CalculateAssetIdRequest): Promise<string> {
     return Promise.resolve(makeid(32))
   }
 
@@ -127,11 +129,11 @@ export class LocalAddressService implements IAddressService {
     throw new Error('not implemented')
   }
 
-  getAssetBalance(request: AssetBalanceRequest): Promise<AssetBalanceResponse> {
+  getAssetBalance(_: AssetBalanceRequest): Promise<AssetBalanceResponse> {
     throw new Error('not implemented')
   }
 
-  getAddressData(request: AddressDataRequest): Promise<DataEntry[]> {
+  getAddressData(_: AddressDataRequest): Promise<DataEntry[]> {
     throw new Error('not implemented')
   }
 

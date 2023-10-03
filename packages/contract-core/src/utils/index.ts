@@ -1,6 +1,6 @@
 import * as os from 'os'
-import {DataEntry} from '@wavesenterprise/we-node-grpc-api'
-import {TVal} from '../intefaces/contract'
+import { DataEntry } from '@wavesenterprise/we-node-grpc-api'
+import { TVal } from '../intefaces/contract'
 import Long from 'long'
 
 export const isUndefined = (v: unknown): v is undefined => {

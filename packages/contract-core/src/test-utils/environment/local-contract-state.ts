@@ -1,14 +1,15 @@
-import {TVal} from "../../intefaces/contract";
-import Long from "long";
-import {ContractIssue} from "@wavesenterprise/we-node-grpc-api";
-import {Account} from "../blockchain";
+import { TVal } from '../../intefaces/contract'
+import Long from 'long'
+import { ContractIssue } from '@wavesenterprise/we-node-grpc-api'
+import { Account } from '../types'
 
-export interface IBlockchainState {
-  setKey(key: string, value: TVal);
+const Native = ':native'
 
-  getKeys(keys: string[]): TVal[]
+export type IBlockchainState = {
+  setKey(key: string, value: TVal),
+
+  getKeys(keys: string[]): TVal[],
 }
-
 
 export class LocalContractState implements IBlockchainState {
   private state = new Map<string, TVal>()
@@ -22,24 +23,33 @@ export class LocalContractState implements IBlockchainState {
   }
 }
 
-const WEST = '__WEST__';
 
 export class LocalAssets {
-  private assets: Map<string, ContractIssue>;
-  private balances: Map<string, Map<Account, Long>>;
-
+  private assets: Map<string, ContractIssue>
+  private balances: Map<string, Map<Account, Long>>
 
   constructor() {
-    this.balances = new Map<string, Map<Account, Long>>();
+    this.balances = new Map<string, Map<Account, Long>>()
+    this.assets = new Map<string, ContractIssue>()
 
-    const westBalances = new Map<Account, Long>()
-    westBalances.set('__root', Long.MAX_VALUE)
-
-    this.balances.set(WEST, westBalances)
+    this.addBalance(Native, '__root', Long.MAX_VALUE)
   }
 
-  getBalance(address: string, assetId = WEST) {
-    if (this.balances.get(assetId)) {
+  addBalance(assetId: string, address: string, amount: Long) {
+    let balancesMap = this.balances.get(assetId)
+
+    if (!balancesMap) {
+      balancesMap = new Map<Account, Long>()
+    }
+
+    balancesMap.set(address, amount)
+
+    this.balances.set(assetId, balancesMap)
+  }
+
+
+  getBalance(address: string, assetId = Native) {
+    if (!this.balances.get(assetId)) {
       throw new Error('asset not exists')
     }
 
@@ -48,15 +58,15 @@ export class LocalAssets {
     return balances.get(address) || Long.fromNumber(0)
   }
 
-  transfer(from: string, to: string, amount: Long, assetId = WEST) {
-    const senderBalance = this.getBalance(from);
-    const recipientBalance = this.getBalance(to);
+  transfer(from: string, to: string, amount: Long, assetId = Native) {
+    const senderBalance = this.getBalance(from, assetId)
+    const recipientBalance = this.getBalance(to, assetId)
 
     if (!senderBalance.subtract(amount).gte(0)) {
-      throw new Error("unsufficient balance")
+      throw new Error('unsufficient balance')
     }
 
-    const asset = this.balances.get(assetId)!;
+    const asset = this.balances.get(assetId)!
 
     asset.set(from, senderBalance.subtract(amount))
     asset.set(to, recipientBalance.add(amount))
@@ -68,7 +78,7 @@ export class LocalAssets {
     return this.getBalance(address).gte(value)
   }
 
-  issue(res: ContractIssue, owner: string) {
+  issue(res: ContractIssue, _: string) {
     if (this.assets.get(res.assetId!)) {
       throw new Error('asset already issued')
     }

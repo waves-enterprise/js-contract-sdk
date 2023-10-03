@@ -1,24 +1,80 @@
-import {Constructable} from '../../intefaces/helpers'
-import {ContractExecutable} from '../blockchain'
-import {Executor} from '../executor'
+import { Constructable } from '../../intefaces/helpers'
+import { ContractExecutable } from '../types'
+import { Executor } from '../executor'
 
-export interface Contract {
+export type Contract = {
+  address: string,
   targetExecutable: ContractExecutable,
 }
 
 export class Test implements Contract {
-  constructor(address: string, public targetExecutable: ContractExecutable) {
+  constructor(
+    public address: string,
+    public targetExecutable: ContractExecutable,
+  ) {
   }
 
   static createFromAddress(address: string, executable: Constructable<ContractExecutable>) {
     return new Test(address, executable)
   }
 
-  async invokeTest(executor: Executor) {
-    const txId = await executor.invoke({call: 'test', params: {}, payments: [{amount: 1000}]})
+  invokeRequestDeposit(
+    executor: Executor,
+    amount: number,
+    assetId: string,
+    targetAddress: string,
+  ) {
+    return executor.invoke({
+      call: 'requestDeposit',
+      params: {
+        amount,
+        assetId,
+        targetAddress,
+      },
+    })
   }
 
-  async invokeNotExist(executor: Executor) {
-    await executor.invoke({call: 'NotExist', params: {}})
+  invokeConfirmDeposit(
+    executor: Executor,
+    requestId: string,
+  ) {
+    return executor.invoke({
+      call: 'confirmDeposit',
+      params: {
+        requestId,
+      },
+    })
+  }
+
+  invokeMintBankCheques(
+    executor: Executor,
+    amount: number,
+    assetName: string,
+  ) {
+    return executor.invoke({
+      call: 'mintBankCheques',
+      payments: [],
+      params: {
+        amount,
+        assetName,
+      },
+    })
+  }
+
+  invokeCreateCheque(
+    executor: Executor,
+    amount: number,
+    assetId: string,
+    targetAddress: string,
+  ) {
+    return executor.invoke({
+      call: 'createCheque',
+      payments: [],
+      params: {
+        amount,
+        assetId,
+        targetAddress,
+      },
+    })
   }
 }

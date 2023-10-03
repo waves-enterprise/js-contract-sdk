@@ -1,12 +1,12 @@
-import {ExecutionContext} from './execution-context'
-import {ERROR_CODE} from './constants'
-import {Container, logger, preload} from '../api'
-import {ParamsExtractor} from './params-extractor'
-import {setContractEntries} from './reflect'
-import {ContractError} from './exceptions'
-import {IGrpcClient} from '../grpc/grpc-client'
-import {ContractTransactionResponse} from '@wavesenterprise/we-node-grpc-api'
-import {ContractAssetOperation} from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
+import { ExecutionContext } from './execution-context'
+import { ERROR_CODE } from './constants'
+import { Container, logger, preload } from '../api'
+import { ParamsExtractor } from './params-extractor'
+import { setContractEntries } from './reflect'
+import { ContractError } from './exceptions'
+import { IGrpcClient } from '../grpc/grpc-client'
+import { ContractTransactionResponse } from '@wavesenterprise/we-node-grpc-api'
+import { ContractAssetOperation } from '@wavesenterprise/js-contract-grpc-client/contract_asset_operation'
 
 export function clearPreloadedEntries(contract: object): void {
   return setContractEntries(contract, new Map())
@@ -29,10 +29,11 @@ export class ContractProcessor {
     })
     const executionContext = new ExecutionContext(resp, this.grpcClient)
 
+
     Container.set(executionContext)
 
     try {
-      const {args, actionMetadata} = this.paramsExtractor
+      const { args, actionMetadata } = this.paramsExtractor
         .extract(this.contract as ObjectConstructor, executionContext)
 
       const c = this.contract as ObjectConstructor
