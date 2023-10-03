@@ -5,4 +5,8 @@ export * from './entrypoint'
 export * from './execution/types'
 export * from './execution/execution-context'
 export * from './execution/exceptions'
-export * as testUtils from './test-utils'
+
+export * from './intefaces/helpers'
+export * from './intefaces/contract'
+
+export * from './test-utils'

@@ -1,13 +1,8 @@
 import { Constructable } from '../../intefaces/helpers'
-import { ContractExecutable } from '../types'
+import { ContractExecutable, SandboxContract } from '../types'
 import { Executor } from '../executor'
 
-export type Contract = {
-  address: string,
-  targetExecutable: ContractExecutable,
-}
-
-export class Test implements Contract {
+export class Test implements SandboxContract {
   constructor(
     public address: string,
     public targetExecutable: ContractExecutable,

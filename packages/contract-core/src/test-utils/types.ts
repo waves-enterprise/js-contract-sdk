@@ -2,6 +2,11 @@ import { TVal } from '../intefaces/contract'
 import { Executor } from './executor'
 import { Keypair } from '@wavesenterprise/signer'
 
+export type SandboxContract = {
+  address: string,
+  targetExecutable: ContractExecutable,
+}
+
 export type ContractExecutable = any
 export type Account = string
 
