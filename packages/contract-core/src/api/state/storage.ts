@@ -2,7 +2,7 @@ import { logger } from '../'
 import { TVal } from '../../intefaces/contract'
 import { _parseDataEntry } from '../../utils'
 import { ContractService } from '@wavesenterprise/we-node-grpc-api'
-import {IContractService} from "../../grpc/grpc-client";
+import { IContractService } from '../../grpc/grpc-client'
 
 export class Storage {
 
@@ -31,7 +31,11 @@ export class Storage {
         contractId: actualContractId,
         key,
       })
-      this.cache.set(cacheKey, _parseDataEntry(res))
+
+      if (res) {
+        this.cache.set(cacheKey, _parseDataEntry(res))
+      }
+
     }
     return this.cache.get(cacheKey)!
   }

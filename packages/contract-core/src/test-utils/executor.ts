@@ -1,36 +1,46 @@
-import {ContractProcessor} from "../execution/contract-processor";
-import {txFactory} from "./environment/response-factory";
-import {ContractExecutable} from "./blockchain";
+import { ContractProcessor } from '../execution/contract-processor'
+import { txFactory } from './environment/response-factory'
+import { ContractExecutable } from './types'
+import { Keypair } from '@wavesenterprise/signer'
+import * as marshal from '../utils/marshal'
 
 
 export class Executor {
-  contractProcessor: ContractProcessor
+  processor: ContractProcessor
+  sender: Keypair
 
-  constructor(private target: ContractExecutable) {
+  constructor(private executable: ContractExecutable) {
   }
 
   setProcessor(cp: ContractProcessor) {
-    this.contractProcessor = cp;
+    this.processor = cp
   }
 
-
-  async get() {
-
+  setSender(kp: Keypair) {
+    this.sender = kp
   }
 
-  async invoke(params: { call: string, params?: object, payments?: { assetId?: string, amount: number }[] }): Promise<string> {
+  async invoke(params: {
+    call: string,
+    params?: Record<string, unknown>,
+    payments?: Array<{ assetId?: string, amount: number }>,
+
+  }): Promise<string> {
     const {
       call,
+      params: txParams,
       ...tx
-    } = params;
+    } = params
 
-    const response = txFactory({
-      action: call,
+    const response = await txFactory({
       ...tx,
-      contractId: this.target.name
-    });
+      action: call,
+      sender: this.sender,
+      contractId: this.executable.name,
+      params: txParams ? marshal.params(txParams) : undefined,
+    })
 
-    await this.contractProcessor.handleIncomingTx(response)
+    await this.processor.handleIncomingTx(response)
 
     return response.transaction.id
   }

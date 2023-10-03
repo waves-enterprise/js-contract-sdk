@@ -11,6 +11,7 @@ import {
   UnexpectedParamTypeException,
 } from './exceptions'
 import { ALL_PARAMS_KEY } from '../api/contants'
+import Long from 'long'
 
 function getArgKey(idx: number) {
   return `arg:${idx}`
@@ -84,7 +85,8 @@ export class ParamsExtractor {
           actionArgs[paramIndex] = paramValue
         } else if (isWrappedType(param)) {
           try {
-            actionArgs[paramIndex] = new param(paramValue)
+            // TODO marshaler functions
+            actionArgs[paramIndex] = Long.fromString(String(paramValue))
           } catch (e) {
             throw new ContractError(e.message)
           }

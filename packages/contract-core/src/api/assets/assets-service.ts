@@ -8,13 +8,13 @@ import {
   AssetTransfer,
   Balance,
   CancelLease,
-  Lease
+  Lease,
 } from './asset'
-import { ContractCancelLease } from "@wavesenterprise/we-node-grpc-api";
+import { ContractCancelLease } from '@wavesenterprise/we-node-grpc-api'
 
 export class AssetsService {
-  private leaseNonce = 1;
-  private issueNonce = 1;
+  private leaseNonce = 1
+  private issueNonce = 1
 
   constructor(private readonly context: ExecutionContext) {
   }
@@ -30,10 +30,10 @@ export class AssetsService {
       nonce: this.leaseNonce,
     })
 
-    const nonce = this.leaseNonce;
+    const nonce = this.leaseNonce
     this.leaseNonce++
 
-    return { leaseId, nonce };
+    return { leaseId, nonce }
   }
 
   private makeAsset(config: AssetConfig) {
@@ -82,11 +82,11 @@ export class AssetsService {
   }
 
   async lease(lease: Lease): Promise<string> {
-    const { leaseId, nonce } = await this.calculateLeaseId();
+    const { leaseId, nonce } = await this.calculateLeaseId()
 
     this.context.assets.addLease({ leaseId, nonce, ...lease })
 
-    return leaseId;
+    return leaseId
   }
 
   leaseCancel(lease: CancelLease) {
